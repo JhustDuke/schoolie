@@ -6,13 +6,16 @@ import {
 	validateSelectField,
 	validateAddressField,
 	populateStates,
-	resetLgaSelect,
 } from "../utils";
 
-import { domRefs as domElements, domValues } from "./";
+import { domRefs as domElements, domStaticValues } from "./";
+import { sessionModel as ssModel } from "../model";
 import { naijaService } from "../services";
 
-export const formMethods = (function (domRefs = domElements) {
+export const formMethods = (function (
+	domRefs = domElements,
+	sessionModel = ssModel
+) {
 	const elementStates = {
 		firstnameInput: false,
 		middlenameInput: false,
@@ -27,6 +30,7 @@ export const formMethods = (function (domRefs = domElements) {
 		otherPhoneInput: false,
 		lgaSelect: false,
 		statesSelect: false,
+		classSelect: false,
 		webCam: false,
 	};
 	const elementDefaultState = function () {
@@ -34,11 +38,13 @@ export const formMethods = (function (domRefs = domElements) {
 		domRefs.stopCameraBtn!.disabled = true;
 		domRefs.snapCameraBtn!.disabled = true;
 	};
+
 	const DOMDefaultState = function () {
 		elementDefaultState();
 		populateStates(domRefs.stateSelect as HTMLSelectElement);
 	};
 
+	// Validation Methods
 	const validateFirstname = function () {
 		const { firstnameInput } = domRefs;
 		validateNameField({
@@ -98,8 +104,17 @@ export const formMethods = (function (domRefs = domElements) {
 			selectElem: domRefs.genderSelect!,
 			fieldKey: "genderSelect",
 			elementStates,
-			invalidValue: domValues.chooseGender,
+			invalidValue: domStaticValues.chooseGender,
 			errorMsg: "Gender is required",
+		});
+	};
+	const validateClass = function () {
+		validateSelectField({
+			selectElem: domRefs.classSelect!,
+			fieldKey: "classSelect",
+			elementStates,
+			invalidValue: domStaticValues.chooseClass,
+			errorMsg: "please select a class ",
 		});
 	};
 
@@ -126,7 +141,7 @@ export const formMethods = (function (domRefs = domElements) {
 			selectElem: domRefs.religionSelect!,
 			fieldKey: "religionSelect",
 			elementStates,
-			invalidValue: domValues.chooseReligion,
+			invalidValue: domStaticValues.chooseReligion,
 			errorMsg: "Religion is required",
 		});
 	};
@@ -136,7 +151,7 @@ export const formMethods = (function (domRefs = domElements) {
 			selectElem: domRefs.bloodGroupSelect!,
 			fieldKey: "bloodGroupSelect",
 			elementStates,
-			invalidValue: domValues.chooseBloodGroup,
+			invalidValue: domStaticValues.chooseBloodGroup,
 			errorMsg: "Blood group is required",
 		});
 	};
@@ -147,13 +162,12 @@ export const formMethods = (function (domRefs = domElements) {
 
 		if (
 			!stateSelect.value.trim() ||
-			stateSelect.value === domValues.chooseState
+			stateSelect.value === domStaticValues.chooseState
 		) {
 			addElemToDom({
 				parentElem: stateSelect.parentElement!,
 				typeOfElem: "span",
 				textContent: "State is required",
-				elemAttributes: { class: "text-danger mt-1" },
 				pluginFunc: showErrMsg,
 			});
 			elementStates.statesSelect = false;
@@ -161,12 +175,13 @@ export const formMethods = (function (domRefs = domElements) {
 			elementStates.statesSelect = true;
 		}
 	};
+
 	const getLocalGovts = function () {
 		const { stateSelect, lgaSelect } = domRefs;
 		if (!stateSelect || !lgaSelect) return;
 
 		const selectedState = stateSelect.value;
-		if (!selectedState || selectedState === domValues.chooseState) {
+		if (!selectedState || selectedState === domStaticValues.chooseState) {
 			addElemToDom({
 				parentElem: lgaSelect.parentElement!,
 				typeOfElem: "span",
@@ -205,6 +220,7 @@ export const formMethods = (function (domRefs = domElements) {
 		});
 	};
 
+	// Webcam functionality
 	let stream: any = null;
 	const startCameranFunc = async function () {
 		const {
@@ -236,6 +252,7 @@ export const formMethods = (function (domRefs = domElements) {
 			console.log("there was an error:", err);
 		}
 	};
+
 	const snapPictureFunc = function () {
 		const { video, canvas, generatedImg } = domRefs;
 		if (stream) {
@@ -272,6 +289,7 @@ export const formMethods = (function (domRefs = domElements) {
 			console.log("stream stopped!");
 		}
 	};
+
 	const saveWebCamImageFunc = function () {
 		snapPictureFunc();
 		stopCameraFunc();
@@ -309,10 +327,70 @@ export const formMethods = (function (domRefs = domElements) {
 			formSubmitBtn!.disabled = true;
 		}
 	};
+
 	const watchForm = function () {
 		checkFormValidity();
 		inputsWithError();
 	};
+
+	const getFormInputs = function () {
+		const formData = new FormData();
+
+		formData.append("surname", domRefs.surnameInput!.value.trim());
+		formData.append("firstname", domRefs!.firstnameInput!.value.trim());
+		formData.append("middlename", domRefs.middlenameInput!.value.trim());
+		formData.append("gender", domRefs.genderSelect!.value);
+		formData.append("dob", domRefs.dobInput!.value.trim());
+		formData.append("state", domRefs.stateSelect!.value);
+		formData.append("lga", domRefs.lgaSelect!.value);
+		formData.append("bloodGroup", domRefs.bloodGroupSelect!.value);
+		formData.append("religion", domRefs.religionSelect!.value);
+		formData.append("address", domRefs.addressInput!.value.trim());
+		formData.append("fatherPhone", domRefs.fatherPhoneInput!.value.trim());
+		formData.append("motherPhone", domRefs.motherPhoneInput!.value.trim());
+		formData.append("otherPhone", domRefs.otherPhoneInput!.value.trim());
+
+		// For webcam image (optional, if used)
+		if (
+			domRefs.generatedImg!.src &&
+			domRefs.generatedImg!.src.startsWith("data:image")
+		) {
+			formData.append("passport", domRefs.generatedImg!.src);
+		}
+
+		const formObject = Object.fromEntries(formData.entries());
+		return formObject;
+	};
+
+	// Store data and add pupil
+	const storeData = function () {
+		const { selectElem } = domRefs;
+		const sessionYear = selectElem?.value.trim();
+		if (!sessionYear || sessionYear === domStaticValues.chooseSession) {
+			alert("please select a session year");
+			console.log("no session year selected");
+			return;
+		}
+
+		const data = getFormInputs() as {
+			surname: string;
+			firstname: string;
+			dob: string;
+			[key: string]: string;
+		};
+
+		// sessionModel.addPupil(
+		// 	sessionYear,
+		// 	"JSS1", // or use dynamic class group
+		// 	"Gold", // or use dynamic level
+		// 	{
+		// 		surname: data.surname,
+		// 		firstname: data.firstname,
+		// 		dob: data.dob,
+		// 	}
+		// );
+	};
+
 	return {
 		DOMDefaultState,
 		validateFirstname,
@@ -324,6 +402,7 @@ export const formMethods = (function (domRefs = domElements) {
 		validateReligion,
 		validateNaijaState,
 		validateAddress,
+		validateClass,
 		validateFatherPhone,
 		validateMotherPhone,
 		validateOtherPhone,
@@ -331,7 +410,17 @@ export const formMethods = (function (domRefs = domElements) {
 		startCameranFunc,
 		stopCameraFunc,
 		saveWebCamImageFunc,
-		elementStates,
+		getFormInputs,
 		watchForm,
+		storeData, // Added to return object
 	};
 })();
+/**
+ * the plan
+ * when the form is filled correctly
+ * and the submit button is hit
+ * it sends the user to a dashboard page
+ * the dashboard page is gotten my first asking the user to select a session year and session class
+ * then it adds it to the db
+ * then it changes location to the dash board page which has the session year in and the class and the pupils card though brief but a more option can be provide to see everything comprehensively
+ */

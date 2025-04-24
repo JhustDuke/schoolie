@@ -26,7 +26,7 @@ export const sessionModel = (function (
 	const initSessions = function () {
 		if (!safeGetStorage(databaseName)) {
 			safeSetStorage(databaseName, {});
-			console.log("amenDivineSessions inited");
+			console.log(databaseName, " inited");
 			return;
 		}
 		console.log("db is already inited");
@@ -73,11 +73,55 @@ export const sessionModel = (function (
 			console.log("New session year added:", sessionYear);
 		}
 	};
+	const addPupil = function ({
+		sessionYear,
+		classGroup,
+		level,
+		pupilData,
+	}: {
+		sessionYear: string;
+		classGroup: string;
+		level: string;
+		pupilData: Record<string, string>;
+	}) {
+		const db = safeGetStorage(databaseName) || {};
+		const hashId = generateHash(
+			pupilData.surname + pupilData.firstname + pupilData.dob
+		);
+
+		if (!db[sessionYear]) {
+			db[sessionYear] = { classes: {} };
+		}
+
+		if (!db[sessionYear].classes[classGroup]) {
+			db[sessionYear].classes[classGroup] = {};
+		}
+
+		if (!db[sessionYear].classes[classGroup][level]) {
+			db[sessionYear].classes[classGroup][level] = { pupils: [] };
+		}
+
+		db[sessionYear].classes[classGroup][level].pupils.push({
+			idHash: hashId,
+			data: pupilData,
+		});
+
+		safeSetStorage(databaseName, db);
+	};
+
 	const getSessionYearData = function () {};
 
 	initSessions();
-	return { loadSessionYears, isDuplicate, addNewSessionYear };
+	return { loadSessionYears, isDuplicate, addNewSessionYear, addPupil };
 })();
+
+function generateHash(input: string) {
+	var hash = 0;
+	for (var i = 0; i < input.length; i++) {
+		hash = (hash * 31 + input.charCodeAt(i)) | 0;
+	}
+	return "h" + hash.toString(16);
+}
 
 // 	};
 

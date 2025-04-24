@@ -4,7 +4,7 @@ import {
 	domUtils as modalUtils,
 	insertBeforeAddSession,
 } from "../utils";
-import { domRefs as domElements, domValues } from ".";
+import { domRefs as domElements, domStaticValues } from ".";
 import { sessionModel as ssModel } from "../model";
 
 export const sessionModalMethods = (function (
@@ -84,7 +84,7 @@ export const sessionModalMethods = (function (
 			modalUtils.toggleVisibility({ targetElem: modalDiv, shouldShow: true });
 		}
 		//the user selected the addSession value
-		else if (selectedOption?.value === domValues.addSession) {
+		else if (selectedOption?.value === domStaticValues.addSession) {
 			modalUtils.toggleVisibility({ targetElem: modalDiv, shouldShow: true });
 		} else {
 			console.log("cannot find", selectedOption);

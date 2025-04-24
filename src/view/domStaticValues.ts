@@ -1,4 +1,4 @@
-export const domValues = {
+export const domStaticValues = {
 	addSession: "addSession",
 	chooseSession: "chooseSession",
 	chooseClass: "chooseClass",

@@ -2,7 +2,7 @@ import {
 	addElemToDom as addToSelectOption,
 	domUtils as modalUtils,
 } from "../utils";
-import { domRefs as domElements, domValues } from ".";
+import { domRefs as domElements, domStaticValues } from ".";
 import { sessionModel as ssModel } from "../model";
 
 export const tableMethods = (function (
@@ -38,8 +38,8 @@ export const tableMethods = (function (
 		}
 
 		if (
-			selectedOption.value === domValues.chooseSession ||
-			selectedOption.value === domValues.addSession
+			selectedOption.value === domStaticValues.chooseSession ||
+			selectedOption.value === domStaticValues.addSession
 		) {
 			mainTable!.style.display = "block";
 			return;

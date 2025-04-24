@@ -22,6 +22,7 @@ export const formController = (function () {
 		stopCameraBtn,
 		snapCameraBtn,
 		formSubmitBtn,
+		classSelect,
 	} = domRefs;
 
 	formMethods.DOMDefaultState();
@@ -66,8 +67,13 @@ export const formController = (function () {
 
 	bloodGroupSelect?.addEventListener("change", formMethods.validateBloodGroup);
 
-	///button toggler
+	classSelect?.addEventListener("change", formMethods.validateClass);
 
+	///button toggler
+	formSubmitBtn?.addEventListener("click", formMethods.storeData);
+
+	//watcher
 	studentForm?.addEventListener("input", formMethods.watchForm);
 	studentForm?.addEventListener("change", formMethods.watchForm);
+	studentForm?.addEventListener("click", formMethods.watchForm);
 })();

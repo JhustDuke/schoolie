@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0" />
+		<link
+			rel="shortcut icon"
+			href="#"
+			type="image/x-icon" />
+		<!-- Bootstrap 5, Font Awesome, and Custom CSS -->
+		<link
+			rel="stylesheet"
+			href="src/css/style.css" />
+		<title>Vite + TS</title>
+	</head>
+
+	<body>
+		<div
+			id="app"
+			class="grey lighten-3">
+			<!-- Session Selection Dropdown -->
+			<center class="blue p-4 mb-3">
+				<div>
+					<select
+						class="form-select text-center"
+						id="select">
+						<option
+							selected
+							disabled
+							value="chooseSession"
+							id="chooseSession"
+							>Choose Session</option
+						>
+						<!-- Dynamically generated sessions will be inserted here -->
+						<option
+							value="addSession"
+							id="addSession"
+							>Add Session</option
+						>
+						<a href="/">go</a>
+					</select>
+				</div>
+			</center>
+
+			<!-- card -->
+
+			<div
+				id="pupilCard"
+				class="card p-3 mx-auto"
+				style="width: 30rem">
+				<!-- First Row -->
+				<div
+					id="topSection"
+					class="d-flex justify-content-between align-items-start mb-3">
+					<!-- Left: Name, Age, Blood Group -->
+					<div
+						id="pupilInfo"
+						class="w-50 pe-2">
+						<div
+							id="nameLabel"
+							class="fs-5 fw-medium"
+							>NAME:</div
+						>
+						<div
+							id="pupilName"
+							class="fs-3 fw-bold text-danger"
+							style="
+								white-space: nowrap;
+								overflow: hidden;
+								text-overflow: ellipsis;
+							">
+							Long Pupil Name Here That Overflows
+						</div>
+						<div
+							id="pupilAge"
+							class="fw-medium"
+							>Age: 10</div
+						>
+						<div
+							id="bloodGroup"
+							class="fw-medium"
+							>Blood Group: O+</div
+						>
+					</div>
+
+					<!-- Right: Image -->
+					<div
+						id="pupilImageContainer"
+						class="w-50 ps-2">
+						<img
+							id="pupilImage"
+							src="/public/490473425_1221928799315994_7573465244633480520_n.jpg"
+							alt="Pupil Image"
+							class="border border-2 rounded-3"
+							style="width: 100%; height: 100px; object-fit: cover" />
+					</div>
+				</div>
+
+				<!-- Second Row -->
+				<div
+					id="contactInfoRow"
+					class="d-flex justify-content-between gap-3">
+					<!-- Left column -->
+					<div
+						id="contactColumnLeft"
+						class="d-flex flex-column fw-medium gap-1 w-50">
+						<div id="momPhone">Mom: 08012345678</div>
+						<div id="dadPhone">Dad: 08023456789</div>
+					</div>
+
+					<!-- Right column -->
+					<div
+						id="contactColumnRight"
+						class="d-flex flex-column fw-medium gap-1 w-50">
+						<div id="otherPhone">Other: 08034567890</div>
+						<div
+							id="homeAddress"
+							class="mt-1">
+							Address: 123 Lorem Ipsum Street, City
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- app close -->
+		</div>
+
+		<!-- JavaScript Files -->
+
+		<script
+			src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+			integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+			crossorigin="anonymous"></script>
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+			integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+			crossorigin="anonymous"></script>
+		<script
+			type="module"
+			src="/src/main.ts"></script>
+	</body>
+</html>
