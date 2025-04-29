@@ -1,8 +1,8 @@
 import { formMethods } from "../view";
-import { populateStates, resetLgaSelect } from "../utils";
-import { domRefs } from "../view";
+import { resetLgaSelect } from "../utils";
+import { domRefs as domElements } from "../view";
 
-export const formController = (function () {
+export const formController = (function (domRefs = domElements) {
 	const {
 		firstnameInput,
 		middlenameInput,
@@ -22,18 +22,18 @@ export const formController = (function () {
 		stopCameraBtn,
 		snapCameraBtn,
 		formSubmitBtn,
-		classSelect,
 	} = domRefs;
 
 	formMethods.DOMDefaultState();
-	//webCam
 
+	//webCam
 	startCameraBtn?.addEventListener("click", formMethods.startCameranFunc);
 
 	stopCameraBtn?.addEventListener("click", formMethods.stopCameraFunc);
 
 	snapCameraBtn?.addEventListener("click", formMethods.saveWebCamImageFunc);
 
+	//selects
 	lgaSelect?.addEventListener("focusin", formMethods.getLocalGovts);
 
 	//name inputs
@@ -67,13 +67,11 @@ export const formController = (function () {
 
 	bloodGroupSelect?.addEventListener("change", formMethods.validateBloodGroup);
 
-	classSelect?.addEventListener("change", formMethods.validateClass);
-
 	///button toggler
-	formSubmitBtn?.addEventListener("click", formMethods.storeData);
+	formSubmitBtn?.addEventListener("click", formMethods.getFormInputs);
 
 	//watcher
+	studentForm?.addEventListener("click", formMethods.watchForm);
 	studentForm?.addEventListener("input", formMethods.watchForm);
 	studentForm?.addEventListener("change", formMethods.watchForm);
-	studentForm?.addEventListener("click", formMethods.watchForm);
 })();

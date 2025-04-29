@@ -13,8 +13,8 @@ import { sessionModel as ssModel } from "../model";
 import { naijaService } from "../services";
 
 export const formMethods = (function (
-	domRefs = domElements,
-	sessionModel = ssModel
+	domRefs = domElements
+	//sessionModel = ssModel
 ) {
 	const elementStates = {
 		firstnameInput: false,
@@ -415,6 +415,7 @@ export const formMethods = (function (
 		storeData, // Added to return object
 	};
 })();
+console.log("form Methods ran");
 /**
  * the plan
  * when the form is filled correctly
