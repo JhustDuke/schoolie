@@ -35,7 +35,7 @@
 			min-height: 100vh !important;
 		}
 
-		#tabsWrapper {
+		#middleDiv {
 			flex: 1;
 		}
 
@@ -67,10 +67,11 @@
 
 			<!-- modal to add session -->
 			<app-add-session-modal></app-add-session-modal>
+
 			<!-- Body contents start -->
 			<div
 				class="row"
-				id="tabsWrapper">
+				id="middleDiv">
 				<!-- Sidebar -->
 				<nav class="col-md-2 d-none d-md-block bg-light py-4">
 					<ul class="nav flex-column">
@@ -100,75 +101,174 @@
 
 				<!-- Tabs togglers and tabs content -->
 				<section
-					class="col-md-10 ms-sm-auto px-md-4 py-4"
-					id="">
+					class="col-md-10 ms-sm-auto px-md-4 py-4 isRelative"
+					id="tabsWrapper">
 					<!-- tab togglers -->
+					<!-- nav class needed to make this works with js bundle -->
 					<div class="nav justify-content-start flex-wrap gap-2">
+						<!-- overview -->
 						<a
 							class="btn btn-custom mx-1 active"
 							style="width: 100px"
-							data-bs-target="#overview"
+							id="overViewTabBtn"
+							data-bs-target="#overViewTabContents"
 							data-bs-toggle="tab"
 							>Overview</a
 						>
+						<!-- grade-1 -->
 						<a
 							class="btn btn-custom mx-1"
 							style="width: 100px"
-							data-bs-target="#gradeOneTab"
+							id="gradeOneTabBtn"
+							data-bs-target="#gradeOneTabContents"
 							data-bs-toggle="tab"
 							>Grade-1</a
 						>
+						<!-- grade-2 -->
 						<a
 							class="btn btn-custom mx-1"
 							style="width: 100px"
-							data-bs-target="#gradeTwoTab"
+							id="gradeTwoTabBtn"
+							data-bs-target="#gradeTwoTabContents"
 							data-bs-toggle="tab"
 							>Grade-2</a
 						>
+
+						<!-- grade 3 -->
 						<a
 							class="btn btn-custom mx-1"
 							style="width: 100px"
-							data-bs-target="#gradeThreeTab"
+							id="gradeThreeTabBtn"
+							data-bs-target="#gradeThreeTabContents"
 							data-bs-toggle="tab"
 							>Grade-3</a
 						>
+						<!-- more+ -->
 						<button
 							class="btn btn-custom mx-1"
 							style="width: 120px"
 							type="button"
-							data-bs-target="#moreTab"
-							data-bs-toggle="tab"
+							id="moreTabBtn"
 							>More+</button
 						>
 					</div>
+					<!-- tab-pane hides the pane tab-content hides all the tab-panel-->
+					<div
+						class="tab-content red"
+						id="tabsContentsWrapper">
+						<!-- overViewContents -->
+						<div
+							id="overViewTabContents"
+							class="tab-pane show fade active"
+							>school overview
+						</div>
 
-					<!-- tabs contents -->
-					<div class="tab-content red">
+						<!-- gradeOnecontents -->
 						<div
-							id="overview"
-							class="tab-pane active"
-							>school overview</div
-						>
+							id="gradeOneTabContents"
+							class="tab-pane fade"
+							style="height: 200px"
+							><div>grade 1 tab contents</div>
+							<student-card
+								name="Jane Doe"
+								age="14"
+								mother-phone="0801 234 5678"
+								father="John Doe"
+								contact="1234 Maple Street"
+								image="/490473425_1221928799315994_7573465244633480520_n.jpg">
+							</student-card>
+						</div>
+
+						<!-- gradeTwoContents -->
 						<div
-							id="gradeOneTab"
-							class="tab-pane"
-							>grade 1 tab contents</div
-						>
+							id="gradeTwoTabContents"
+							class="tab-pane fade">
+							<div>
+								<div> grade 2 tab contents </div>
+							</div>
+
+							<!-- student card  wrapper-->
+							<section class="d-flex flex-wrap justify-content-around gap-1">
+								<student-card
+									name="Jane Doe"
+									age="14"
+									mother-phone="0801 234 5678"
+									father="John Doe"
+									contact="1234 Maple Street"
+									image="/490473425_1221928799315994_7573465244633480520_n.jpg">
+								</student-card>
+
+								<student-card
+									name="Jake Smith"
+									age="15"
+									mother-phone="0802 345 6789"
+									father="Robert Smith"
+									contact="5678 Oak Avenue"
+									image="/490473425_1221928799315994_7573465244633480520_n.jpg">
+								</student-card>
+
+								<student-card
+									name="Lily Adams"
+									age="13"
+									mother-phone="0803 456 7890"
+									father="Michael Adams"
+									contact="9102 Pine Street"
+									image="/490473425_1221928799315994_7573465244633480520_n.jpg">
+								</student-card>
+							</section>
+						</div>
+
+						<!-- gradeThreeContents -->
 						<div
-							id="gradeTwoTab"
-							class="tab-pane"
-							>grade 2 tab contents</div
-						>
+							id="gradeThreeTabContents"
+							class="tab-pane fade">
+							<div>grade 3 tab contents</div>
+
+							<!-- cards wrapper -->
+							<section
+								class="d-flex flex-wrap gap-2"
+								style="height: 150px !important">
+								<student-card
+									name="Jane Doe"
+									age="14"
+									mother-phone="0801 234 5678"
+									father="John Doe"
+									contact="1234 Maple Street"
+									image="/490473425_1221928799315994_7573465244633480520_n.jpg">
+								</student-card>
+
+								<student-card
+									name="Jake Smith"
+									age="15"
+									mother-phone="0802 345 6789"
+									father="Robert Smith"
+									contact="5678 Oak Avenue"
+									image="/490473425_1221928799315994_7573465244633480520_n.jpg">
+								</student-card>
+
+								<student-card
+									name="Lily Adams"
+									age="13"
+									mother-phone="0803 456 7890"
+									father="Michael Adams"
+									contact="9102 Pine Street"
+									image="/490473425_1221928799315994_7573465244633480520_n.jpg">
+								</student-card>
+							</section>
+						</div>
+
+						<!-- moreContents -->
 						<div
-							id="gradeThreeTab"
-							class="tab-pane"
-							>grade 3 tab contents</div
-						>
-						<div
-							id="moreTab"
-							class="tab-pane"
+							id="moreTabContents"
+							class="fade"
+							data-bs-keyboard="false"
+							tabindex="-1"
+							data-bs-backdrop="static"
 							>more tab contents</div
 						>
+
+						<!--add class modal -->
+						<add-class-modal></add-class-modal>
 					</div>
 				</section>
 			</div>

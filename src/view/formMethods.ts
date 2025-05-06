@@ -33,6 +33,7 @@ export const formMethods = (function (
 		classSelect: false,
 		webCam: false,
 	};
+
 	const elementDefaultState = function () {
 		domRefs.formSubmitBtn!.disabled = true;
 		domRefs.stopCameraBtn!.disabled = true;
@@ -272,6 +273,31 @@ export const formMethods = (function (
 				elementStates.webCam = true;
 			}
 		}
+		console.log(generatedImg!);
+	};
+
+	const uploadImageFunc = function (this: any) {
+		const { generatedImg } = domRefs;
+		const fileInput = this as any | HTMLInputElement;
+		const file = fileInput.files?.[0];
+
+		if (!file || !file.type.startsWith("image/")) return;
+
+		const reader = new FileReader();
+		reader.onload = function (e) {
+			if (generatedImg && e.target?.result) {
+				generatedImg.src = e.target.result as string;
+
+				generatedImg!.classList.remove("d-none");
+				console.log("image read and stored successfully");
+				elementStates.webCam = true;
+			} else {
+				elementStates.webCam = false;
+				console.log("image failed to upload try again");
+			}
+		};
+
+		reader.readAsDataURL(file);
 	};
 
 	const stopCameraFunc = function () {
@@ -410,6 +436,7 @@ export const formMethods = (function (
 		startCameranFunc,
 		stopCameraFunc,
 		saveWebCamImageFunc,
+		uploadImageFunc,
 		getFormInputs,
 		watchForm,
 		storeData, // Added to return object

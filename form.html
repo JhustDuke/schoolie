@@ -19,68 +19,12 @@
 	<body>
 		<div
 			id="app"
-			class="grey lighten-3">
-			<!-- Session Selection Dropdown -->
-			<center class="blue p-4 mb-3">
-				<div>
-					<select
-						class="form-select text-center"
-						id="select">
-						<option
-							selected
-							disabled
-							value="chooseSession"
-							id="chooseSession"
-							>Choose Session</option
-						>
-						<!-- Dynamically generated sessions will be inserted here -->
-						<option
-							value="addSession"
-							id="addSession"
-							>Add Session</option
-						>
-						<a href="/">go</a>
-					</select>
-				</div>
-			</center>
-
-			<!-- Add Session Modal -->
-			<div
-				class="center px-2 py-1 w-50 text-center mx-auto isRelative grey darken-3"
-				id="addSessionModal"
-				style="z-index: 4">
-				<!-- Close Modal Button -->
-				<span
-					class="red-text isAbsolute hover"
-					style="right: 8px; top: 0"
-					id="closeModalBtn">
-					<i
-						class="fa fa-window-close"
-						aria-hidden="true"></i>
-				</span>
-
-				<div>
-					<!-- Modal Instruction -->
-					<p class="form-text white-text fw-medium text-capitalize">
-						Please register a session year <br />
-						<span id="modalHelp">YYYY/YYYY</span>
-					</p>
-					<!-- Input Field for Session Name -->
-					<input
-						type="text"
-						class="form-control my-0"
-						id="sessionModalInput" />
-					<br />
-					<!-- Submit Button -->
-					<button
-						disabled
-						class="btn btn-primary w-100"
-						id="addSessionBtn"
-						>Add Session</button
-					>
-				</div>
-			</div>
-
+			class="grey lighten-3 p-4">
+			<center
+				><h3 class="red-text text-darken-4 text-uppercase fw-bold"
+					>fill the form below</h3
+				></center
+			>
 			<!-- Student Registration Form -->
 			<form
 				id="studentForm"
@@ -101,8 +45,11 @@
 									class="h-100 w-100 isAbsolute"
 									style="object-fit: cover; top: 0; left: 0"></video>
 							</div>
-							<span id="cameraHelp"
-								>please press the button below to start camera</span
+							<span
+								id="cameraHelp"
+								class="red-text"
+								>please press the button below to start camera or upload an
+								image file instead, if available!</span
 							>
 
 							<!-- generated image -->
@@ -135,6 +82,12 @@
 								>snap</button
 							>
 						</div>
+						<input
+							class="btn btn-primary w-25"
+							id="uploadBtn"
+							accept="image/png, image/jpeg"
+							style="max-width: 100px !important"
+							type="file" />
 					</center>
 				</div>
 				<!-- name and class div -->

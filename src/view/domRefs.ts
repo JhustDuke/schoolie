@@ -59,7 +59,9 @@ export const domRefs = {
 
 	stopCameraBtn: document.querySelector<HTMLButtonElement>("#stopCameraBtn"),
 
-	snapCameraBtn: document.querySelector<HTMLButtonElement>("#snapCameraBtn"),
+	snapCameraBtn: document.querySelector<HTMLInputElement>("#snapCameraBtn"),
+
+	uploadBtn: document.querySelector<HTMLInputElement>("#uploadBtn"),
 	canvasWrapper: document.querySelector<HTMLElement>("#canvasWrapper"),
 
 	canvas: document.querySelector<HTMLCanvasElement>("#canvas"),

@@ -1,0 +1,25 @@
+	/**the plan
+		* the plan create the tabs to display stuffs when relevant to its button when clicked
+		*create a student card modal
+		* create all the available classes in the db
+		
+		* add a more modal
+		* move z index in session-modal to the parent div to prevent pushing down items
+		
+	 */
+  {}
+
+
+  idea
+		// the classes should have an alias in the db
+		the alias should be 
+		e.g 
+	=>  classes:{
+		grade1:{
+			aliasName{
+				boys:{}
+				girls:{}
+			}
+	}	
+		}
+	=	add the ability to delete a class from the addClass icon on hover

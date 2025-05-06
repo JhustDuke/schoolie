@@ -19,8 +19,9 @@ export const formController = (function (domRefs = domElements) {
 		studentForm,
 		addressInput,
 		startCameraBtn,
-		stopCameraBtn,
 		snapCameraBtn,
+		stopCameraBtn,
+		uploadBtn,
 		formSubmitBtn,
 	} = domRefs;
 
@@ -30,6 +31,9 @@ export const formController = (function (domRefs = domElements) {
 	startCameraBtn?.addEventListener("click", formMethods.startCameranFunc);
 
 	stopCameraBtn?.addEventListener("click", formMethods.stopCameraFunc);
+
+	//when its input file
+	uploadBtn?.addEventListener("input", formMethods.uploadImageFunc);
 
 	snapCameraBtn?.addEventListener("click", formMethods.saveWebCamImageFunc);
 
