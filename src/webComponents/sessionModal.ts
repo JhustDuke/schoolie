@@ -1,4 +1,4 @@
-export class sessionModal extends HTMLElement {
+class sessionModal extends HTMLElement {
 	constructor() {
 		super();
 		this.innerHTML = `<section>

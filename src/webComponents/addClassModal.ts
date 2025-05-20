@@ -1,4 +1,4 @@
-export class addClassModal extends HTMLElement {
+class addClassModal extends HTMLElement {
 	constructor() {
 		super();
 		this.innerHTML = `

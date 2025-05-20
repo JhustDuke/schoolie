@@ -1,4 +1,4 @@
-export class StudentRegistrationForm extends HTMLElement {
+class StudentRegistrationForm extends HTMLElement {
 	constructor() {
 		super();
 		this.innerHTML = `

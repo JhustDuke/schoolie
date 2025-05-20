@@ -1,9 +1,9 @@
+import { get } from "mongoose";
 import { addElemToDom } from "../utils";
 import { tabsRefs as refs } from "./";
-addElemToDom;
 
 export const tabsMethods = (function (tabsRefs = refs) {
-	const test0 = function () {
+	const overviewFunc = function () {
 		const { overViewTabBtn } = tabsRefs;
 
 		if (!overViewTabBtn) {
@@ -11,38 +11,56 @@ export const tabsMethods = (function (tabsRefs = refs) {
 		}
 	};
 
-	const test1 = function () {
+	const gradeOneTabFunc = function () {
 		const { gradeOneTabBtn } = tabsRefs;
 
 		if (!gradeOneTabBtn) {
 			console.log("tab button not found");
 		}
 	};
-	const test2 = function () {
+	const gradeTwoTabFunc = function () {
 		const { gradeTwoTabBtn } = tabsRefs;
 
 		if (!gradeTwoTabBtn) {
 			console.log("tab button not found");
 		}
 	};
-	const test3 = function () {
+	const gradeThreeTabFunc = function () {
 		const { gradeThreeTabBtn } = tabsRefs;
 
 		if (!gradeThreeTabBtn) {
 			console.log("tab button not found");
 		}
 	};
-	const test4 = function () {
-		const { moreTabBtn } = tabsRefs;
+	const moreTabFunc = function () {
+		const { moreTabBtn, tabsMenu } = tabsRefs;
 		if (!moreTabBtn) {
-			console.log("tab button not found");
+			console.log("more tab button not found");
+			return;
 		}
+		if (!tabsMenu) {
+			console.log("tabsMenu not found");
+			return;
+		}
+		addElemToDom({
+			typeOfElem: "div",
+			parentElem: tabsMenu,
+			textContent: "test",
+			pluginFunc: function (parent: any, newElem) {
+				const referencBtn = parent?.querySelector("#moreTabBtn");
+				newElem?.classList.add("btn", "btn-custom", "mx-1");
+				newElem!.style.width = "100px";
+				if (referencBtn) {
+					parent?.insertBefore(newElem, referencBtn);
+				}
+			},
+		});
 	};
 	return {
-		test0,
-		test1,
-		test2,
-		test3,
-		test4,
+		overviewFunc,
+		gradeOneTabFunc,
+		gradeTwoTabFunc,
+		gradeThreeTabFunc,
+		moreTabFunc,
 	};
 })();

@@ -1,4 +1,4 @@
-export class navBar extends HTMLElement {
+class navBar extends HTMLElement {
 	constructor() {
 		super();
 		this.innerHTML = `

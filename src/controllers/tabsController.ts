@@ -1,5 +1,6 @@
 import { tabsRefs as refs } from "../view";
 import { tabsMethods } from "../view";
+
 tabsMethods;
 export const tabsController = (function (tabsRefs = refs) {
 	console.log("tabs controllers ran");
@@ -11,13 +12,13 @@ export const tabsController = (function (tabsRefs = refs) {
 		moreTabBtn,
 	} = tabsRefs;
 
-	overViewTabBtn?.addEventListener("click", tabsMethods.test0);
+	overViewTabBtn?.addEventListener("click", tabsMethods.overviewFunc);
 
-	gradeOneTabBtn?.addEventListener("click", tabsMethods.test1);
+	gradeOneTabBtn?.addEventListener("click", tabsMethods.gradeOneTabFunc);
 
-	gradeTwoTabBtn?.addEventListener("click", tabsMethods.test2);
+	gradeTwoTabBtn?.addEventListener("click", tabsMethods.gradeTwoTabFunc);
 
-	gradeThreeTabBtn?.addEventListener("click", tabsMethods.test3);
+	gradeThreeTabBtn?.addEventListener("click", tabsMethods.gradeThreeTabFunc);
 
-	moreTabBtn?.addEventListener("click", tabsMethods.test4);
+	moreTabBtn?.addEventListener("click", tabsMethods.moreTabFunc);
 })();

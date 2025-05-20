@@ -3,6 +3,8 @@ export const tabsRefs = {
 		"#tabsContentsWrapper"
 	),
 
+	tabsMenu: document.querySelector<HTMLElement>("#tabsMenu"),
+
 	//tab buttons
 
 	overViewTabBtn: document.querySelector<HTMLElement>("#overViewTabBtn"),
