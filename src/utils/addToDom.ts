@@ -43,8 +43,9 @@ export function addElemToDom({
 		applyAttributes(createdElem, elemAttributes);
 	}
 
-	parentElem.appendChild(createdElem);
 	if (typeof pluginFunc === "function") {
 		pluginFunc(parentElem, createdElem);
+	} else {
+		parentElem.appendChild(createdElem);
 	}
 }

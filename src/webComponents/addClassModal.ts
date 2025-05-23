@@ -4,7 +4,7 @@ class addClassModal extends HTMLElement {
 		this.innerHTML = `
   			<center
 							id="addClassModal"
-							class="p-3 isAbsolute grey lighten-3 w-75 d-none"
+							class="p-3 isAbsolute grey lighten-3 w-75"
 							style="
 								z-index: 44444;
 								top: 0;
@@ -19,6 +19,7 @@ class addClassModal extends HTMLElement {
 									class="fa fa-window-close"
 									aria-hidden="true"></i>
 							</span>
+							<small class='mt-2 red-text text-darken-3 p-2 text-capitalize'>double click to add a class</small>
 							<div class="mt-3 d-flex justify-content-evenly">
 								<div class="row mt-3 justify-content-center">
 									<!-- jss1 -->

@@ -3,9 +3,26 @@ class SideNav extends HTMLElement {
 		super();
 		this.innerHTML = `
       <ul class="nav flex-column">
-        <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Trending</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Subscriptions</a></li>
+        <li class="nav-item ">
+          <a class="nav-link  text-uppercase fw-medium active" href="#">
+          overview
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-uppercase fw-medium" href="#">
+          timetable/scheduling
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-uppercase fw-medium " href="#">
+         about
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-medium text-capitalize " href="#">
+         contact
+          </a>
+        </li>
       </ul>
     `;
 	}

@@ -1,4 +1,30 @@
-	/**the plan
+	/**the MVP plan
+							***the header which***
+	=>school or app logo
+	=>has choose/add session select 
+	=>settings for customization
+	=>search bar (coming soon)
+	=> (collapsible for phones)
+	
+						***the tabs will have***
+	=> overview page
+			>> total classes
+			>> total pupils
+			>> pupils based on gender
+			>> last updated
+			>>last added
+	=> timetable page(coming soon)
+	=> ads and school promotion (coming soon)
+	=> about the app
+	
+		=>
+	**the sign up student page
+	**the classes page
+	** the update student data modal
+	
+	
+	
+	/**the plan long term plan
 		
 	** when a class is created via the more-btn tab option,
 	->it shld b added as a tabs btn in the tabs n saved 

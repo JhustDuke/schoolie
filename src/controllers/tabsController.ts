@@ -10,7 +10,11 @@ export const tabsController = (function (tabsRefs = refs) {
 		gradeTwoTabBtn,
 		gradeThreeTabBtn,
 		moreTabBtn,
+		addClassModal,
+		closeAddClassIcon,
 	} = tabsRefs;
+
+	tabsMethods.elemDefaultStates();
 
 	overViewTabBtn?.addEventListener("click", tabsMethods.overviewFunc);
 
@@ -21,4 +25,8 @@ export const tabsController = (function (tabsRefs = refs) {
 	gradeThreeTabBtn?.addEventListener("click", tabsMethods.gradeThreeTabFunc);
 
 	moreTabBtn?.addEventListener("click", tabsMethods.moreTabFunc);
+
+	addClassModal?.addEventListener("dblclick", tabsMethods.addPresetClassFunc);
+
+	closeAddClassIcon?.addEventListener("click", tabsMethods.closeAddClassModal);
 })();

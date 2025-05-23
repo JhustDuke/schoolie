@@ -9,3 +9,4 @@ export * from "./validatePhonefield";
 export * from "./validateSelectfield";
 export * from "./studentFormUtils";
 export * from "./validateAddress";
+export * from "./addToTabMenuHelper";
