@@ -4,7 +4,7 @@
 	=>has choose/add session select 
 	=>settings for customization
 	=>search bar (coming soon)
-	=> (collapsible for phones)
+	=> (collapsible for phones hidden on big screens)
 	
 						***the tabs will have***
 	=> overview page
