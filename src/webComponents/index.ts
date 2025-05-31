@@ -4,3 +4,4 @@ import "./form";
 import "./studentCard";
 import "./addClassModal";
 import "./asideNav";
+import "./footer";

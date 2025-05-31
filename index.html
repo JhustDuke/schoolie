@@ -135,13 +135,136 @@
 					</div>
 					<!-- tab-pane hides the pane tab-content hides all the tab-panel-->
 					<div
-						class="tab-content red"
+						class="tab-content"
 						id="tabsContentsWrapper">
 						<!-- overViewContents -->
 						<div
-							id="overViewTabContents"
-							class="tab-pane show fade active"
-							>school overview
+							class="container mt-4 p-3 rounded blue-grey lighten-5 shadow text-center text-md-start">
+							<div class="row g-4 justify-content-center">
+								<!-- Row 1 -->
+								<div class="col-md">
+									<div class="p-3 rounded white">
+										<h5>Total Classes</h5>
+										<p class="fs-4 fw-bold">12</p>
+									</div>
+								</div>
+								<div class="col-md">
+									<div class="p-3 rounded white">
+										<h5>Gender summary</h5>
+										<div class="d-flex justify-content-center gap-4 mt-2">
+											<div>
+												<i class="fa fa-male blue-text fa-2x"></i>
+												<div class="fw-bold">99</div>
+											</div>
+											<div>
+												<i class="fa fa-female pink-text fa-2x"></i>
+												<div class="fw-bold">98</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<!-- Row 2 -->
+								<div class="col-md">
+									<div class="p-3 rounded white">
+										<h5>Total Pupils</h5>
+										<p class="fs-4 fw-bold">385</p>
+									</div>
+								</div>
+
+								<!-- Recently Added Pupil -->
+								<div class="col-12">
+									<div class="p-3 rounded white">
+										<h5>Recently Added Pupil</h5>
+										<div
+											class="d-flex flex-column flex-md-row justify-content-center justify-content-md-around align-items-center align-items-md-start p-3 flex-wrap text-center text-md-start">
+											<student-card
+												class="d-inline-block my-2 my-md-2"
+												name="Aisha Bello"
+												age="13"
+												mother-phone="0802 456 7890"
+												father="Mr. Bello"
+												contact="23 Unity Rd"
+												image="/490473425_1221928799315994_7573465244633480520_n.jpg"></student-card>
+											<student-card
+												class="d-inline-block my-2 my-md-2"
+												name="Aisha Bello"
+												age="13"
+												mother-phone="0802 456 7890"
+												father="Mr. Bello"
+												contact="23 Unity Rd"
+												image="/490473425_1221928799315994_7573465244633480520_n.jpg"></student-card>
+											<student-card
+												class="d-inline-block my-2 my-md-2"
+												name="Aisha Bello"
+												age="13"
+												mother-phone="0802 456 7890"
+												father="Mr. Bello"
+												contact="23 Unity Rd"
+												image="/490473425_1221928799315994_7573465244633480520_n.jpg"></student-card>
+										</div>
+									</div>
+								</div>
+
+								<!-- Row 3: Class Stats -->
+								<div class="col-12">
+									<div class="p-3 rounded z-depth-1 white">
+										<h5>Class Summary</h5>
+										<div class="row g-3 justify-content-center">
+											<!-- Grade 1 -->
+											<div class="col-md-3">
+												<div class="p-2 border rounded">
+													<h6>Grade 1</h6>
+													<p>Total: 120</p>
+													<p>Boys: 60</p>
+													<p>Girls: 60</p>
+												</div>
+											</div>
+											<!-- Grade 2 -->
+											<div class="col-md-3">
+												<div class="p-2 border rounded">
+													<h6>Grade 2</h6>
+													<p>Total: 130</p>
+													<p>Boys: 65</p>
+													<p>Girls: 65</p>
+												</div>
+											</div>
+											<!-- Grade 3 -->
+											<div class="col-md-3">
+												<div class="p-2 border rounded">
+													<h6>Grade 3</h6>
+													<p>Total: 135</p>
+													<p>Boys: 70</p>
+													<p>Girls: 65</p>
+												</div>
+											</div>
+											<!-- Delete Option -->
+											<div class="col-md-3">
+												<div class="p-2 border rounded">
+													<h6>Delete</h6>
+													<button class="btn red darken-2 white-text"
+														>Delete Class/Session</button
+													>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<!-- Row 4: Recent Updates -->
+								<div class="col-md-6">
+									<div class="p-3 rounded z-depth-1 white">
+										<h5>Recently Updated Class</h5>
+										<p>Grade 2 - May 21</p>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="p-3 rounded z-depth-1 white">
+										<h5>Recently Updated Pupil</h5>
+										<p>David Obi - May 21</p>
+									</div>
+								</div>
+							</div>
 						</div>
 
 						<!-- gradeOnecontents -->
@@ -257,9 +380,7 @@
 			<!-- Body contents end -->
 
 			<!-- Footer -->
-			<footer class="blue darken-3 text-white text-center py-3">
-				&copy; 2025 Your App – All rights reserved
-			</footer>
+			<app-footer></app-footer>
 		</div>
 
 		<!-- Custom JS -->

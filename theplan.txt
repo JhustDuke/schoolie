@@ -7,12 +7,14 @@
 	=> (collapsible for phones hidden on big screens)
 	
 						***the tabs will have***
-	=> overview page
+	=> overview page: the contents are
 			>> total classes
 			>> total pupils
 			>> pupils based on gender
 			>> last updated
-			>>last added
+
+	=> delete session,class(inside settings icon)
+			
 	=> timetable page(coming soon)
 	=> ads and school promotion (coming soon)
 	=> about the app
