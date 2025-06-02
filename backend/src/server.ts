@@ -1,27 +1,33 @@
-import Hapi, { Server, Request, ResponseToolkit } from "@hapi/hapi";
 import dotenv from "dotenv";
+import Hapi, { Server } from "@hapi/hapi";
+import { getRoutes } from "./routes";
+import { createDB } from "./model";
 
 dotenv.config();
 
-const port: number = Number(process.env.PORT) || 3333;
+const port: number = Number(process.env.PORT);
+const host: string = process.env.HOST || "localhost";
 
 const server: Server = Hapi.server({
 	port,
-	host: "localhost",
+	host,
 });
 
-server.route({
-	method: "GET",
-	path: "/",
-	handler(req: Request, h: ResponseToolkit) {
-		return "Hello from Hapi + TypeScript!";
-	},
-});
+server.route(getRoutes);
 
 async function start(): Promise<void> {
+	const time = new Date();
+	// Ensure the database is created before starting the server
+
 	try {
+		await createDB; // Ensure the database is created
 		await server.start();
-		console.log(`🚀 Server running at: ${server.info.uri}`);
+		// Ensure the database is created before starting the server
+		console.log(
+			`🚀 Server running at: ${
+				server.info.uri
+			} at ${time.getHours()}:${time.getMinutes()}`
+		);
 	} catch (err) {
 		console.error("Server start error:", err);
 		process.exit(1);
