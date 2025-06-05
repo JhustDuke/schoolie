@@ -18,11 +18,10 @@ server.route(allRoutes);
 async function start() {
 	const time = new Date();
 	// Ensure the database is created before starting the server
-
 	try {
 		await createDB(); // Ensure the database is created
 		await server.start();
-		// Ensure the database is created before starting the server
+
 		console.log(
 			`🚀 Server running at: ${
 				server.info.uri

@@ -22,8 +22,11 @@
 	},
 	"dependencies": {
 		"bootstrap": "^5.3.5",
+		"dayjs": "^1.11.13",
 		"font-awesome": "^4.7.0",
 		"materializecss-colors-alone": "^0.1.0",
-		"naija-state-local-government": "^1.1.2"
+		"moments": "^0.0.2",
+		"naija-state-local-government": "^1.1.2",
+		"uuid": "^11.1.0"
 	}
 }
