@@ -1,5 +1,4 @@
 import { getRoutes } from "./getRoutes";
+import { postRoutes } from "./postRoutes";
 
-export const allRoutes = [
-	...getRoutes, // Spread the routes from getRoutes
-];
+export const allRoutes = [...getRoutes, ...postRoutes];

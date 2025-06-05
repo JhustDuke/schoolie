@@ -1,5 +1,4 @@
 import { ServerRoute, Request, ResponseToolkit } from "@hapi/hapi";
-import { createSessionYearTable } from "../model";
 
 export const getRoutes: ServerRoute[] = [
 	{
@@ -11,27 +10,7 @@ export const getRoutes: ServerRoute[] = [
 				.code(200);
 		},
 	},
-	{
-		method: "POST",
-		path: "/post",
-		handler: function (request: Request, res: ResponseToolkit) {
-			const { sessionYear } = request.payload as { sessionYear: string };
-			if (!sessionYear) {
-				return res.response("Session year is required").code(400);
-			}
-
-			createSessionYearTable(sessionYear)
-				.then(function () {
-					return res
-						.response(
-							`Session year table for ${sessionYear} created successfully`
-						)
-						.code(201);
-				})
-				.catch(function (err) {
-					console.error("Error creating session year table:", err);
-					return res.response("Failed to create session year table").code(500);
-				});
-		},
-	},
 ];
+function sanitizeTableName(name: string): string {
+	return name.replace(/[^a-zA-Z0-9_]/g, "_");
+}

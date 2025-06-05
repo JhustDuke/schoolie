@@ -5,6 +5,11 @@ import { createDB } from "./model";
 
 dotenv.config();
 
+/**things to work on
+ * global handler that returns an error page if none is provided
+ * handler that makes sure all routes returns something
+ */
+
 const port: number = Number(process.env.PORT);
 const host: string = process.env.HOST || "localhost";
 
@@ -25,7 +30,7 @@ async function start() {
 		console.log(
 			`🚀 Server running at: ${
 				server.info.uri
-			} at ${time.getHours()}:${time.getMinutes()}`
+			}as at ${time.getHours()}:${time.getMinutes()}`
 		);
 	} catch (err) {
 		console.error("Server start error:", err);
