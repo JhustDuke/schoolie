@@ -30,7 +30,7 @@ async function start() {
 		console.log(
 			`🚀 Server running at: ${
 				server.info.uri
-			}as at ${time.getHours()}:${time.getMinutes()}`
+			} as at ${time.getHours()}:${time.getMinutes()}`
 		);
 	} catch (err) {
 		console.error("Server start error:", err);
