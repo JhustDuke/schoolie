@@ -1,5 +1,5 @@
-import { domUtils, addToTabMenuHelper } from "../utils";
-import { tabsRefs as refs } from "./";
+import { domUtils, addToTabMenuHelper } from "../../utils";
+import { tabsRefs as refs } from "../";
 
 export const tabsMethods = (function (tabsRefs = refs) {
 	const elemDefaultStates = function () {

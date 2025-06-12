@@ -1,6 +1,6 @@
 import { formMethods } from "../view";
 import { resetLgaSelect } from "../utils";
-import { domRefs as domElements } from "../view";
+import { formRefs as domElements } from "../view";
 
 export const formController = (function (domRefs = domElements) {
 	const {

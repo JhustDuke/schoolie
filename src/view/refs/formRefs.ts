@@ -1,23 +1,4 @@
-export const domRefs = {
-	selectElem: document.querySelector<HTMLSelectElement>("#select"),
-
-	sessionModal: document.querySelector<HTMLDivElement>("#addSessionModal"),
-
-	sessionModalInput:
-		document.querySelector<HTMLInputElement>("#sessionModalInput"),
-
-	modalSubmitBtn: document.querySelector<HTMLButtonElement>("#addSessionBtn"),
-
-	modalHelp: document.querySelector<HTMLParagraphElement>("#modalHelp"),
-
-	closeModalBtn: document.querySelector<HTMLSpanElement>("#closeModalBtn"),
-
-	mainTable: document.querySelector<HTMLDivElement>("#mainTable"),
-
-	classSelect: document.querySelector<HTMLSelectElement>("#classSelect"),
-
-	addClassBtn: document.querySelector<HTMLButtonElement>("#addClass"),
-
+export const formRefs = {
 	// Form elements
 	studentForm: document.querySelector<HTMLFormElement>("#studentForm"),
 

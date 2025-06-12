@@ -1,8 +1,8 @@
-export * from "./sessionModalRefs";
-export * from "./tabsRefs";
-export * from "./sessionModalMethods";
-export * from "./tabsMethods";
-export * from "./formMethods";
-export * from "./navBarRefs";
-export * from "./navbarMethods";
+//domElemRefs
+export * from "./refs";
+
+//methods
+export * from "./methods";
+
+// dom values
 export * from "./domStaticValues";

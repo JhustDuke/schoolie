@@ -22,7 +22,7 @@ class navBar extends HTMLElement {
     <div class="d-flex align-items-center gap-3 isRelative">
       <select class="form-select" id="select" style="border-radius: 20px; width: auto">
         <option selected disabled value="chooseSession" id="chooseSession">Choose session</option>
-        <option value="addSession" id="addSession">Add Session</option>
+        <option value="addSession" id="addSessionOption">Add Session</option>
       </select>
       <i class="fa fa-cog white-text fs-5" id="settingsCog" style="cursor:pointer;"></i>
     </div>

@@ -1,4 +1,4 @@
-export const navBarRefs = {
+export const navCogRefs = {
 	settingsCog: document.querySelector<HTMLElement>("#settingsCog"),
 	settingsPanel: document.querySelector<HTMLElement>("#settingsPanel"),
 	closeSettingsIcon: document.querySelector<HTMLElement>("#closeSettingsIcon"),

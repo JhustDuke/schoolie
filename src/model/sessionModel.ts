@@ -1,133 +1,54 @@
 import { isValidYearFormat } from "../utils";
 
-export const sessionModel = (function (
-	databaseName: string = "amenDivineSessions"
-) {
-	const safeGetStorage = function (key: string) {
+export const sessionModel = function () {
+	const API_BASE_URL = "http://localhost:3333";
+
+	// const loadSessionYears = async function (): Promise<string[] | null> {
+	// 	try {
+	// 		const res = await fetch(`${API_BASE_URL}/addSessionYear`, {
+	// 			method: "GET",
+	// 		});
+	// 		if (!res.ok) {
+	// 			console.error("Failed to fetch session years");
+	// 			return null;
+	// 		}
+	// 		const data = await res.json();
+	// 		if (!Array.isArray(data)) {
+	// 			console.error("Invalid response format");
+	// 			return null;
+	// 		}
+	// 		return data;
+	// 	} catch (err) {
+	// 		console.error("Error fetching session years:", err);
+	// 		return null;
+	// 	}
+	// };
+
+	// const isDuplicate = async function (sessionYear: string): Promise<boolean> {
+	// 	const years = await loadSessionYears();
+	// 	if (!years || years.length === 0) return false;
+
+	// 	for (let i = 0; i < years.length; i++) {
+	// 		if (years[i] === sessionYear) return true;
+	// 	}
+	// 	return false;
+	// };
+
+	const addNewSessionYear = async function (
+		sessionYear: string
+	): Promise<void> {
 		try {
-			const data = localStorage.getItem(key);
-			return data ? JSON.parse(data) : null;
-		} catch (error) {
-			console.error("Error reading localStorage:", error);
-			return null;
+			const res = await fetch(`${API_BASE_URL}/addSessionYear`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ sessionYear }),
+			});
+			const msg = await res.text();
+			console.log("Server response:", msg);
+		} catch (err) {
+			console.error("Error adding session year:", err);
 		}
 	};
 
-	const safeSetStorage = function (key: string, value: object) {
-		try {
-			localStorage.setItem(key, JSON.stringify(value));
-			return true;
-		} catch (error) {
-			console.error("Error writing to localStorage:", error);
-			return false;
-		}
-	};
-
-	const initSessions = function () {
-		if (!safeGetStorage(databaseName)) {
-			safeSetStorage(databaseName, {});
-			console.log(databaseName, " inited");
-			return;
-		}
-		console.log("db is already inited");
-	};
-
-	const loadSessionYears = function () {
-		const sessionDb = safeGetStorage(databaseName);
-		if (!sessionDb) {
-			console.log("no session years available");
-			return null;
-		}
-		const sessionYears = Object.keys(sessionDb);
-		if (sessionYears.length === 0) {
-			console.log("no session years available");
-			return null;
-		}
-		return sessionYears;
-	};
-
-	const isDuplicate = function (sessionYear: string) {
-		const sessionDb = safeGetStorage(databaseName);
-		if (!sessionDb) {
-			console.log(databaseName, "not found");
-			return false;
-		}
-		if (!sessionDb[sessionYear]) {
-			console.log("session does not exist");
-			return false;
-		}
-		return true;
-	};
-
-	const addNewSessionYear = function (sessionYear: string) {
-		const sessionDb = safeGetStorage(databaseName) || {};
-		if (sessionDb[sessionYear]) {
-			console.log("Session year already exists");
-			return;
-		}
-		sessionDb[sessionYear] = {
-			createdAt: new Date().toISOString(),
-			meta: {},
-		};
-		if (safeSetStorage(databaseName, sessionDb)) {
-			console.log("New session year added:", sessionYear);
-		}
-	};
-	const addPupil = function ({
-		sessionYear,
-		classGroup,
-		level,
-		pupilData,
-	}: {
-		sessionYear: string;
-		classGroup: string;
-		level: string;
-		pupilData: Record<string, string>;
-	}) {
-		const db = safeGetStorage(databaseName) || {};
-		const hashId = generateHash(
-			pupilData.surname + pupilData.firstname + pupilData.dob
-		);
-
-		if (!db[sessionYear]) {
-			db[sessionYear] = { classes: {} };
-		}
-
-		if (!db[sessionYear].classes[classGroup]) {
-			db[sessionYear].classes[classGroup] = {};
-		}
-
-		if (!db[sessionYear].classes[classGroup][level]) {
-			db[sessionYear].classes[classGroup][level] = { pupils: [] };
-		}
-
-		db[sessionYear].classes[classGroup][level].pupils.push({
-			idHash: hashId,
-			data: pupilData,
-		});
-
-		safeSetStorage(databaseName, db);
-	};
-
-	const getSessionYearData = function () {};
-
-	initSessions();
-	return { loadSessionYears, isDuplicate, addNewSessionYear, addPupil };
-})();
-
-function generateHash(input: string) {
-	var hash = 0;
-	for (var i = 0; i < input.length; i++) {
-		hash = (hash * 31 + input.charCodeAt(i)) | 0;
-	}
-	return "h" + hash.toString(16);
-}
-
-// 	};
-
-// 	/** Gets session data if it exists */
-// 	const getSessionData = function (sessionYear: string): any {
-// 		if (!isSessionYearExist(sessionYear)) {
-// 			console.log(`Session year ${sessionYear} does not exist.`);
-// 			return null;
-// 		}
+	return { addNewSessionYear };
+};

@@ -6,11 +6,10 @@ import {
 	validateSelectField,
 	validateAddressField,
 	populateStates,
-} from "../utils";
+} from "../../utils";
 
-import { domRefs as domElements, domStaticValues } from "./";
-import { sessionModel as ssModel } from "../model";
-import { naijaService } from "../services";
+import { formRefs as domElements, domStaticValues } from "..";
+import { naijaService } from "../../services";
 
 export const formMethods = (function (
 	domRefs = domElements
@@ -111,7 +110,7 @@ export const formMethods = (function (
 	};
 	const validateClass = function () {
 		validateSelectField({
-			selectElem: domRefs.classSelect!,
+			selectElem: <any>document.getElementById("classSelect"),
 			fieldKey: "classSelect",
 			elementStates,
 			invalidValue: domStaticValues.chooseClass,
@@ -390,7 +389,7 @@ export const formMethods = (function (
 
 	// Store data and add pupil
 	const storeData = function () {
-		const { selectElem } = domRefs;
+		const selectElem = <HTMLSelectElement>document.getElementById("select");
 		const sessionYear = selectElem?.value.trim();
 		if (!sessionYear || sessionYear === domStaticValues.chooseSession) {
 			alert("please select a session year");

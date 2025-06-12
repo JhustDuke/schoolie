@@ -1,6 +1,6 @@
-import { navBarRefs } from "./navBarRefs.js";
+import { navCogRefs } from "../refs/navCogRefs.js";
 
-export const navBarMethods = (function (refs = navBarRefs) {
+export const navBarMethods = (function (refs = navCogRefs) {
 	function domDefaultState() {
 		const { settingsPanel } = refs;
 		settingsPanel!.style.display = "none";

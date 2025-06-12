@@ -1,4 +1,4 @@
-import { domRefs, navBarRefs as navRefs } from "../view";
+import { navCogRefs as navRefs } from "../view/refs/navCogRefs";
 import { navBarMethods } from "../view";
 
 export const navBarController = (function (domRefs = navRefs) {
