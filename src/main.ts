@@ -2,7 +2,7 @@
 
 import "./webComponents";
 
-import { sessionModalController, tabsController } from "./controllers";
+import { sessionModalController, tabsController } from "./eventListeners";
 
 (function () {
 	document.addEventListener("DOMContentLoaded", function () {

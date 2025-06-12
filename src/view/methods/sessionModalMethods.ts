@@ -3,6 +3,8 @@ import {
 	addElemToDom as addToSelectOption,
 	domUtils as modalUtils,
 	insertBeforeAddSession,
+	addElemToDom,
+	notifyToast,
 } from "../../utils";
 import { domRefs as domElements } from "..";
 import { sessionModel as ssModel } from "../../model";
@@ -127,12 +129,12 @@ export const sessionModalMethods = (function (
 			return;
 		}
 
-		const originalHTML = submitBtn.innerHTML;
-		submitBtn.disabled = true;
-		submitBtn.innerHTML =
-			'<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding...';
+		const initialBtnTextContent = submitBtn.innerHTML;
 
-		sessionModel()
+		submitBtn.innerHTML =
+			'<span class="spinner-border spinner-border-sm"></span> Adding...';
+
+		sessionModel
 			.addNewSessionYear(sessionValue)
 			.then(function () {
 				addToSelectOption({
@@ -145,18 +147,24 @@ export const sessionModalMethods = (function (
 				removeNoSessionOption();
 				clearModalInputs();
 				hideModal();
-				console.log(`Session year ${sessionValue} added successfully!`);
-			})
-			.catch(function (err) {
-				console.error("Failed to add session year", err);
-				modalUtils.inputHintHelper({
-					hintText: "Error adding session year",
-					targetElem: modalHelp,
+				notifyToast({
+					text: `session ${sessionValue} added succesfull`,
+					type: "success",
+					parentElem: <any>document.getElementById("app"),
 				});
 			})
+			.catch(function (err) {
+				notifyToast({
+					text: `error adding ${sessionValue} reason:${err.message}`,
+					type: "error",
+					timeout: 15000,
+					parentElem: <any>document.getElementById("app"),
+				});
+				hideModal();
+				console.error("Failed to add session year", err);
+			})
 			.finally(function () {
-				submitBtn.innerHTML = originalHTML;
-				submitBtn.disabled = false;
+				submitBtn.innerHTML = initialBtnTextContent;
 			});
 	};
 

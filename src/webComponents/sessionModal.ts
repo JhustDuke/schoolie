@@ -5,7 +5,7 @@ class sessionModal extends HTMLElement {
 				<div
 					class="center px-2 py-1 w-50 text-center mx-auto isRelative grey darken-3"
 					id="addSessionModal"
-					style="z-index: 4">
+					style="z-index:555554">
 					<!-- Close Modal Button -->
 					<span
 						class="red-text isAbsolute hover"

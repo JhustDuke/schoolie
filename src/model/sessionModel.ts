@@ -1,6 +1,6 @@
 import { isValidYearFormat } from "../utils";
 
-export const sessionModel = function () {
+export const sessionModel = (function () {
 	const API_BASE_URL = "http://localhost:3333";
 
 	// const loadSessionYears = async function (): Promise<string[] | null> {
@@ -34,16 +34,14 @@ export const sessionModel = function () {
 	// 	return false;
 	// };
 
-	const addNewSessionYear = async function (
-		sessionYear: string
-	): Promise<void> {
+	const addNewSessionYear = async function (sessionYear: string) {
 		try {
 			const res = await fetch(`${API_BASE_URL}/addSessionYear`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ sessionYear }),
 			});
-			const msg = await res.text();
+			const msg = await res.json();
 			console.log("Server response:", msg);
 		} catch (err) {
 			console.error("Error adding session year:", err);
@@ -51,4 +49,4 @@ export const sessionModel = function () {
 	};
 
 	return { addNewSessionYear };
-};
+})();
