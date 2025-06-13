@@ -1,9 +1,21 @@
 import { addElemToDom } from "./";
 
-addElemToDom;
+/**
+ * Displays a temporary toast notification on the page.
+ *
+ * @param {Object} options - Configuration options for the toast.
+ * @param {string} options.text - The message to display.
+ * @param {"success" | "error"} [options.type="success"] - Type of message for styling.
+ * @param {number} [options.timeout=5000] - Duration (ms) before the toast disappears.
+ * @param {HTMLElement} [options.parentElem=document.body] - Parent element to append the toast to.
+ *
+ * @example
+ * notifyToast({ text: "Data saved", type: "success" });
+ * notifyToast({ text: "Failed to save", type: "error", timeout: 3000 });
+ */
 export function notifyToast({
 	text,
-	type = "success", // "success" | "error"
+	type = "success",
 	timeout = 5000,
 	parentElem = document.body,
 }: {
@@ -13,8 +25,8 @@ export function notifyToast({
 	parentElem?: HTMLElement;
 }) {
 	const classMap = {
-		success: "green green-darken-4 white-text mt-2",
-		error: "red red-darken-4 white-text mt-2",
+		success: "green green-darken-4 white-text",
+		error: "red red-darken-4 white-text",
 	};
 
 	addElemToDom({
