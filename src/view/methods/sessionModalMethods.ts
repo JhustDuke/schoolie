@@ -3,7 +3,6 @@ import {
 	addElemToDom as addToSelectOption,
 	domUtils as modalUtils,
 	insertBeforeAddSession,
-	addElemToDom,
 	notifyToast,
 } from "../../utils";
 import { domRefs as domElements } from "..";
@@ -13,58 +12,58 @@ export const sessionModalMethods = (function (
 	domRefs = domElements,
 	sessionModel = ssModel
 ) {
-	const DOMDefaultState = function () {
-		//elementDefaultState();
-		//populateSelect();
+	const DOMDefaultState = async function () {
+		await Promise.all([elementDefaultState(), populateSessionSelect()]);
 	};
-	// const elementDefaultState = function () {
-	// 	const modalDiv = domRefs.sessionModal;
-	// 	const modalSubmitBtn = domRefs.modalSubmitBtn;
-	// 	const modalSelectElem = domRefs.selectElem;
+	const elementDefaultState = async function () {
+		const modalDiv = domRefs.sessionModal;
+		const modalSubmitBtn = domRefs.modalSubmitBtn;
+		const modalSelectElem = domRefs.selectElem;
 
-	// 	if (!modalDiv || !modalSelectElem || !modalSubmitBtn) return;
+		if (!modalDiv || !modalSelectElem || !modalSubmitBtn) return;
 
-	// 	//disabled elements
-	// 	modalUtils.toggleVisibility({ targetElem: modalDiv, shouldShow: false });
-	// 	modalSubmitBtn!.disabled = true;
+		//disabled elements
+		modalUtils.toggleVisibility({ targetElem: modalDiv, shouldShow: false });
+		modalSubmitBtn!.disabled = true;
 
-	// 	if (!sessionModel().loadSessionYears()) {
-	// 		addToSelectOption({
-	// 			parentElem: modalSelectElem,
-	// 			typeOfElem: "option",
-	// 			textContent: "no sessions registered click addSession to register",
-	// 			elemAttributes: {
-	// 				disabled: true,
-	// 				id: "noSession",
-	// 			},
-	// 			pluginFunc: insertBeforeAddSession,
-	// 		});
-	// 		return;
-	// 	}
-	// };
-	// const populateSelect = async function () {
-	// 	const selectElem = domRefs.selectElem;
-	// 	if (!selectElem) {
-	// 		console.log("selectElem not found");
-	// 		return;
-	// 	}
+		const sessionDataFromDb = await sessionModel.loadSessionYears();
+		if (!sessionDataFromDb) {
+			addToSelectOption({
+				parentElem: modalSelectElem,
+				typeOfElem: "option",
+				textContent: "no sessions registered click addSession to register",
+				elemAttributes: {
+					disabled: true,
+					id: "noSession",
+				},
+				pluginFunc: insertBeforeAddSession,
+			});
+			return;
+		}
+	};
+	const populateSessionSelect = async function () {
+		const selectElem = domRefs.selectElem;
+		if (!selectElem) {
+			console.error("selectElem not found");
+			return;
+		}
 
-	// 	const data = await sessionModel().loadSessionYears();
-	// 	if (!data || data.length === 0) {
-	// 		console.log("No session years available");
-	// 		return;
-	// 	}
-
-	// 	data.forEach((sessionYear) => {
-	// 		addToSelectOption({
-	// 			parentElem: selectElem,
-	// 			typeOfElem: "option",
-	// 			textContent: sessionYear,
-	// 			elemAttributes: { value: sessionYear },
-	// 			pluginFunc: insertBeforeAddSession,
-	// 		});
-	// 	});
-	// };
+		const data = await sessionModel.loadSessionYears();
+		if (!data || data.length === 0) {
+			console.log("No session years available");
+			return;
+		}
+		console.log(selectElem);
+		data.forEach(function (sessionYear) {
+			addToSelectOption({
+				parentElem: selectElem,
+				typeOfElem: "option",
+				textContent: sessionYear,
+				elemAttributes: { value: sessionYear },
+				pluginFunc: insertBeforeAddSession,
+			});
+		});
+	};
 
 	const displayModal = function (): void {
 		const modalSelectElem = domRefs.selectElem;
@@ -205,7 +204,7 @@ export const sessionModalMethods = (function (
 
 	return {
 		DOMDefaultState,
-		/*populateSelect,*/
+
 		hideModal,
 		displayModal,
 		updateModalUI,

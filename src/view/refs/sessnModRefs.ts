@@ -1,5 +1,6 @@
 export const domRefs = {
 	selectElem: document.querySelector<HTMLSelectElement>("#select"),
+
 	addSessionOption:
 		document.querySelector<HTMLSelectElement>("#addSessionOption"),
 

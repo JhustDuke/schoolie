@@ -1,7 +1,7 @@
 import { sessionModalMethods } from "../view";
 import { domRefs as refs } from "../view";
 
-export const sessionModalController = (function (domRefs = refs) {
+export const sessionModalController = (async function (domRefs = refs) {
 	const modalSelectElem = domRefs.selectElem;
 	const userInputs = domRefs.sessionModalInput;
 	const modalSubmitBtn = domRefs.modalSubmitBtn;
@@ -9,7 +9,7 @@ export const sessionModalController = (function (domRefs = refs) {
 	const { addSessionOption } = domRefs;
 
 	// load default state
-	sessionModalMethods.DOMDefaultState();
+	await sessionModalMethods.DOMDefaultState();
 
 	modalSelectElem!.addEventListener("change", sessionModalMethods.watchModal);
 

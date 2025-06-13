@@ -1,10 +1,7 @@
-export function createElem(
-	typeOfElem: keyof HTMLElementTagNameMap
-): HTMLElement {
+function createElem(typeOfElem: keyof HTMLElementTagNameMap): HTMLElement {
 	return document.createElement(typeOfElem);
 }
-
-export function applyAttributes(
+function applyAttributes(
 	elem: HTMLElement,
 	attributes: { [key: string]: any }
 ): void {
@@ -18,27 +15,33 @@ export function applyAttributes(
 	}
 }
 
+interface AddElemToDomOptions {
+	parentElem?: HTMLElement | null;
+	typeOfElem: keyof HTMLElementTagNameMap;
+	textContent?: string;
+	elemAttributes?: { [key: string]: any };
+	pluginFunc?: (parentElem?: HTMLElement, newElem?: HTMLElement) => void;
+}
+
+/**
+ * Dynamically creates and inserts an HTML element into the DOM.
+ * See detailed docs in previous response.
+ */
 export function addElemToDom({
 	parentElem = document.body,
 	typeOfElem,
 	textContent = "placeholder",
 	elemAttributes = {},
 	pluginFunc,
-}: {
-	parentElem?: HTMLElement | null;
-	typeOfElem: keyof HTMLElementTagNameMap;
-	textContent?: string;
-	elemAttributes?: { [key: string]: any };
-	pluginFunc?: (parentElem?: HTMLElement, newElem?: HTMLElement) => void;
-}): void {
+}: AddElemToDomOptions) {
 	if (!(parentElem instanceof HTMLElement)) {
 		console.log(`${parentElem} is not a valid HTML element`);
 		return;
 	}
 
 	const createdElem = createElem(typeOfElem);
-
 	createdElem.textContent = textContent;
+
 	if (elemAttributes) {
 		applyAttributes(createdElem, elemAttributes);
 	}
