@@ -1,10 +1,10 @@
-import { appPool } from "./";
+import { appPool } from ".";
 
 function sanitizeTableName(name: string): string {
 	return name.replace(/[^a-zA-Z0-9_]/g, "_");
 }
 
-export async function createSessionYearTable(sessionYear: string) {
+export async function sessionYearTableModel(sessionYear: string) {
 	const tableName = sanitizeTableName(sessionYear);
 
 	const createTableSQL = `

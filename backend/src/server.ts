@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import Hapi, { Server } from "@hapi/hapi";
 import { allRoutes } from "./routes";
-import { createDB } from "./model";
+import { createDBModel } from "./model";
 
 dotenv.config();
 
@@ -24,7 +24,7 @@ async function start() {
 	const time = new Date();
 	// Ensure the database is created before starting the server
 	try {
-		await createDB(); // Ensure the database is created
+		await createDBModel(); // Ensure the database is created
 		await server.start();
 
 		console.log(

@@ -29,7 +29,7 @@ export const formMethods = (function (
 		otherPhoneInput: false,
 		lgaSelect: false,
 		statesSelect: false,
-		classSelect: false,
+		classSelect: true,
 		webCam: false,
 	};
 
@@ -388,11 +388,17 @@ export const formMethods = (function (
 	};
 
 	// Store data and add pupil
-	const storeData = function () {
-		const selectElem = <HTMLSelectElement>document.getElementById("select");
-		const sessionYear = selectElem?.value.trim();
+	const sendFormToServer = async function () {
+		const { domRefs } = await import("../refs/sessnModRefs");
+		const selectElem = domRefs.selectElem;
+
+		if (!selectElem) {
+			console.error("element with id select no found");
+			return;
+		}
+		const sessionYear = selectElem?.value.trim() as HTMLSelectElement | string;
 		if (!sessionYear || sessionYear === domStaticValues.chooseSession) {
-			alert("please select a session year");
+			alert("please select or add a session year then retry");
 			console.log("no session year selected");
 			return;
 		}
@@ -438,7 +444,7 @@ export const formMethods = (function (
 		uploadImageFunc,
 		getFormInputs,
 		watchForm,
-		storeData, // Added to return object
+		sendFormToServer, // Added to return object
 	};
 })();
 console.log("form Methods ran");

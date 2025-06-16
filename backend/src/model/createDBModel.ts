@@ -30,7 +30,7 @@ export const appPool = mysql.createPool({
 	connectionLimit: 10,
 });
 
-export async function createDB() {
+export async function createDBModel() {
 	const conn = await adminPool.getConnection();
 
 	try {

@@ -1,7 +1,7 @@
 import { RowDataPacket } from "mysql2";
-import { appPool } from "./createDB";
+import { appPool } from "./createDBModel";
 
-export const getAllSessionYears = async function () {
+export const getAllSessionModel = async function () {
 	const dbConnection = await appPool.getConnection();
 	try {
 		const [rows] = await dbConnection.query("SHOW TABLES");
