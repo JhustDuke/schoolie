@@ -44,5 +44,6 @@ export async function handleFileUpload({
 		file.pipe(writeStream);
 	});
 	console.log(filePath);
+
 	return filePath;
 }

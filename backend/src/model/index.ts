@@ -1,4 +1,6 @@
 export * from "./createDBModel";
 export * from "./sessionYearTableModel";
-export * from "./addPupilModel";
 export * from "./getAllSessionModel";
+
+export * from "./addPupilModel";
+export * from "./getPupilByClassModel";
