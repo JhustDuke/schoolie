@@ -14,6 +14,8 @@ export const formRefs = {
 
 	stateSelect: document.querySelector<HTMLSelectElement>("#stateSelect"),
 
+	classSelect: document.querySelector<HTMLSelectElement>("#classSelect"),
+
 	lgaSelect: document.querySelector<HTMLSelectElement>("#lgaSelect"),
 
 	bloodGroupSelect:

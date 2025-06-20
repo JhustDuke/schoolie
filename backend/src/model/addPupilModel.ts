@@ -1,113 +1,76 @@
-// src/modules/addPupilToClass.ts
-import { v4 as uuidv4 } from "uuid";
-import * as time from "dayjs";
-import { appPool } from ".";
+// import { v4 as uuidv4 } from "uuid";
+// import * as time from "dayjs";
 
-function sanitizeTableName(name: string): string {
-	return name.replace(/[^a-zA-Z0-9_]/g, "_");
-}
+import { appPool } from ".";
+import { sanitizeTableName, getTotalStats } from "../utils";
+import { PupilPersonalInfoInterface } from "../interfaces";
 
 interface newPupilInterface {
 	sessionYear: string;
 	className: string;
 	gender: "male" | "female";
 	alias?: string;
-	pupil: {
-		[key: string]: any;
-	};
+	pupilPersonalInfo: PupilPersonalInfoInterface;
 }
 
+/**
+ * Adds a new pupil to the class list for the given session year.
+ * Updates totals if the pupil is not a duplicate.
+ */
 export async function addPupilModel({
 	sessionYear,
 	className,
 	gender,
-	alias = "",
-	pupil,
-}: newPupilInterface) {
-	const sanitizedTableName = sanitizeTableName(sessionYear);
-	console.log(sanitizedTableName);
-	const conn = await appPool.getConnection();
-	const query = `SELECT id,classes,total_boys,total_girls,total_pupils,newly_added_pupils FROM \`${sanitizedTableName}\` WHERE id=1`;
-	const execQuery = conn.query(query) as any;
-	try {
-		const [queryOutcome] = await execQuery;
-		if (!queryOutcome.length) {
-			console.log("table not found");
-			return false;
+	alias = "test_alias",
+	pupilPersonalInfo,
+}: newPupilInterface): Promise<boolean> {
+	const table = sanitizeTableName(sessionYear);
+	const sessionYearStats = await getTotalStats(table);
+
+	let { total_boys, total_girls, classes: existingClasses } = sessionYearStats;
+
+	const classExists = existingClasses[className] !== undefined;
+	const genderKey = gender === "female" ? "girls" : "boys";
+
+	if (!classExists) {
+		existingClasses[className] = {
+			alias,
+			boys: [],
+			girls: [],
+		};
+		existingClasses[className][genderKey].push(pupilPersonalInfo);
+		if (gender === "female") total_girls += 1;
+		if (gender === "male") total_boys += 1;
+	} else {
+		const pupilList = existingClasses[className][genderKey];
+		if (!isPupilDuplicate(pupilList, pupilPersonalInfo)) {
+			pupilList.push(pupilPersonalInfo);
+			if (gender === "female") total_girls += 1;
+			if (gender === "male") total_boys += 1;
 		}
-		return queryOutcome;
-	} catch (err: any) {
-		return err.message;
 	}
 
-	// try {
-	// 	const [rows]: any = await conn.query(
-	// 		`SELECT id, classes, total_boys, total_girls, total_pupils, newly_added_pupils
-	//       FROM \`${sanitizedTableName}\`,
-	//       WHERE id = 1`
-	// 	);
+	const classDataToJson = JSON.stringify(existingClasses);
 
-	// 	if (!rows.length) {
-	// 		throw new Error("Session-year table not initialized");
-	// 	}
+	const conn = await appPool.getConnection();
+	try {
+		const insertQuery = `UPDATE \`${table}\` SET classes=?, total_boys=?, total_girls=? WHERE id=1`;
+		await conn.query(insertQuery, [classDataToJson, total_boys, total_girls]);
+		console.log("insert success");
+		return true;
+	} catch (err: any) {
+		console.log("insert data failure");
+		throw new Error(err.message);
+	} finally {
+		conn.release();
+	}
+}
 
-	// 	const currentSessionRow = rows[0];
-	// 	const parsedClasses = JSON.parse(currentSessionRow.classes);
-
-	// 	if (!parsedClasses[className]) {
-	// 		parsedClasses[className] = { alias, boys: [], girls: [] };
-	// 	}
-
-	// 	const newPupil = {
-	// 		id: uuidv4(),
-	// 		createdAt: new Date().toISOString(),
-	// 		...pupil,
-	// 	};
-
-	// 	parsedClasses[className][gender].push(newPupil);
-
-	// 	const updatedTotalBoys =
-	// 		gender === "boys"
-	// 			? currentSessionRow.total_boys + 1
-	// 			: currentSessionRow.total_boys;
-	// 	const updatedTotalGirls =
-	// 		gender === "girls"
-	// 			? currentSessionRow.total_girls + 1
-	// 			: currentSessionRow.total_girls;
-	// 	const updatedTotalPupils = updatedTotalBoys + updatedTotalGirls;
-
-	// 	let recentlyAddedPupils: any[] = currentSessionRow.newly_added_pupils
-	// 		? JSON.parse(currentSessionRow.newly_added_pupils)
-	// 		: [];
-
-	// 	recentlyAddedPupils.unshift(newPupil);
-
-	// 	const thresholdDateForNewPupils = time.default().subtract(30, "day");
-
-	// 	recentlyAddedPupils = recentlyAddedPupils
-	// 		.filter(function (pupilEntry: any) {
-	// 			const createdAtDate = time.default(pupilEntry.createdAt);
-	// 			return createdAtDate.isAfter(thresholdDateForNewPupils);
-	// 		})
-	// 		.slice(0, 10);
-
-	// 	await conn.query(
-	// 		`UPDATE \`${sanitizedTableName}\`
-	//         SET classes             = ?,
-	//             total_boys          = ?,
-	//             total_girls         = ?,
-	//             total_pupils        = ?,
-	//             newly_added_pupils  = ?
-	//       WHERE id = 1`,
-	// 		[
-	// 			JSON.stringify(parsedClasses),
-	// 			updatedTotalBoys,
-	// 			updatedTotalGirls,
-	// 			updatedTotalPupils,
-	// 			JSON.stringify(recentlyAddedPupils),
-	// 		]
-	// 	);
-	// } finally {
-	// 	conn.release();
-	// }
+/**
+ * Checks if a pupil already exists in the provided array.
+ */
+function isPupilDuplicate(arr: any[], pupil: any): boolean {
+	return arr.some(function (item) {
+		return JSON.stringify(item) === JSON.stringify(pupil);
+	});
 }

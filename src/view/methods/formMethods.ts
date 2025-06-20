@@ -10,6 +10,7 @@ import {
 
 import { formRefs as domElements, domStaticValues } from "..";
 import { naijaService } from "../../services";
+import { formModel } from "../../model";
 
 export const formMethods = (function (
 	domRefs = domElements
@@ -29,7 +30,7 @@ export const formMethods = (function (
 		otherPhoneInput: false,
 		lgaSelect: false,
 		statesSelect: false,
-		classSelect: true,
+		classSelect: false,
 		webCam: false,
 	};
 
@@ -367,6 +368,7 @@ export const formMethods = (function (
 		formData.append("gender", domRefs.genderSelect!.value);
 		formData.append("dob", domRefs.dobInput!.value.trim());
 		formData.append("state", domRefs.stateSelect!.value);
+		formData.append("classSelect", domRefs.classSelect!.value);
 		formData.append("lga", domRefs.lgaSelect!.value);
 		formData.append("bloodGroup", domRefs.bloodGroupSelect!.value);
 		formData.append("religion", domRefs.religionSelect!.value);
@@ -376,11 +378,11 @@ export const formMethods = (function (
 		formData.append("otherPhone", domRefs.otherPhoneInput!.value.trim());
 
 		// For webcam image (optional, if used)
-		if (
-			domRefs.generatedImg!.src &&
-			domRefs.generatedImg!.src.startsWith("data:image")
-		) {
+		if (domRefs.generatedImg!.src) {
 			formData.append("passport", domRefs.generatedImg!.src);
+		} else {
+			console.log("image file missing");
+			return;
 		}
 
 		const formObject = Object.fromEntries(formData.entries());

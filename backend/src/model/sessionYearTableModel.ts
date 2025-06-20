@@ -13,7 +13,7 @@ export async function sessionYearTableModel(sessionYear: string) {
       classes JSON NOT NULL,
       total_boys INT DEFAULT 0,
       total_girls INT DEFAULT 0,
-      total_pupils INT DEFAULT 0,
+      total_pupils INT GENERATED ALWAYS AS(total_boys+total_girls) STORED ,
       newly_added_pupils JSON,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

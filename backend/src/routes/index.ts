@@ -1,5 +1,5 @@
-import { getRoutes } from "./getRoutes";
-import { postRoutes } from "./postRoutes";
+import { getRoutes } from "./allGetRoute";
+import { postRoutes } from "./allPostRoute";
 import { notFoundRoutes } from "./notFound";
 
 export const allRoutes = [...getRoutes, ...postRoutes, ...notFoundRoutes];
