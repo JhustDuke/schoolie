@@ -10,3 +10,7 @@ export * from "./getPupilByClassModel";
 
 //patch
 export * from "./updatePupilModel";
+
+//delet
+
+export * from "./deletePupilModel";

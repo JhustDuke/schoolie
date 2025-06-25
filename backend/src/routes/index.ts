@@ -1,6 +1,13 @@
 import { getRoutes } from "./allGetRoute";
 import { postRoutes } from "./allPostRoute";
-import {updatePupilData}from './updateHandler'
+import { updatePupilData } from "./updateHandler";
+import { deletePupil } from "./deleteHandler";
 import { notFoundRoutes } from "./notFound";
 
-export const allRoutes = [...getRoutes, ...postRoutes, ...notFoundRoutes,...updatePupilData];
+export const allRoutes = [
+	...getRoutes,
+	...postRoutes,
+	...notFoundRoutes,
+	...updatePupilData,
+	...deletePupil,
+];
