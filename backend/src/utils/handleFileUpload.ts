@@ -7,13 +7,21 @@ import * as fs from "fs";
  * @param uploadDir - Directory to save the file in.
  * @returns Relative path to the saved file.
  */
+
+interface pupilImageData {
+	firstname: string;
+	middleName: string;
+	lastName: string;
+	gender: "male" | "female";
+	className: string;
+}
 export async function handleFileUpload({
 	file,
 	uploadDir = "src/uploads",
-	pupilname,
+	imageData,
 }: {
 	file: any;
-	pupilname: string;
+	imageData: pupilImageData;
 	uploadDir?: string;
 }) {
 	if (!file || typeof file.pipe !== "function" || !file.hapi?.filename) {
@@ -22,7 +30,7 @@ export async function handleFileUpload({
 
 	const originalName = file.hapi.filename;
 	const ext = path.extname(originalName) || ".png";
-	const filename = `${pupilname}${ext}`;
+	const filename = `${imageData.firstname}${imageData.middleName}${imageData.lastName}${imageData.className}${imageData.gender}${ext}`;
 	const filePath = path.join(uploadDir, filename);
 
 	await new Promise(function (resolve, reject) {

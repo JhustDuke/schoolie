@@ -16,8 +16,13 @@ export const addSessionYear: ServerRoute = {
 		},
 	},
 
-	handler: function (request: Request, res: ResponseToolkit) {
-		const { sessionYear } = <{ sessionYear: string }>request.payload;
+	handler: function (req: Request, res: ResponseToolkit) {
+		if (!req.payload) {
+			return res
+				.response({ message: "urlencoded paylod is required" })
+				.code(400);
+		}
+		const { sessionYear } = <{ sessionYear: string }>req.payload;
 		if (!sessionYear) {
 			return res.response("Session year is required").code(400);
 		}

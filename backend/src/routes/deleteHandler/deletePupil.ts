@@ -7,26 +7,46 @@ export const deletePupil: ServerRoute[] = [
 		method: "DELETE",
 		path: "/deletePupil",
 		options: {
+			cors: {
+				origin: ["*"],
+				headers: ["Accept", "Content-Type", "Access-Control-Allow-Origin"],
+			},
 			payload: {
+				failAction: "error",
 				parse: true,
 				allow: ["application/json"],
 			},
 		},
 		handler: async function (req: Request, res: ResponseToolkit) {
-			const { sessionYear, className, firstName, gender } = <any>req.payload;
-			const field = { sessionYear, className, firstName, gender };
+			if (!req.payload) {
+				return res
+					.response({ message: "bad request", reason: "no payload provided" })
+					.code(400);
+			}
 
-			const missing = validateFormFields(field);
-			if (missing) {
-				return res.response(missing).code(400);
+			const { sessionYear, className, gender, firstName, middleName, surName } =
+				<any>req.payload;
+
+			const missingField = validateFormFields({
+				sessionYear,
+				className,
+				gender,
+				firstName,
+				middleName,
+				surName,
+			});
+			if (missingField) {
+				return res.response({ missingField }).code(400);
 			}
 
 			try {
 				const result = await deletePupilModel({
 					sessionYear,
 					className,
-					firstName,
 					gender,
+					firstName,
+					middleName,
+					surName,
 				});
 				return res.response(result).code(200);
 			} catch (err: any) {

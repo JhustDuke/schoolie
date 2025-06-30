@@ -16,11 +16,14 @@ export const addPupil: ServerRoute = {
 			multipart: true,
 			parse: true,
 			maxBytes: 2 * 1024 * 1024,
-			allow: ["multipart/form-data"],
+			allow: ["application/json", "multipart/form-data"],
 		},
 	},
 
 	handler: async function (req: Request, res: ResponseToolkit) {
+		if (!req.payload)
+			return res.response({ message: "payload required" }).code(500);
+
 		const {
 			firstnameInput,
 			middlenameInput,
@@ -62,7 +65,13 @@ export const addPupil: ServerRoute = {
 		try {
 			const filepath = await handleFileUpload({
 				file: passport,
-				pupilname: firstnameInput,
+				imageData: {
+					firstname: firstnameInput,
+					lastName: surnameInput,
+					className: classSelect,
+					gender: genderSelect,
+					middleName: middlenameInput,
+				},
 			});
 			const result = await addPupilModel({
 				sessionYear: "3000/3333",
@@ -74,7 +83,9 @@ export const addPupil: ServerRoute = {
 					passport: filepath,
 				},
 			});
-			return res.response({ result }).code(200);
+			return res
+				.response({ result, message: "upload was succesful" })
+				.code(200);
 		} catch (error: any) {
 			return res.response({ msg: error.message }).code(500);
 		}

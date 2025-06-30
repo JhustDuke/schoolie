@@ -17,10 +17,18 @@ export const getPupilByClass: ServerRoute = {
 		},
 	},
 	handler: async function (req: Request, res: ResponseToolkit) {
-		const { sessionYear, className, gender, firstName } = <any>req.payload;
+		if (!req.payload) {
+			return res
+				.response({ message: "urlencoded payload is required" })
+				.code(400);
+		}
+		const { sessionYear, className, gender, firstName, lastName, middleName } =
+			<any>req.payload;
 
 		const missingField = validateFormFields({
 			sessionYear,
+			lastName,
+			middleName,
 			className,
 			gender,
 			firstName,
@@ -31,6 +39,8 @@ export const getPupilByClass: ServerRoute = {
 
 		try {
 			const result = await getPupilByClassModel({
+				lastName,
+				middleName,
 				sessionYear,
 				className,
 				gender,
