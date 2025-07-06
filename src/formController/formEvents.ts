@@ -25,7 +25,9 @@ export const formController = (function (domRefs = domElements) {
 		formSubmitBtn,
 	} = domRefs;
 
-	//formMethods.DOMDefaultState();
+	if (window.location.pathname === "/form.html") {
+		formMethods.DOMDefaultState();
+	}
 
 	//webCam
 	startCameraBtn?.addEventListener("click", formMethods.startCameranFunc);

@@ -3,6 +3,7 @@ export * from "./sessionYearTableModel";
 
 //get
 export * from "./getAllSessionModel";
+export * from "./totalStatsModel";
 
 //post
 export * from "./addPupilModel";

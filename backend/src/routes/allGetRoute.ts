@@ -1,4 +1,4 @@
 import { ServerRoute } from "@hapi/hapi";
-import { baseRoute, getAllSession } from "./getHandlers";
+import { baseRoute, getAllSession, getTotals } from "./getHandlers";
 
-export const getRoutes: ServerRoute[] = [baseRoute, getAllSession];
+export const getRoutes: ServerRoute[] = [baseRoute, getAllSession, getTotals];

@@ -27,15 +27,20 @@ export const sessionModel = (function () {
 		}
 	};
 
-	// const isDuplicate = async function (sessionYear: string): Promise<boolean> {
-	// 	const years = await loadSessionYears();
-	// 	if (!years || years.length === 0) return false;
-
-	// 	for (let i = 0; i < years.length; i++) {
-	// 		if (years[i] === sessionYear) return true;
-	// 	}
-	// 	return false;
-	// };
+	const getTotals = async function () {
+		try {
+			const res = await fetch(`${API_BASE_URL}/getTotals/3000_3333`, {
+				method: "GET",
+			});
+			if (!res.ok) {
+				console.error("failed to fetch resource");
+				return null;
+			}
+			console.log(await res.json());
+		} catch (err: any) {
+			console.error(err.message);
+		}
+	};
 
 	const addNewSessionYear = async function (sessionYear: string) {
 		try {
@@ -51,5 +56,5 @@ export const sessionModel = (function () {
 		}
 	};
 
-	return { addNewSessionYear, loadSessionYears };
+	return { addNewSessionYear, loadSessionYears, getTotals };
 })();

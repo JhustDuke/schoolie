@@ -5,19 +5,15 @@ import "./webComponents";
 import {
 	sessionModalController,
 	tabsController,
-	// formController,
-} from "./eventListeners";
+	formController,
+} from "./formController";
 
 (function () {
 	document.addEventListener("DOMContentLoaded", function () {
-		if (document.getElementById("#sessionModal")) {
-			sessionModalController;
-		}
-		if (document.getElementById("#tabsContainer")) {
-			tabsController;
-		}
-		// if (document.getElementById("form")) {
-		// 	formController;
-		// }
+		sessionModalController;
+
+		tabsController;
+
+		formController;
 	});
 })();
