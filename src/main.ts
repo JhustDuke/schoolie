@@ -5,8 +5,8 @@ import "./webComponents";
 import {
 	sessionModalController,
 	tabsController,
-	formController,
-} from "./controllers";
+	// formController,
+} from "./eventListeners";
 
 (function () {
 	document.addEventListener("DOMContentLoaded", function () {
@@ -16,8 +16,8 @@ import {
 		if (document.getElementById("#tabsContainer")) {
 			tabsController;
 		}
-		if (document.getElementById("form")) {
-			formController;
-		}
+		// if (document.getElementById("form")) {
+		// 	formController;
+		// }
 	});
 })();

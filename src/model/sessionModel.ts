@@ -1,5 +1,3 @@
-import { isValidYearFormat } from "../utils";
-
 export const sessionModel = (function () {
 	const API_BASE_URL = "http://localhost:3333";
 
@@ -21,7 +19,7 @@ export const sessionModel = (function () {
 				console.error("no session years available in db");
 				return null;
 			}
-
+			console.log("session years loaded");
 			return data;
 		} catch (err) {
 			console.error("Error fetching session years:", err);
@@ -47,7 +45,7 @@ export const sessionModel = (function () {
 				body: JSON.stringify({ sessionYear }),
 			});
 			const msg = await res.json();
-			console.log("Server response:", msg);
+			console.log(`session year: ${sessionYear} created`);
 		} catch (err) {
 			console.error("Error adding session year:", err);
 		}
