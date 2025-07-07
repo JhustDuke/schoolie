@@ -1,9 +1,9 @@
 export const sessionModel = (function () {
-	const API_BASE_URL = "http://localhost:3333";
+	const baseurl = "http://localhost:3333";
 
 	const loadSessionYears = async function (): Promise<string[] | null> {
 		try {
-			const res = await fetch(`${API_BASE_URL}/getAllSessionYears`, {
+			const res = await fetch(`${baseurl}/getAllSessionYears`, {
 				method: "GET",
 			});
 			if (!res.ok) {
@@ -27,24 +27,9 @@ export const sessionModel = (function () {
 		}
 	};
 
-	const getTotals = async function () {
-		try {
-			const res = await fetch(`${API_BASE_URL}/getTotals/3000_3333`, {
-				method: "GET",
-			});
-			if (!res.ok) {
-				console.error("failed to fetch resource");
-				return null;
-			}
-			console.log(await res.json());
-		} catch (err: any) {
-			console.error(err.message);
-		}
-	};
-
 	const addNewSessionYear = async function (sessionYear: string) {
 		try {
-			const res = await fetch(`${API_BASE_URL}/addSessionYear`, {
+			const res = await fetch(`${baseurl}/addSessionYear`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ sessionYear }),
@@ -56,5 +41,5 @@ export const sessionModel = (function () {
 		}
 	};
 
-	return { addNewSessionYear, loadSessionYears, getTotals };
+	return { addNewSessionYear, loadSessionYears };
 })();

@@ -36,6 +36,8 @@ export class TabsSection extends HTMLElement {
             <p class="fs-4 fw-bold" id="totalPupils">385</p>
           </div>
         </div>
+
+       <!-- card -->
         <div class="col-12">
           <div class="p-3 rounded white">
             <h5>Recently Added Pupil</h5>

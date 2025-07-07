@@ -42,12 +42,6 @@ export const sessionModalMethods = (function (
 		}
 	};
 	const populateSessionSelect = async function () {
-		sessionModel
-			.getTotals()
-
-			.catch(function (reason) {
-				console.log(reason);
-			});
 		const selectElem = domRefs.selectElem;
 		if (!selectElem) {
 			console.error("selectElem not found");

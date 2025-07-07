@@ -2,7 +2,7 @@ import { Request, ResponseToolkit, ServerRoute } from "@hapi/hapi";
 import joi from "joi";
 import { totalStatsModel } from "../../model/totalStatsModel";
 
-const paramSchema = joi.object({
+const paramValidateSchema = joi.object({
 	sessionYear: joi.string().length(9).required(),
 });
 
@@ -16,7 +16,7 @@ export const getTotals: ServerRoute = {
 			additionalHeaders: ["X-Requested-With"],
 		},
 		validate: {
-			params: paramSchema,
+			params: paramValidateSchema,
 		},
 
 		handler: async function (req: Request, res: ResponseToolkit) {

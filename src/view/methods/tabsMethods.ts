@@ -1,15 +1,34 @@
 import { domUtils, addToTabMenuHelper } from "../../utils";
-import { tabsRefs as refs } from "../";
+import { domStaticValues, tabsRefs as refs } from "../";
+import { tabsModel as model } from "../../model";
 
-export const tabsMethods = (function (tabsRefs = refs) {
+export const tabsMethods = (function (tabsRefs = refs, tabsModel = model) {
 	const elemDefaultStates = function () {
 		const { addClassModal } = tabsRefs;
 
 		addClassModal!.style.display = "none";
 	};
+	const getTotals = async function () {
+		const { domRefs } = await import("../refs/sessnModRefs");
+		const selectElem = domRefs.selectElem;
+		const { closeAddClassIcon } = tabsRefs;
+		if (!selectElem) {
+			console.error(`element with id selectElem not found`);
+			return;
+		}
+		const selectValue = selectElem.value.toLowerCase();
+		if (selectValue === domStaticValues.chooseSession) {
+			alert(
+				"please select or add a session to get the total for pupils,genders and classes"
+			);
+			return;
+		}
+
+		try {
+		} catch (err: any) {}
+	};
 	const overviewFunc = function () {
 		const { overViewTabBtn } = tabsRefs;
-
 		if (!overViewTabBtn) {
 			console.log("tab button not found");
 		}
