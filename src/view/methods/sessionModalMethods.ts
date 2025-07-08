@@ -114,7 +114,8 @@ export const sessionModalMethods = (function (
 	};
 
 	const watchModal = function (): void {
-		displayModal();
+		console.log(" ran watch modal");
+		//displayModal();
 		updateModalUI();
 	};
 	const addNewSession = function (): void {

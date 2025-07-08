@@ -1,7 +1,6 @@
 import { tabsRefs as refs } from "../view";
 import { tabsMethods } from "../view";
 
-tabsMethods;
 export const tabsController = (function (tabsRefs = refs) {
 	console.log("tabs controllers ran");
 	const {
@@ -13,6 +12,10 @@ export const tabsController = (function (tabsRefs = refs) {
 		addClassModal,
 		closeAddClassIcon,
 	} = tabsRefs;
+
+	window.addEventListener("change", async function () {
+		await tabsMethods.getTotals();
+	});
 
 	tabsMethods.elemDefaultStates();
 

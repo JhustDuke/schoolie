@@ -6,7 +6,7 @@ import {
 	sessionModalController,
 	tabsController,
 	formController,
-} from "./formController";
+} from "./eventListeners";
 
 (function () {
 	document.addEventListener("DOMContentLoaded", function () {
