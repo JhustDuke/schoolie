@@ -1,3 +1,4 @@
 export * from "./baseRoute";
 export * from "./getAllSessions";
-export * from "./getTotals";
+export * from "./getSchoolStats";
+export * from "./getClass";

@@ -1,13 +1,88 @@
 import { domStaticValues as _domStaticValues } from "../domStaticValues";
-import { overviewRefs as _overviewRefs, tabsRefs as refs } from "../refs";
+import {
+	overviewRefs as _overviewRefs,
+	tabsRefs as refs,
+	domRefs as _domRefs,
+} from "../refs";
 import {
 	domUtils as _domUtils,
 	addToTabMenuHelper as _addToTabMenuHelper,
 	addElemToDom as _addElemToDom,
 	notifyToast as _notifyToast,
+	addElemToDom,
 } from "../../utils";
 import { tabsModel as model } from "../../model";
 
+interface tabhelper {
+	parentElem: HTMLElement | null;
+	sessionYear: string;
+	className: string;
+	fetchClassData: any;
+	spinner: string;
+	domStaticValues: any;
+	notify: Function;
+	addElemToDom: Function;
+}
+const tabHelper = async function ({
+	parentElem,
+	sessionYear,
+	className,
+	fetchClassData,
+	notify,
+	addElemToDom,
+	spinner,
+	domStaticValues,
+}: tabhelper) {
+	if (
+		sessionYear === domStaticValues.addSession ||
+		sessionYear === domStaticValues.chooseSession
+	) {
+		notify({
+			type: "error",
+			text: "Please select or add a session year to view data",
+			parentElem: document.body.querySelector("#app"),
+		});
+		return;
+	}
+
+	parentElem!.innerHTML = `<div class="fs-3 text-center ">${spinner}</div>`;
+
+	try {
+		const classData = await fetchClassData(sessionYear, className);
+		parentElem!.innerHTML = "";
+
+		if (!classData || classData.length === 0) {
+			addElemToDom({
+				parentElem,
+				typeOfElem: "div",
+				elemAttributes: { class: "red-text p-2" },
+				textContent: "No data found",
+			});
+			return;
+		}
+
+		classData.forEach(function (entry: any) {
+			addElemToDom({
+				parentElem,
+				typeOfElem: "div",
+				textContent: entry.alias,
+			});
+		});
+	} catch (err: any) {
+		parentElem!.innerHTML = "";
+		notify({
+			type: "error",
+			text: err.message,
+			parentElem: document.body.querySelector("#app"),
+		});
+		addElemToDom({
+			parentElem,
+			typeOfElem: "div",
+			elemAttributes: { class: "red-text p-2" },
+			textContent: err.message,
+		});
+	}
+};
 export const tabsMethods = (function (
 	tabsRefs = refs,
 	tabsModel = model,
@@ -15,18 +90,27 @@ export const tabsMethods = (function (
 		domStaticValues = _domStaticValues,
 		domUtils = _domUtils,
 		addToTabMenuHelper = _addToTabMenuHelper,
-		//	addElemToDom = _addToTabMenuHelper,
+		fetchData = tabHelper,
 		notifyToast = _notifyToast,
 		overviewRefs = _overviewRefs,
+		domRefs = _domRefs,
 	} = {}
 ) {
+	const spinner = `<div class="spinner-border red-text spinner-border-sm " role="status"></div>`;
 	const elemDefaultStates = function () {
 		const { addClassModal } = tabsRefs;
 		addClassModal!.style.display = "none";
+
+		const { femaleGenderTotal, maleGenderTotal, totalClasses, totalPupils } =
+			overviewRefs;
+		const defaultValue = "<span class='red-text'>N/A</span>";
+		femaleGenderTotal!.innerHTML = defaultValue;
+		maleGenderTotal!.innerHTML = defaultValue;
+		totalClasses!.innerHTML = defaultValue;
+		totalPupils!.innerHTML = defaultValue;
 	};
 
 	const getTotals = async function () {
-		const { domRefs } = await import("../refs/sessnModRefs");
 		const selectElem = domRefs.selectElem;
 
 		if (!selectElem) {
@@ -47,14 +131,13 @@ export const tabsMethods = (function (
 		const { femaleGenderTotal, maleGenderTotal, totalClasses, totalPupils } =
 			overviewRefs;
 
-		const spinner = `<div class="spinner-border red-text spinner-border-sm " role="status"></div>`;
 		femaleGenderTotal!.innerHTML = spinner;
 		maleGenderTotal!.innerHTML = spinner;
 		totalClasses!.innerHTML = spinner;
 		totalPupils!.innerHTML = spinner;
 
 		try {
-			const schoolSummary = await tabsModel.getTotals(safeValue);
+			const schoolSummary = await tabsModel.getSchoolStats(safeValue);
 			if (schoolSummary) {
 				femaleGenderTotal!.innerHTML = schoolSummary.total_girls as any;
 				maleGenderTotal!.innerHTML = schoolSummary.total_boys as any;
@@ -72,9 +155,26 @@ export const tabsMethods = (function (
 		if (!overViewTabBtn) console.log("tab button not found");
 	};
 
-	const gradeOneTabFunc = function () {
-		const { gradeOneTabBtn } = tabsRefs;
-		if (!gradeOneTabBtn) console.log("tab button not found");
+	const gradeOneTabFunc = async function () {
+		const { gradeOneTabBtn, gradeOneTabContents } = tabsRefs;
+		const { selectElem } = domRefs;
+
+		if (!gradeOneTabBtn) {
+			alert(`gradeOneTabBtn not found`);
+			console.error("tab button not found");
+			return;
+		}
+
+		await fetchData({
+			parentElem: gradeOneTabContents,
+			sessionYear: selectElem!.value,
+			className: "primary-5",
+			fetchClassData: tabsModel.getClassData,
+			notify: notifyToast,
+			addElemToDom,
+			spinner,
+			domStaticValues,
+		});
 	};
 
 	const gradeTwoTabFunc = function () {

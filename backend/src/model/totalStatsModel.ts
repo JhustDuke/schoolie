@@ -16,7 +16,8 @@ export async function totalStatsModel(
 		const [rows]: any = await conn.query(query);
 		if (rows.length === 0) {
 			await conn.query(
-				`INSERT INTO \`${table}\` (id, total_boys, total_girls, classes) VALUES (1, 0, 0, '{}')`
+				`UPDATE \`${table}\` SET total_boys = ?, total_girls = ?, classes = ? WHERE id = 1`,
+				[0, 0, JSON.stringify({})]
 			);
 			return { total_boys: 0, total_girls: 0, classes: 0 };
 		}

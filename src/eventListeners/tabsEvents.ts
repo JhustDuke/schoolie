@@ -1,7 +1,10 @@
 import { tabsRefs as refs } from "../view";
-import { tabsMethods } from "../view";
+import { tabsMethods as methods } from "../view";
 
-export const tabsController = (function (tabsRefs = refs) {
+export const tabsController = (function (
+	tabsRefs = refs,
+	tabsMethods = methods
+) {
 	console.log("tabs controllers ran");
 	const {
 		overViewTabBtn,
@@ -17,7 +20,9 @@ export const tabsController = (function (tabsRefs = refs) {
 		await tabsMethods.getTotals();
 	});
 
-	tabsMethods.elemDefaultStates();
+	if (window.location.pathname === "/") {
+		tabsMethods.elemDefaultStates();
+	}
 
 	overViewTabBtn?.addEventListener("click", tabsMethods.overviewFunc);
 

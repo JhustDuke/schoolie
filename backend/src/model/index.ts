@@ -4,6 +4,7 @@ export * from "./sessionYearTableModel";
 //get
 export * from "./getAllSessionModel";
 export * from "./totalStatsModel";
+export * from "./getClassModel";
 
 //post
 export * from "./addPupilModel";
