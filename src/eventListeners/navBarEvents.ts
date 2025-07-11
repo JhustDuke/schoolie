@@ -1,12 +1,16 @@
-import { navCogRefs as navRefs } from "../view/refs/navCogRefs";
-import { navBarMethods } from "../view";
+import { searchAndCogRefs as navRefs } from "../view/refs/searchAndCogRefs";
+import { navBarMethods as methods } from "../view";
 
-export const navBarController = (function (domRefs = navRefs) {
-	const { settingsCog, settingsPanel } = domRefs;
+export const navBarController = (function (
+	domRefs = navRefs,
+	navBarMethods = methods
+) {
+	const { settingsCog, settingsPanel, searchInput } = domRefs;
 	console.log("navBar controller initialized");
 
 	// hide settings panel by default
-	navBarMethods.domDefaultState();
+	navBarMethods.DOMDefaultState();
+
 	// toggle settings panel when cog is clicked
 	settingsCog?.addEventListener("click", navBarMethods.toggleCogDisplay);
 
@@ -15,6 +19,9 @@ export const navBarController = (function (domRefs = navRefs) {
 		navBarMethods.toggleCogDisplay
 	);
 
-	// you can add more listeners here if needed
-	console.log("ran navbar controller ");
+	searchInput?.addEventListener("keydown", function (e: KeyboardEvent) {
+		if (e.key === "Enter") {
+			navBarMethods.search();
+		}
+	});
 })();

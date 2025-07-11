@@ -2,5 +2,5 @@
 export * from "./sessnModRefs";
 export * from "./tabsRefs";
 export * from "./formRefs";
-export * from "./navCogRefs";
+export * from "./searchAndCogRefs";
 export * from "./overviewRefs";

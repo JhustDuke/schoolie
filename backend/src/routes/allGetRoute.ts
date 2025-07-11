@@ -4,6 +4,7 @@ import {
 	getAllSession,
 	getClass,
 	getSchoolStats,
+	searchQuery,
 } from "./getHandlers";
 
 export const getRoutes: ServerRoute[] = [
@@ -11,4 +12,5 @@ export const getRoutes: ServerRoute[] = [
 	getAllSession,
 	getSchoolStats,
 	getClass,
+	searchQuery,
 ];

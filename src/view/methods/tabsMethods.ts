@@ -83,6 +83,13 @@ const tabHelper = async function ({
 		});
 	}
 };
+
+/**
+ * to do
+ * search via the search bar
+ * switch to vue
+ * map the component structure
+ */
 export const tabsMethods = (function (
 	tabsRefs = refs,
 	tabsModel = model,
