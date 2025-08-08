@@ -1,5 +1,6 @@
 import { Request, ServerRoute, ResponseToolkit } from "@hapi/hapi";
 import { searchQueryModel } from "../../model";
+import { response } from "express";
 
 export const searchQuery: ServerRoute = {
 	method: "GET",
@@ -17,10 +18,10 @@ export const searchQuery: ServerRoute = {
 			return res.response("no query provided");
 		}
 		try {
-			const test = searchQueryModel(query);
-			return res.response(test);
+			const test = await searchQueryModel(query);
+			return res.response({ status: "pass", response: test });
 		} catch (err: any) {
-			return res.response(err.message);
+			return res.response({ status: "fail", response: err.message }).code(400);
 		}
 	},
 };

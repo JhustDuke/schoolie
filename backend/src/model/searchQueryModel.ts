@@ -1,9 +1,12 @@
 import { appPool } from "./createDBModel";
 import { getAllSessionModel } from "./";
+import { sanitizeTableName } from "../utils";
+import { all } from "axios";
 
 interface queryInterface {
 	sessionyear?: string | null;
 	classname?: string | null;
+	classes?: string | null;
 	gender?: string | null;
 	[key: string]: string | null | undefined;
 }
@@ -24,20 +27,21 @@ interface queryInterface {
  * CREATE A RECURSION FOR WHEN HIGHPRIORITY KEYS ARE NOT PROVIDED
 
  */
-export const searchQueryModel = function (
+
+export const searchQueryModel = async function (
 	queryObj: queryInterface,
 	pool = appPool
 ) {
-	const HighPriorityKeys = ["sessionyear", "classname", "gender"];
+	const HighPriorityKeys = ["classname", "gender", "sessionyear"];
 
 	const queryParser = function (): any {
 		const queryStringKeys = Object.keys(queryObj);
 		const highKeys: string[] = [];
-		const otherKeys = [];
+		const otherKeys: string[] = [];
 
-		//search for high priority and (low-priority)
 		for (let key of queryStringKeys) {
-			if (HighPriorityKeys.includes(key)) {
+			const lowerCasedKey = key.toLowerCase();
+			if (HighPriorityKeys.includes(lowerCasedKey)) {
 				highKeys.push(key);
 			} else {
 				otherKeys.push(key);
@@ -50,75 +54,245 @@ export const searchQueryModel = function (
 		};
 	};
 
-	const buildHighPriorityQuery = function () {
-		const { highKeys } = queryParser();
-		let dbquery = "";
-		const queryIndex: any[] = [];
-		const conditionals: string[] = [];
+	/**
+	 * Filters pupils based on search terms from the queryObj
+	 */
+	const filterPupilsBySearchTerms = function (
+		pupilsData: any[],
+		queryObj: queryInterface,
+		searchTerms: string[]
+	): any[] {
+		const match: any[] = [];
 
-		if (highKeys.length > 0) {
-			if (highKeys.includes("sessionyear") && queryObj.sessionyear) {
-				queryIndex.push(queryObj.sessionyear);
-				conditionals.push(`sessionYear='$${queryIndex.length}'`);
+		for (let i = 0; i < pupilsData.length; i++) {
+			const pupil = pupilsData[i];
+			let isMatch = true;
+
+			for (const term of searchTerms) {
+				if (!(term in queryObj)) continue;
+
+				const queryVal = queryObj[term]?.toLowerCase();
+				const pupilVal = pupil[term]?.toLowerCase();
+
+				if (pupilVal !== queryVal) {
+					isMatch = false;
+					break;
+				}
 			}
-			if (highKeys.includes("classname") && queryObj.classname) {
-				queryIndex.push(queryObj.classname);
-				conditionals.push(`className='$${queryIndex.length}'`);
-			}
-			if (highKeys.includes("gender") && queryObj.gender) {
-				queryIndex.push(queryObj.gender); // 🔧 FIXED: previously pushed classname again
-				conditionals.push(`gender='$${queryIndex.length}'`);
-			}
+
+			if (isMatch) match.push(pupil);
 		}
 
-		if (conditionals.length > 0) {
-			dbquery = conditionals.join(" AND ");
-		}
-
-		if (dbquery === "") {
-			return false;
-		}
-
-		console.log("ran to this point in major query");
-		return {
-			query: dbquery.trim(),
-			values: queryIndex, // 🔧 returning values for merge
-		};
+		return match;
 	};
 
-	const mergeOtherQuery = function () {
-		const result = buildHighPriorityQuery();
-		if (result === false) {
-			// TODO: handle recursive fallback
-			return;
+	/**
+	 * Parses and validates classes from DB result
+	 */
+	const extractClassData = async function (
+		tableName: string,
+		queriedClass: string | null,
+		gender: string
+	) {
+		const parsed = await fetchParsedClassesFromDB(tableName);
+		if (!parsed || Object.keys(parsed).length === 0)
+			throw new Error("invalid or empty SQL result...");
+
+		const result: any = { allClasses: parsed, genderData: [] };
+
+		if (queriedClass && parsed[queriedClass]) {
+			result.classContent = parsed[queriedClass];
+			result.genderData = parsed[queriedClass][gender] || [];
 		}
 
-		let { query: majorQuery, values } = result;
-		const { otherKeys, highKeys } = queryParser();
+		return result;
+	};
 
-		if (otherKeys.length === 0 && highKeys.length === 0) {
-			throw new Error("no search term provided");
+	const fetchParsedClassesFromDB = async function (tableName: string) {
+		try {
+			const safeTable = sanitizeTableName(tableName);
+			const query = `SELECT classes FROM \`${safeTable}\``;
+			const [rows]: any = await appPool.query(query);
+
+			if (!rows.length) {
+				throw new Error("rows array is empty ");
+			}
+			if (!rows[0].classes) {
+				throw new Error(`no classes present in ${rows[0]}`);
+			}
+
+			const parsed = JSON.parse(rows[0].classes);
+
+			return parsed;
+		} catch (err: any) {
+			throw new Error(err.message);
 		}
+	};
 
-		const conditionals: string[] = [];
+	const getAllSessionsClasses = async function (sessionsArr: any[]) {
+		//get all the sessionyear in the db
+		const allClasses = [];
+		const emptyClasses = [];
+		//enter the classes column in each year
+		for await (let classEntry of sessionsArr) {
+			//parse the classes
+			let parsedClassData: any = await fetchParsedClassesFromDB(classEntry);
 
-		for (let key of otherKeys) {
-			const val = queryObj[key];
-			if (val !== null) {
-				values.push(val);
-				conditionals.push(`${key}='$${values.length}'`);
+			if (parsedClassData && Object.keys(parsedClassData).length) {
+				allClasses.push(parsedClassData);
+			} else {
+				emptyClasses.push({ _empty: true });
 			}
 		}
 
-		let newQuery = majorQuery;
-		if (conditionals.length > 0) {
-			newQuery += " AND " + conditionals.join(" AND ");
-		}
-		console.log("ran to this point in other query");
-		return {
-			whereClause: newQuery,
-			values,
-		};
+		return { allClasses, emptyClasses };
 	};
-	return mergeOtherQuery();
+
+	const hasProperty = function (pupilProp: any, prop: string) {
+		if (pupilProp[prop]) {
+			return true;
+		}
+		return false;
+	};
+	const propValueMatches = function (
+		pupilProp: any,
+		queryProp: string,
+		queryObj: any
+	) {
+		const pupilVal = pupilProp[queryProp]?.toLowerCase();
+		const queryVal = queryObj[queryProp]?.toLowerCase();
+
+		if (pupilVal === queryVal) {
+			return true;
+		}
+		return false;
+	};
+
+	const searchParsedClassesByGender = function (
+		classesArr: any[],
+		queryObj: any,
+		searchKeys: string[]
+	) {
+		// create an empty array to store all matched pupils
+		const matchedPupils: any[] = [];
+
+		// loop through each classEntryObj in the array
+		for (let classEntryObj of classesArr) {
+			// for each class key in that object (e.g. "premiereClass", "primary-5")
+			for (let singleClassKey in classEntryObj) {
+				const singleClass = classEntryObj[singleClassKey];
+
+				// define gender groups
+				const genderGroups = ["boys", "girls"];
+
+				// loop through each gender group in the current class
+				for (let genderType of genderGroups) {
+					const pupilsArr = singleClass[genderType];
+
+					if (!Array.isArray(pupilsArr)) continue; // defensive check
+
+					// loop through each pupil in this gender group
+					for (
+						let pupilIndex = 0;
+						pupilIndex < pupilsArr.length;
+						pupilIndex++
+					) {
+						const currentPupil = pupilsArr[pupilIndex];
+						// check all search keys for this pupil
+						for (let searchKey of searchKeys) {
+							//if the searchkey prop exist in the pupil data
+							if (hasProperty(currentPupil, searchKey)) {
+								//if the supplied data and the stored data values are the same
+								if (propValueMatches(currentPupil, searchKey, queryObj)) {
+									matchedPupils.push(currentPupil);
+									break; // stop checking other keys for this pupil
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		if (!matchedPupils.length) {
+			throw new Error("no pupil found");
+		}
+		return matchedPupils;
+	};
+
+	const recurseClassSearch = async function (
+		queryObj: any,
+		searchKeys: string[]
+	) {
+		try {
+			const allSessionYears = await getAllSessionModel();
+			const { allClasses } = await getAllSessionsClasses(allSessionYears);
+			const result = searchParsedClassesByGender(
+				allClasses,
+				queryObj,
+				searchKeys
+			);
+
+			//check if the supplied otherKey prop exist as a prop in each pupil of the genderArr
+			//if it does, check if the value===the provided value
+			//if its a match push the current pupilData to the global match object
+			//if it doesnt move to other pupils in the genderArr
+			//repeat for all gender in all sessionYear and return the
+			return result;
+		} catch (err: any) {
+			throw new Error(err.message);
+		}
+	};
+
+	const execClassDataSearch = async function () {
+		//mainFilter=[gender,classname]
+		const { otherKeys: searchTerms, highKeys: mainFilter } = queryParser();
+
+		if (!searchTerms.length && !mainFilter.length)
+			throw new Error("no value provided");
+
+		if (!mainFilter.length) {
+			return await recurseClassSearch(queryObj, searchTerms);
+		}
+
+		const tableName = queryObj.sessionyear
+			? sanitizeTableName(queryObj.sessionyear)
+			: null;
+		if (!tableName) throw new Error("no session year provided");
+
+		const conn = await pool.getConnection();
+		try {
+			const queriedClass = queryObj.classname;
+			const gender =
+				queryObj.gender === "male".toLowerCase().trim() ? "boys" : "girls";
+
+			const { classContent, allClasses, genderData } = await extractClassData(
+				tableName,
+				queriedClass || null,
+				gender
+			);
+
+			const finalOutput: any = {};
+
+			if (queriedClass) {
+				finalOutput[queriedClass] = classContent;
+				const match = filterPupilsBySearchTerms(
+					genderData,
+					queryObj,
+					searchTerms
+				);
+				if (!match.length) throw new Error("no matching records found");
+				finalOutput.match = match;
+			} else {
+				finalOutput.allClasses = allClasses;
+			}
+
+			return finalOutput;
+		} catch (err: any) {
+			throw new Error(JSON.stringify({ err: err.message, source: err.stack }));
+		} finally {
+			conn.release();
+		}
+	};
+
+	return await execClassDataSearch();
 };

@@ -10,11 +10,7 @@ export const getAllSessionModel = async function () {
 		});
 		return tableNames;
 	} catch (err: any) {
-		console.log(err);
-		return {
-			status: "there was an error",
-			errorMsg: err.message,
-		};
+		throw new Error(err.message);
 	} finally {
 		dbConnection.release();
 	}
