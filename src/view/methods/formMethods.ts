@@ -8,7 +8,7 @@ import {
 	populateStates,
 } from "../../utils";
 
-import { formRefs as domElements, domStaticValues } from "..";
+import { formRefs as domElements, domStaticValues } from "../../view";
 import { naijaService } from "../../services";
 import { formModel } from "../../model";
 
@@ -391,7 +391,7 @@ export const formMethods = (function (
 
 	// Store data and add pupil
 	const sendFormToServer = async function () {
-		const { domRefs } = await import("../refs/sessnModRefs");
+		const { domRefs } = await import("../../view/refs/sessnModRefs");
 		const selectElem = domRefs.selectElem;
 
 		if (!selectElem) {
