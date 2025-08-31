@@ -1,17 +1,17 @@
-import { domStaticValues as _domStaticValues } from "../../view/domStaticValues";
+import { domStaticValues as _domStaticValues } from "../view/domStaticValues";
 import {
 	overviewRefs as _overviewRefs,
 	tabsRefs as refs,
 	domRefs as _domRefs,
-} from "../../view/refs";
+} from "../view/refs";
 import {
 	domUtils as _domUtils,
 	addToTabMenuHelper as _addToTabMenuHelper,
 	addElemToDom as _addElemToDom,
 	notifyToast as _notifyToast,
 	addElemToDom,
-} from "../../utils";
-import { tabsModel as model } from "../../model";
+} from "../utils";
+import { tabsModel as model } from "../model";
 
 interface tabhelper {
 	parentElem: HTMLElement | null;

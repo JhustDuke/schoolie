@@ -1,6 +1,6 @@
-import { navBarModel } from "../../model/navBarModel.js";
-import { notifyToast } from "../../utils/notifyToast.js";
-import { searchAndCogRefs } from "../../view/refs/searchAndCogRefs.js";
+import { navBarModel } from "../model/navBarModel.js";
+import { notifyToast } from "../utils/notifyToast.js";
+import { searchAndCogRefs } from "../view/refs/searchAndCogRefs.js";
 
 export const navBarMethods = (function (
 	refs = searchAndCogRefs,
@@ -24,17 +24,15 @@ export const navBarMethods = (function (
 	}
 	function validateSearch(input: string): boolean | any {
 		const blacklist = /[<>/"'`]|(script|onerror|onload|javascript):?/i;
-		//if the input field contains any of the blacklisted
 		if (blacklist.test(input) === true) {
 			return false;
 		}
-		//match all key=value starting with @
 		const criteria = /@(\w+)=([\w-]+)/g;
 		const inputArr = [...input.matchAll(criteria)];
 
 		const matchedKeyValueObj: Record<string, string> = {};
 		inputArr.map(function (entry: any) {
-			matchedKeyValueObj[entry[1]] = entry[2];
+			matchedKeyValueObj[entry[1].toLowerCase()] = entry[2].toLowerCase();
 		});
 		return matchedKeyValueObj;
 	}
@@ -45,18 +43,18 @@ export const navBarMethods = (function (
 		let safeValues: any = validateSearch(searchValue);
 
 		if (safeValues === false) {
-			notifyToast({
+			return notifyToast({
 				type: "error",
 				text: "Input must match @key=value format (letters, digits, hyphens allowed)",
 				parentElem: document.getElementById("app") as any,
 			});
-			return;
 		}
 
 		try {
-			console.log(safeValues);
 			const data = await model.searchModel(safeValues);
+			console.log(data);
 		} catch (error: unknown) {
+			console.error("something went wrong");
 			throw new Error((error as Error).message);
 		}
 	}

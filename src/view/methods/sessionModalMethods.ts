@@ -5,7 +5,7 @@ import {
 	insertBeforeAddSession,
 	notifyToast,
 } from "../../utils";
-import { domRefs as domElements } from "..";
+import { domRefs as domElements } from "../../view";
 import { sessionModel as ssModel } from "../../model";
 
 export const sessionModalMethods = (function (

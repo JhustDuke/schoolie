@@ -19,7 +19,7 @@ export const navBarController = (function (
 		navBarMethods.toggleCogDisplay
 	);
 
-	searchInput?.addEventListener("keydown", function (e: KeyboardEvent) {
+	searchInput?.addEventListener("keyup", function (e: KeyboardEvent) {
 		if (e.key === "Enter") {
 			navBarMethods.search();
 		}
