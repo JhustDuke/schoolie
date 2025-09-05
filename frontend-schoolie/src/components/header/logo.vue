@@ -3,7 +3,7 @@
 <template>
 	<div class="d-flex align-items-center">
 		<span class="nav-link white-text fw-bold fs-5 d-none d-md-inline"
-			>Logo Here</span
+			>SCHOoLLie</span
 		>
 		<button
 			class="btn white-text d-inline d-md-none"

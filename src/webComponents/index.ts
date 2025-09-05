@@ -2,7 +2,7 @@ import "./navbar";
 import "./sessionModal";
 
 import "./studentCard";
-import "./addClassModal";
+import "./genericModal";
 import "./asideNav";
 import "./tabsSection";
 import "./footer";

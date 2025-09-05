@@ -1,11 +1,31 @@
-<script setup lang="ts">
-	import NavBar from "./components/navBar.vue";
-</script>
-
 <template>
-	<div>
-		<NavBar />
+	<div class="layout mx-auto grey lighten-3">
+		<section>
+			<NavBar />
+		</section>
+
+		<main class="main-body">
+			<Body />
+		</main>
+
+		<footer class="yellow p-4"> footer content goes here </footer>
 	</div>
 </template>
 
-<style scoped></style>
+<script setup lang="ts">
+	import Body from "./components/body/body.vue";
+	import NavBar from "./components/header/navBar.vue";
+</script>
+
+<style scoped>
+	.layout {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+	}
+
+	/* Body grows to take remaining space */
+	.main-body {
+		flex: 1;
+	}
+</style>
