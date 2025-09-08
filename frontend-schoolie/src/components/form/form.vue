@@ -53,7 +53,7 @@
 						'Grade 5',
 					]"
 					v-model="classSelect"
-					@blur="
+					@focusout="
 						runValidation(
 							'select',
 							'classSelect',
@@ -72,7 +72,7 @@
 					label="Gender"
 					v-model="genderSelect"
 					:options="['Male', 'Female']"
-					@blur="
+					@focusout="
 						runValidation(
 							'select',
 							'genderSelect',
@@ -87,8 +87,8 @@
 					label="Date of Birth"
 					v-model="dobInput"
 					placeholder="YYYY-MM-DD"
-					type="date"
-					@blur="runValidation('dob', 'dobInput', $event)" />
+					type="text"
+					@focusout="runValidation('dob', 'dobInput', $event)" />
 			</div>
 			<div class="col-md-4 mb-3">
 				<SelectField
@@ -96,7 +96,7 @@
 					label="Religion"
 					v-model="religionSelect"
 					:options="['Christian', 'Muslim']"
-					@blur="
+					@focusout="
 						runValidation(
 							'select',
 							'religionSelect',
@@ -115,7 +115,7 @@
 					label="State"
 					v-model="stateSelect"
 					:options="['State 1', 'State 2', 'State 3']"
-					@change="
+					@focusout="
 						runValidation(
 							'select',
 							'stateSelect',
@@ -130,7 +130,7 @@
 					label="Local Government"
 					v-model="lgaSelect"
 					:options="['LGA 1', 'LGA 2', 'LGA 3']"
-					@change="
+					@focusout="
 						runValidation(
 							'select',
 							'lgaSelect',
@@ -145,7 +145,7 @@
 					label="Blood Group"
 					v-model="bloodGroupSelect"
 					:options="['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-']"
-					@blur="
+					@focusout="
 						runValidation(
 							'select',
 							'bloodGroupSelect',
@@ -308,7 +308,6 @@
 				statesObj: formFieldsState.value,
 			});
 		}
-		console.log(formFieldsState.value);
 	}
 
 	function onWebcamCapture() {}

@@ -20,5 +20,5 @@ export function showErrMsg(
 		if (parentElem.contains(newElem)) {
 			newElem.remove();
 		}
-	}, 3000);
+	}, 5000);
 }

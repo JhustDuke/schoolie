@@ -18,6 +18,7 @@
 	interface Props {
 		id: string;
 		label: string;
+		type?: string;
 		placeholder?: string;
 	}
 
