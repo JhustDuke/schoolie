@@ -18,6 +18,7 @@ export const validatePhoneField = function <
 	if (!isValid) {
 		if (!inputElem.parentElement) {
 			console.error("Parent element is null. Cannot add error message.");
+			statesObj[prop] = false as S[K];
 			return;
 		}
 		addElemToDom({
