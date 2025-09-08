@@ -48,8 +48,6 @@
 </template>
 
 <script setup lang="ts">
-	import { defineProps, defineEmits } from "vue";
-
 	defineProps({
 		helpText: { type: String, default: "Press start or upload an image." },
 		altText: { type: String, default: "webcam image" },

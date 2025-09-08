@@ -42,11 +42,11 @@ export function addElemToDom({
 	const createdElem = createElem(typeOfElem);
 	createdElem.textContent = textContent;
 
-	if (Object.keys(elemAttributes).length > 0) {
+	if (elemAttributes) {
 		applyAttributes(createdElem, elemAttributes);
 	}
 
-	if (typeof pluginFunc === "function" && pluginFunc !== undefined) {
+	if (typeof pluginFunc === "function") {
 		pluginFunc(parentElem, createdElem);
 	} else {
 		parentElem.appendChild(createdElem);

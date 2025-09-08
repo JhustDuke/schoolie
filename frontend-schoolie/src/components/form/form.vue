@@ -3,7 +3,9 @@
 		<!-- Webcam Section -->
 		<div class="row mb-3">
 			<div class="text-center">
-				<WebCam @image-captured="onWebcamCapture" />
+				<WebCam
+					@image-captured="onWebcamCapture"
+					v-model="webCam" />
 			</div>
 		</div>
 
@@ -14,22 +16,27 @@
 					id="surname"
 					label="Surname"
 					placeholder="Enter Surname"
-					@input="onInputChange" />
+					v-model="surnameInput"
+					@input="runValidation('name', 'surnameInput', $event)" />
 			</div>
 			<div class="col-md-3 mb-3">
 				<TextField
 					id="firstname"
 					label="First Name"
 					placeholder="Enter First Name"
-					@input="onInputChange" />
+					v-model="firstnameInput"
+					@input="runValidation('name', 'firstnameInput', $event)" />
 			</div>
 			<div class="col-md-3 mb-3">
 				<TextField
 					id="middlename"
 					label="Middle Name"
 					placeholder="Enter Middle Name"
-					@input="onInputChange" />
+					v-model="middlenameInput"
+					@input="runValidation('name', 'middlenameInput', $event)" />
 			</div>
+
+			<!-- select field starts here -->
 			<div class="col-md-3 mb-3">
 				<SelectField
 					id="classSelect"
@@ -45,7 +52,15 @@
 						'Grade 4',
 						'Grade 5',
 					]"
-					@change="onInputChange" />
+					v-model="classSelect"
+					@blur="
+						runValidation(
+							'select',
+							'classSelect',
+							$event,
+							domStaticValues.chooseClass
+						)
+					" />
 			</div>
 		</div>
 
@@ -55,23 +70,40 @@
 				<SelectField
 					id="genderSelect"
 					label="Gender"
+					v-model="genderSelect"
 					:options="['Male', 'Female']"
-					@change="onInputChange" />
+					@blur="
+						runValidation(
+							'select',
+							'genderSelect',
+							$event,
+							domStaticValues.chooseGender
+						)
+					" />
 			</div>
 			<div class="col-md-4 mb-3">
 				<TextField
 					id="dobInput"
 					label="Date of Birth"
+					v-model="dobInput"
 					placeholder="YYYY-MM-DD"
 					type="date"
-					@input="onInputChange" />
+					@blur="runValidation('dob', 'dobInput', $event)" />
 			</div>
 			<div class="col-md-4 mb-3">
 				<SelectField
 					id="religionSelect"
 					label="Religion"
+					v-model="religionSelect"
 					:options="['Christian', 'Muslim']"
-					@change="onInputChange" />
+					@blur="
+						runValidation(
+							'select',
+							'religionSelect',
+							$event,
+							domStaticValues.chooseReligion
+						)
+					" />
 			</div>
 		</div>
 
@@ -81,22 +113,46 @@
 				<SelectField
 					id="stateSelect"
 					label="State"
+					v-model="stateSelect"
 					:options="['State 1', 'State 2', 'State 3']"
-					@change="onInputChange" />
+					@change="
+						runValidation(
+							'select',
+							'stateSelect',
+							$event,
+							domStaticValues.chooseState
+						)
+					" />
 			</div>
 			<div class="col-md-4 mb-3">
 				<SelectField
 					id="lgaSelect"
 					label="Local Government"
+					v-model="lgaSelect"
 					:options="['LGA 1', 'LGA 2', 'LGA 3']"
-					@change="onInputChange" />
+					@change="
+						runValidation(
+							'select',
+							'lgaSelect',
+							$event,
+							domStaticValues.chooseLga
+						)
+					" />
 			</div>
 			<div class="col-md-4 mb-3">
 				<SelectField
 					id="bloodGroupSelect"
 					label="Blood Group"
+					v-model="bloodGroupSelect"
 					:options="['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-']"
-					@change="onInputChange" />
+					@blur="
+						runValidation(
+							'select',
+							'bloodGroupSelect',
+							$event,
+							domStaticValues.chooseBloodGroup
+						)
+					" />
 			</div>
 		</div>
 
@@ -108,7 +164,8 @@
 					label="Address"
 					placeholder="Enter Address"
 					isTextarea
-					@input="onInputChange" />
+					v-model="addressInput"
+					@input="runValidation('address', 'addressInput', $event)" />
 			</div>
 		</div>
 
@@ -119,21 +176,24 @@
 					id="fatherPhone"
 					label="Father's Phone"
 					placeholder="Enter Father's Phone"
-					@input="onInputChange" />
+					v-model="fatherPhoneInput"
+					@input="runValidation('phone', 'fatherPhoneInput', $event)" />
 			</div>
 			<div class="col-md-4 mb-3">
 				<PhoneField
 					id="motherPhone"
 					label="Mother's Phone"
 					placeholder="Enter Mother's Phone"
-					@input="onInputChange" />
+					v-model="motherPhoneInput"
+					@input="runValidation('phone', 'motherPhoneInput', $event)" />
 			</div>
 			<div class="col-md-4 mb-3">
 				<PhoneField
 					id="otherPhone"
 					label="Other Phone"
 					placeholder="Enter Other Phone"
-					@input="onInputChange" />
+					v-model="otherPhoneInput"
+					@input="runValidation('phone', 'otherPhoneInput', $event)" />
 			</div>
 		</div>
 
@@ -143,9 +203,9 @@
 				disabled
 				type="button"
 				class="btn btn-primary w-50"
-				@click="onSubmit"
-				>Submit</button
-			>
+				@click="onSubmit">
+				Submit
+			</button>
 		</center>
 	</form>
 </template>
@@ -155,16 +215,103 @@
 	import PhoneField from "./phoneField.vue";
 	import SelectField from "./selectField.vue";
 	import WebCam from "./webcam.vue";
-	//import naijaStateLocalGovernment from "naija-state-local-government";
+	import { ref } from "vue";
+	import {
+		validateNameField,
+		validateSelectField,
+		domStaticValues,
+		validatePhoneField,
+		validateDob,
+		validateAddressField,
+	} from "../utils/scripts";
 
-	// Placeholder methods for now
-	function onInputChange(value?: any) {
-		console.log("Input changed:", value);
+	const firstnameInput = ref<string>("");
+	const middlenameInput = ref<string>("");
+	const surnameInput = ref<string>("");
+	const genderSelect = ref<string>("");
+	const dobInput = ref<string>("");
+	const religionSelect = ref<string>("");
+	const bloodGroupSelect = ref<string>("");
+	const addressInput = ref<string>("");
+	const fatherPhoneInput = ref<string>("");
+	const motherPhoneInput = ref<string>("");
+	const otherPhoneInput = ref<string>("");
+	const lgaSelect = ref<string>("");
+	const stateSelect = ref<string>("");
+	const classSelect = ref<string>("");
+	const webCam = ref<string>("");
+
+	const formFieldsState = ref<Record<string, boolean>>({
+		firstnameInput: false,
+		middlenameInput: false,
+		surnameInput: false,
+		genderSelect: false,
+		dobInput: false,
+		religionSelect: false,
+		bloodGroupSelect: false,
+		addressInput: false,
+		fatherPhoneInput: false,
+		motherPhoneInput: false,
+		otherPhoneInput: false,
+		lgaSelect: false,
+		stateSelect: false,
+		classSelect: false,
+		webCam: false,
+	});
+
+	/**
+	 * Centralized validation
+	 */
+	function runValidation(
+		type: "name" | "select" | "phone" | "dob" | "address",
+		prop: string,
+		event: Event,
+		invalidValue?: string
+	): void {
+		const target = event.target as
+			| HTMLInputElement
+			| HTMLSelectElement
+			| HTMLTextAreaElement;
+		if (type === "name") {
+			validateNameField({
+				inputElem: target as HTMLInputElement,
+				elementStateObj: formFieldsState.value,
+				stateProp: prop,
+			});
+		}
+		if (type === "select") {
+			validateSelectField({
+				invalidValue: invalidValue || "",
+				stateObj: formFieldsState.value,
+				prop,
+				selectElem: target as HTMLSelectElement,
+			});
+		}
+		if (type === "phone") {
+			validatePhoneField({
+				inputElem: target as HTMLInputElement,
+				prop,
+				statesObj: formFieldsState.value,
+			});
+		}
+		if (type === "dob") {
+			validateDob({
+				inputElem: target as HTMLInputElement,
+				prop,
+				statesObj: formFieldsState.value,
+			});
+		}
+		if (type === "address") {
+			validateAddressField({
+				inputElem: target as HTMLTextAreaElement,
+				prop,
+				statesObj: formFieldsState.value,
+			});
+		}
+		console.log(formFieldsState.value);
 	}
 
-	function onWebcamCapture(imgData: string) {
-		console.log("Captured image:", imgData);
-	}
+	function onWebcamCapture() {}
 
 	function onSubmit() {
 		console.log("Submit clicked");

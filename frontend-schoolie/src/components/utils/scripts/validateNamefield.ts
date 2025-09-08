@@ -1,13 +1,16 @@
-import { showErrMsg, addElemToDom } from "./";
-export const validateNameField = function ({
+import { showErrMsg, addElemToDom } from "./index";
+export const validateNameField = function <
+	stateObjectType extends object,
+	keyType extends keyof stateObjectType
+>({
 	inputElem,
-	fieldKey,
-	elementStates,
+	stateProp,
+	elementStateObj,
 	errMsg = "Input must be text with/out hyphen",
 }: {
 	inputElem: HTMLInputElement | HTMLTextAreaElement;
-	fieldKey: keyof typeof elementStates;
-	elementStates: Record<string, boolean>;
+	stateProp: keyType;
+	elementStateObj: stateObjectType;
 	errMsg?: string;
 }) {
 	const nameRegex = /^[A-Za-z\s-]+$/;
@@ -22,9 +25,8 @@ export const validateNameField = function ({
 			elemAttributes: { class: "text-danger fw-small" },
 			pluginFunc: showErrMsg,
 		});
-
-		elementStates[fieldKey] = false;
+		elementStateObj[stateProp] = false as stateObjectType[keyType];
 	} else {
-		elementStates[fieldKey] = true;
+		elementStateObj[stateProp] = true as stateObjectType[keyType];
 	}
 };

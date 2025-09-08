@@ -26,19 +26,22 @@
 </template>
 
 <script setup lang="ts">
-	import { defineProps } from "vue";
-
 	interface Props {
 		id: string;
 		label: string;
+
 		options: string[];
 		placeholder?: string;
 	}
+	defineProps<Props>();
 
-	const props = defineProps<Props>();
+	const emit = defineEmits<{
+		(event: "update:modelValue", value: string): void;
+	}>();
 
 	function onChange(e: Event) {
-		const val = (e.target as HTMLSelectElement).value;
-		console.log(`Select ${props.id}:`, val); // placeholder
+		const elem = <HTMLSelectElement>e.target;
+
+		emit("update:modelValue", elem.value);
 	}
 </script>

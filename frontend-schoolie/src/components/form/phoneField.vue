@@ -17,18 +17,22 @@
 </template>
 
 <script setup lang="ts">
-	import { defineProps } from "vue";
-
 	interface Props {
 		id: string;
 		label: string;
 		placeholder?: string;
 	}
 
-	const props = defineProps<Props>();
+	defineProps<Props>();
+	const evt = "update:modelValue";
+
+	const emit = defineEmits<{
+		(event: "update:modelValue", data: string): void;
+	}>();
 
 	function onInput(e: Event) {
-		const val = (e.target as HTMLInputElement).value;
-		console.log(`Phone input ${props.id}:`, val); // placeholder
+		const elem = e.target as HTMLInputElement;
+
+		emit(evt, elem.value);
 	}
 </script>

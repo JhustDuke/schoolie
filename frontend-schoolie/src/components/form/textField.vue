@@ -15,18 +15,20 @@
 </template>
 
 <script setup lang="ts">
-	import { defineProps } from "vue";
-
 	interface Props {
 		id: string;
 		label: string;
 		placeholder?: string;
 	}
 
-	const props = defineProps<Props>();
+	defineProps<Props>();
+	const emit = defineEmits<{
+		(event: "update:modelValue", value: string): void;
+	}>();
 
 	function onInput(e: Event) {
-		const val = (e.target as HTMLInputElement).value;
-		console.log(`Input for ${props.id}:`, val); // placeholder for later logic
+		const elem = e.target as HTMLInputElement;
+		// placeholder for later logic
+		emit("update:modelValue", elem.value);
 	}
 </script>

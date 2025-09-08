@@ -3,6 +3,7 @@ export function showErrMsg(
 	newElem: HTMLElement | undefined
 ) {
 	if (!parentElem || !newElem) return;
+
 	// Ensure the error message appears properly
 	parentElem.style.position = "relative";
 
@@ -12,10 +13,10 @@ export function showErrMsg(
 	newElem.style.color = "red";
 
 	newElem.style.padding = "5px";
-	parentElem.append(newElem);
+	parentElem.appendChild(newElem);
 
 	// Remove after 5 seconds if not corrected
-	setTimeout(function () {
+	setTimeout(() => {
 		if (parentElem.contains(newElem)) {
 			newElem.remove();
 		}
