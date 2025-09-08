@@ -19,13 +19,16 @@ export const validateSelectField = function <
 	const value = selectElem.value.trim();
 
 	if (!value || value === invalidValue) {
-		addElemToDom({
-			parentElem: selectElem.parentElement!,
-			typeOfElem: "span",
-			textContent: errorMsg,
-			elemAttributes: { class: "text-danger mt-1" },
-			pluginFunc: showErrMsg,
-		});
+		const parentElem = selectElem.parentElement;
+		if (parentElem) {
+			addElemToDom({
+				parentElem: parentElem,
+				typeOfElem: "span",
+				textContent: errorMsg,
+				elemAttributes: { class: "text-danger mt-1" },
+				pluginFunc: showErrMsg,
+			});
+		}
 		stateObj[prop] = false as stateObjType[Keytype];
 	} else {
 		stateObj[prop] = true as stateObjType[Keytype];

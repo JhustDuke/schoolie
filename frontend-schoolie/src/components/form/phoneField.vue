@@ -24,8 +24,6 @@
 	}
 
 	defineProps<Props>();
-	const evt = "update:modelValue";
-
 	const emit = defineEmits<{
 		(event: "update:modelValue", data: string): void;
 	}>();
@@ -33,6 +31,6 @@
 	function onInput(e: Event) {
 		const elem = e.target as HTMLInputElement;
 
-		emit(evt, elem.value);
+		emit("update:modelValue", elem.value);
 	}
 </script>

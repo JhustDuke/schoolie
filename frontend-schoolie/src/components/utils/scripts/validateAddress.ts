@@ -18,13 +18,16 @@ export const validateAddressField = function <
 	const isValid = input.length >= 10;
 
 	if (!isValid) {
-		addElemToDom({
-			parentElem: inputElem.parentElement!,
-			typeOfElem: "span",
-			textContent: errMsg,
-			elemAttributes: { class: "text-danger fw-small" },
-			pluginFunc: showErrMsg,
-		});
+		const parentElem = inputElem.parentElement;
+		if (parentElem) {
+			addElemToDom({
+				parentElem: parentElem,
+				typeOfElem: "span",
+				textContent: errMsg,
+				elemAttributes: { class: "text-danger fw-small" },
+				pluginFunc: showErrMsg,
+			});
+		}
 		statesObj[prop] = false as S[K];
 	} else {
 		statesObj[prop] = true as S[K];

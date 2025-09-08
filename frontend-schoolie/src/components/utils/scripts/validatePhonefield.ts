@@ -16,8 +16,12 @@ export const validatePhoneField = function <
 	const isValid = phoneRegex.test(inputElem.value.trim());
 
 	if (!isValid) {
+		if (!inputElem.parentElement) {
+			console.error("Parent element is null. Cannot add error message.");
+			return;
+		}
 		addElemToDom({
-			parentElem: inputElem.parentElement!,
+			parentElem: inputElem.parentElement,
 			typeOfElem: "span",
 			textContent: "Invalid phone number",
 			elemAttributes: { class: "text-danger mt-1" },
