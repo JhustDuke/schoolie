@@ -30,7 +30,7 @@
 		id: string;
 		label: string;
 
-		options: string[];
+		options?: string[];
 		placeholder?: string;
 	}
 	defineProps<Props>();

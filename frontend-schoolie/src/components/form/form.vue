@@ -4,7 +4,8 @@
 		<div class="row mb-3">
 			<div class="text-center">
 				<WebCam
-					@image-captured="onWebcamCapture"
+					@image-captured="onImageReceived"
+					@upload="onUploadReceived"
 					v-model="webCam" />
 			</div>
 		</div>
@@ -114,7 +115,7 @@
 					id="stateSelect"
 					label="State"
 					v-model="stateSelect"
-					:options="['State 1', 'State 2', 'State 3']"
+					:options="stateSelectOptions"
 					@focusout="
 						runValidation(
 							'select',
@@ -129,7 +130,7 @@
 					id="lgaSelect"
 					label="Local Government"
 					v-model="lgaSelect"
-					:options="['LGA 1', 'LGA 2', 'LGA 3']"
+					:options="lgaSelectOptions"
 					@focusout="
 						runValidation(
 							'select',
@@ -197,10 +198,17 @@
 			</div>
 		</div>
 
-		<!-- Submit -->
+		<!-- Submit and error list -->
 		<center>
+			<div
+				v-if="hasFalsyState.hasError"
+				style="overflow-wrap: break-word"
+				class="red-text text muted p-2">
+				this fields are invalid:
+				{{ Array.from(hasFalsyState.fields).join(", ") }}
+			</div>
 			<button
-				disabled
+				:disabled="hasFalsyState.hasError"
 				type="button"
 				class="btn btn-primary w-50"
 				@click="onSubmit">
@@ -215,7 +223,7 @@
 	import PhoneField from "./phoneField.vue";
 	import SelectField from "./selectField.vue";
 	import WebCam from "./webcam.vue";
-	import { ref } from "vue";
+	import { ref, watch, computed } from "vue";
 	import {
 		validateNameField,
 		validateSelectField,
@@ -224,6 +232,7 @@
 		validateDob,
 		validateAddressField,
 	} from "../utils/scripts";
+	import naijaStateLocalGovernment from "naija-state-local-government";
 
 	const firstnameInput = ref<string>("");
 	const middlenameInput = ref<string>("");
@@ -239,6 +248,8 @@
 	const lgaSelect = ref<string>("");
 	const stateSelect = ref<string>("");
 	const classSelect = ref<string>("");
+
+	// webcam captured image (base64)
 	const webCam = ref<string>("");
 
 	const formFieldsState = ref<Record<string, boolean>>({
@@ -259,9 +270,26 @@
 		webCam: false,
 	});
 
-	/**
-	 * Centralized validation
-	 */
+	const stateSelectOptions: string[] = naijaStateLocalGovernment.states();
+	let lgaSelectOptions = ref<string[]>([]);
+
+	watch(stateSelect, function (newValue) {
+		lgaSelectOptions.value = naijaStateLocalGovernment.lgas(newValue).lgas;
+	});
+
+	const hasFalsyState = computed(function () {
+		const errors = new Set<string>();
+		for (const key in formFieldsState.value) {
+			if (!formFieldsState.value[key]) {
+				errors.add(key);
+			}
+		}
+		return {
+			hasError: errors.size > 0,
+			fields: errors,
+		};
+	});
+
 	function runValidation(
 		type: "name" | "select" | "phone" | "dob" | "address",
 		prop: string,
@@ -310,9 +338,36 @@
 		}
 	}
 
-	function onWebcamCapture() {}
+	function onImageReceived(payload: {
+		success: boolean;
+		image?: string | undefined;
+	}) {
+		if (!payload.success) {
+			console.log("webcam failure");
+			return;
+		}
+
+		webCam.value = payload.image!;
+		formFieldsState.value.webCam = !!webCam.value;
+		console.log("webcam success");
+	}
+	function onUploadReceived(payload: {
+		success: boolean;
+		file?: string | undefined;
+	}) {
+		if (!payload.success) {
+			console.log("upload failure");
+			return;
+		}
+
+		// if child sends base64 as payload.file
+		webCam.value = payload.file!;
+		formFieldsState.value.webCam = !!webCam.value;
+		console.log("upload success");
+	}
 
 	function onSubmit() {
 		console.log("Submit clicked");
+		console.log("Webcam base64:", webCam.value);
 	}
 </script>

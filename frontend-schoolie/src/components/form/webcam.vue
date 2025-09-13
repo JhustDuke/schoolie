@@ -13,7 +13,11 @@
 					style="object-fit: cover; top: 0; left: 0"></video>
 			</div>
 
-			<span class="red-text">{{ helpText }}</span>
+			<span
+				class="red-text"
+				ref="cameraHelp"
+				>{{ helpText }}</span
+			>
 			<img
 				ref="generatedImg"
 				class="d-none w-100 h-100 isAbsolute"
@@ -23,23 +27,32 @@
 
 		<div class="my-2">
 			<button
+				disabled
+				ref="stopCamBtn"
+				type="button"
 				class="btn btn-primary m-2"
 				@click="stopCamera"
 				>Stop</button
 			>
 			<button
+				ref="startCamBtn"
+				type="button"
 				class="btn btn-primary"
 				@click="startCamera"
 				>Start Camera</button
 			>
 			<button
+				disabled
+				ref="snapCamBtn"
+				type="button"
 				class="btn btn-primary m-2"
-				@click="snapPhoto"
+				@click="snapAndStopCam"
 				>Snap</button
 			>
 		</div>
 
 		<input
+			ref="uploadCamBtn"
 			class="btn btn-primary w-25"
 			type="file"
 			accept="image/png, image/jpeg"
@@ -48,28 +61,123 @@
 </template>
 
 <script setup lang="ts">
+	import { ref } from "vue";
 	defineProps({
 		helpText: { type: String, default: "Press start or upload an image." },
 		altText: { type: String, default: "webcam image" },
 	});
 
 	const emit = defineEmits<{
-		(e: "start"): void;
-		(e: "stop"): void;
-		(e: "snap"): void;
-		(e: "upload", file: Event): void;
+		(e: "imageCaptured", payload: { success: boolean; image?: string }): void;
+		(e: "upload", payload: { success: boolean; file?: string }): void;
 	}>();
 
-	function startCamera() {
-		emit("start");
+	const video = ref<HTMLVideoElement | null>(null);
+
+	const startCamBtn = ref<HTMLButtonElement | null>(null);
+	const stopCamBtn = ref<HTMLButtonElement | null>(null);
+	const snapCamBtn = ref<HTMLButtonElement | null>(null);
+
+	const canvas = ref<HTMLCanvasElement | null>(null);
+	const canvasWrapper = ref<HTMLDivElement | null>(null);
+
+	const cameraHelp = ref<HTMLElement | null>(null);
+	const generatedImg = ref<HTMLImageElement | null>(null);
+
+	let stream: MediaStream | null = null;
+
+	async function startCamera() {
+		try {
+			//if the stream is inactive start the webcam
+			if (!stream) {
+				stream = await navigator.mediaDevices.getUserMedia({ video: true });
+				video.value!.srcObject = stream;
+				video.value?.play();
+				canvasWrapper.value?.classList.remove("d-none");
+				cameraHelp.value?.classList.add("d-none");
+
+				generatedImg.value!.src = "";
+
+				startCamBtn.value!.textContent = "retake?";
+				startCamBtn.value!.disabled = true;
+				stopCamBtn.value!.disabled = false;
+				snapCamBtn.value!.disabled = false;
+				console.log("streaming");
+			}
+		} catch (err) {
+			console.log("there was an error:", err);
+		}
+
+		// emit("start");
 	}
 	function stopCamera() {
-		emit("stop");
+		if (stream) {
+			stream.getTracks().forEach(function (track: any) {
+				track.stop();
+			});
+			stream = null;
+			video.value?.pause();
+			stopCamBtn.value!.disabled = true;
+			snapCamBtn.value!.disabled = true;
+			startCamBtn.value!.disabled = false;
+			console.log("stream stopped!");
+		}
 	}
+
 	function snapPhoto() {
-		emit("snap");
+		if (stream) {
+			const ctx = canvas.value?.getContext("2d");
+			canvas.value!.width = video.value?.videoWidth as number;
+			canvas.value!.height = video.value?.videoHeight as number;
+			ctx?.drawImage(
+				video.value!,
+				0,
+				0,
+				canvas.value!.width,
+				canvas.value!.height
+			);
+			const convertToImageData = canvas.value?.toDataURL("image/png");
+			generatedImg.value?.classList.remove("d-none");
+			generatedImg.value!.src = convertToImageData as string;
+			canvas.value?.classList.add("d-none");
+			console.log("snapped picture");
+			//if no image has been snapped
+			if (generatedImg.value!.src === "") {
+				emit("imageCaptured", { success: false });
+				return;
+			} else {
+				emit("imageCaptured", {
+					success: true,
+					image: generatedImg.value!.src,
+				});
+			}
+		}
+	}
+
+	function snapAndStopCam() {
+		snapPhoto();
+		stopCamera();
 	}
 	function uploadFile(event: Event) {
-		emit("upload", event);
+		const fileInput = event.target as HTMLInputElement;
+		const file = fileInput.files?.[0];
+
+		if (!file || !file.type.startsWith("image/")) return;
+
+		const reader = new FileReader();
+		reader.onload = function (e) {
+			if (generatedImg.value && e.target?.result) {
+				generatedImg.value!.src = e.target.result as string;
+
+				generatedImg.value!.classList.remove("d-none");
+				console.log("image read and stored successfully");
+				emit("upload", { success: true, file: generatedImg.value!.src });
+			} else {
+				emit("upload", { success: false });
+
+				console.log("image failed to upload try again");
+			}
+		};
+		reader.readAsDataURL(file);
 	}
 </script>

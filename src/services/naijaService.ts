@@ -5,6 +5,6 @@ export const naijaService = {
 		return naijaStates.states();
 	},
 	getLgasByState: function (state: string) {
-		return naijaStates.lgas(state).lgas;
+		return naijaStates.lgas(state).lgas();
 	},
 };
