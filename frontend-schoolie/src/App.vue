@@ -9,7 +9,7 @@
 		</main>
 
 		<div>
-			<Form />
+			<!-- <Form /> -->
 		</div>
 		<footer class="yellow p-4"> footer content goes here </footer>
 	</div>
@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 	import Body from "./components/body/body.vue";
-	import Form from "./components/form/form.vue";
+	//import Form from "./components/form/form.vue";
 	import NavBar from "./components/header/navBar.vue";
 </script>
 

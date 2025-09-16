@@ -11,21 +11,22 @@
 				value="chooseSession"
 				>Choose session</option
 			>
-			<option value="addSession">Add Session</option>
+			<option
+				value="addSession"
+				@click="isVisible = true"
+				>Add Session</option
+			>
 		</select>
 
 		<!-- Generic modal directly underneath the select position absolute to navbar -->
 		<div
 			class="mt-2 w-50 isAbsolute"
 			style="top: 96%; left: 20%">
-			<GenericModal>
-				<div>
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem
-					libero corrupti, ducimus, harum sit esse odit tempore quod sequi ad
-					ipsam quam, ipsa repudiandae aperiam alias voluptatibus maxime
-					quibusdam minima?
-				</div>
-			</GenericModal>
+			<AddSessionModal
+				:visible="isVisible"
+				@error="showError"
+				@success="showSuccess"
+				@close="isVisible = false" />
 		</div>
 
 		<!-- Cog icon styled as clickable -->
@@ -36,7 +37,22 @@
 </template>
 
 <script setup lang="ts">
-	import GenericModal from "../utils/genericModal.vue";
+	//import { sessionModel } from "../../model";
+	import { ref } from "vue";
+	import AddSessionModal from "./addSessionModal.vue";
+	import { notifyToast } from "../utils/scripts";
 
-	//const show: boolean = true;
+	const isVisible = ref<boolean>(false);
+
+	function showError() {
+		notifyToast({
+			text: "session year not added",
+			type: "error",
+			parentElem: <HTMLDivElement>document.getElementById("app"),
+		});
+	}
+
+	function showSuccess() {
+		notifyToast({ text: "session year not added", type: "error" });
+	}
 </script>

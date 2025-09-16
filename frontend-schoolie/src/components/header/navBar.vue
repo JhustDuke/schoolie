@@ -9,6 +9,7 @@
 	</nav>
 </template>
 <script setup lang="ts">
+	import { sessionModel } from "../../model";
 	import Logo from "./logo.vue";
 	import SearchAndTooltip from "./searchAndTooltip.vue";
 	import SessionAndCog from "./sessionSelectAndCog.vue";

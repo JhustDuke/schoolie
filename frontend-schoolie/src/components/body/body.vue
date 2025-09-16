@@ -4,17 +4,11 @@
 		<aside class="col-md-2 d-none d-md-block py-4">
 			<ul class="nav flex-column">
 				<AnchorLink
-					linkName="overview"
+					v-for="item in asideLinks"
+					:key="item.name"
+					:linkName="item.name"
 					customClass="text-uppercase fw-bold"
-					@click="setTab('overview')" />
-				<AnchorLink
-					linkName="timetable"
-					customClass="text-uppercase fw-bold"
-					@click="setTab('timetable')" />
-				<AnchorLink
-					linkName="about"
-					customClass="text-uppercase fw-bold"
-					@click="setTab('about')" />
+					@click="setTab(item.name)" />
 			</ul>
 		</aside>
 
@@ -24,16 +18,11 @@
 				name="fade-slide"
 				mode="out-in">
 				<section v-if="activeTab === 'overview'">
-					<!-- Correctly pass arrays, not strings -->
-					<div
-						class="d-md-flex justify-content-md-start d-sm-flex justify-content-sm-center mb-3">
-						<TabTitle
-							bsToggle="tab"
-							:tabTitles="['Grade-1', 'Grade-2']"
-							:targetElemIds="['#grade1', '#grade2']" />
-					</div>
+					<TabTitle
+						bsToggle="tab"
+						:tabTitles="['Grade-1', 'Grade-2']"
+						:targetElemIds="['#grade1', '#grade2']" />
 
-					<!-- class 'tab-content' is REQUIRED BY BOOTSTRAP-JS -->
 					<div class="tab-content">
 						<TabContent
 							id="grade1"
@@ -45,25 +34,11 @@
 					</div>
 				</section>
 
-				<section v-else-if="activeTab === 'timetable'">
-					<BrokenLink
-						title="timeTable"
-						errorMessage="this page seems to be unavailable at the moment" />
-				</section>
-
 				<section
-					v-else-if="activeTab === 'about'"
-					class="">
-					<div>
-						<BrokenLink
-							title="About"
-							errorMessage="this page seems to be unavailable at the moment" />
-					</div>
-				</section>
-
-				<section v-else-if="activeTab === 'more'">
+					v-else
+					:key="activeTab">
 					<BrokenLink
-						title="more"
+						:title="activeTab"
 						errorMessage="this page seems to be unavailable at the moment" />
 				</section>
 			</transition>
@@ -80,11 +55,17 @@
 
 	const activeTab = ref<string>("overview");
 
+	const asideLinks: { name: string }[] = [
+		{ name: "overview" },
+		{ name: "timetable" },
+		{ name: "about" },
+		{ name: "more" },
+	];
+
 	function setTab(tab: string): void {
 		activeTab.value = tab;
 	}
 </script>
-
 <style scoped>
 	.fade-slide-enter-active,
 	.fade-slide-leave-active {
