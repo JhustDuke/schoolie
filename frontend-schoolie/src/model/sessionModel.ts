@@ -36,12 +36,15 @@ export const sessionModel = (function () {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ sessionYear }),
 			});
+			if (!res.ok) {
+				throw new Error("request did not succeed");
+			}
 			const msg: { msg: string } = await res.json();
 			console.log(`session year: ${sessionYear} created`);
 			return msg;
 		} catch (err: any) {
 			console.error("Error adding session year:", err.message);
-			return { msg: "Failed to add session year" };
+			throw new Error(JSON.stringify({ msg: "Failed to add session year" }));
 		}
 	};
 

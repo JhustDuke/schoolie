@@ -44,15 +44,17 @@
 
 	const isVisible = ref<boolean>(false);
 
-	function showError() {
+	function showError(payload?: { msg: string; reason?: string }) {
 		notifyToast({
-			text: "session year not added",
+			text: `msg:${payload?.msg}-reason:${payload?.reason} `,
 			type: "error",
-			parentElem: <HTMLDivElement>document.getElementById("app"),
 		});
 	}
 
-	function showSuccess() {
-		notifyToast({ text: "session year not added", type: "error" });
+	function showSuccess(payload?: { msg: string }) {
+		notifyToast({
+			text: ` ${payload?.msg}`,
+			type: "success",
+		});
 	}
 </script>

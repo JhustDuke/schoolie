@@ -34,8 +34,8 @@ export function notifyToast({
 		typeOfElem: "div",
 		textContent: text,
 		elemAttributes: {
-			class: `mx-auto p-3 w-50 isAbsolute text-center ${classMap[type]}`,
-			style: "left:30%;",
+			class: `mx-auto p-3 w-50 fixed-top  text-center ${classMap[type]}`,
+			style: "left:20%;",
 		},
 		pluginFunc: function (parentElem, newElem) {
 			if (!newElem || !parentElem) return;

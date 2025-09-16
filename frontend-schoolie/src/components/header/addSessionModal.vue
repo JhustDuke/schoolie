@@ -5,7 +5,7 @@
 		id="genericModal">
 		<div class="pt-2 px-4 text-center pb-2 grey darken-3">
 			<!-- Close Button -->
-			<span class="isAbsolute hover close-btn mb-2">
+			<span class="float-end hover close-btn mb-2">
 				<i
 					class="fa fa-window-close red-text"
 					aria-hidden="true"
@@ -54,7 +54,7 @@
 
 	const emit = defineEmits<{
 		(event: "close"): void;
-		(event: "error"): void;
+		(event: "error", payload?: { msg: string; reason?: string }): void;
 		(event: "success", payload?: { msg: string }): void;
 	}>();
 
@@ -80,17 +80,20 @@
 		btnDisabled.value = false;
 	}
 
-	const modal = ref<HTMLElement | null>(null);
-
 	async function sendToDatabase() {
 		btnText.value = spinner;
 		btnDisabled.value = true;
 
 		try {
 			await sessionModel.addNewSessionYear(inputVal.value);
+			console.log("success");
 			emit("success", { msg: `session year ${inputVal.value} added` });
-		} catch (err) {
-			emit("error");
+		} catch (err: any) {
+			console.error(err.message);
+			emit("error", {
+				msg: `session year ${inputVal.value} not added`,
+				reason: err.message,
+			});
 		} finally {
 			btnText.value = "Add Session";
 			btnDisabled.value = true;
