@@ -4,7 +4,7 @@ export const tabsModel = (function () {
 	const getSchoolStats = async function (sessionYear: string): Promise<{
 		total_boys: number;
 		total_girls: number;
-		classes: number;
+		total_classes: number;
 	} | null> {
 		try {
 			const res = await fetch(`${baseUrl}/getSchoolStats/${sessionYear}`, {
@@ -12,7 +12,7 @@ export const tabsModel = (function () {
 			});
 			if (!res.ok) {
 				console.error("failed to fetch resource");
-				return null;
+				throw new Error("failed to fetch resource");
 			}
 			const final = await res.json();
 			return final;
@@ -46,5 +46,13 @@ export const tabsModel = (function () {
 		}
 	};
 
-	return { getSchoolStats, getClassData };
+	const loadClasses = async function (): Promise<string[]> {
+		try {
+			return [];
+		} catch (err: any) {
+			throw new Error(err.message);
+		}
+	};
+
+	return { loadClasses, getSchoolStats, getClassData };
 })();

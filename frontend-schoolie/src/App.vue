@@ -9,7 +9,7 @@
 		</main>
 
 		<div>
-			<!-- <Form /> -->
+			<AddClassModal />
 		</div>
 		<footer class="yellow p-4"> footer content goes here </footer>
 	</div>
@@ -19,6 +19,7 @@
 	import Body from "./components/body/body.vue";
 	//import Form from "./components/form/form.vue";
 	import NavBar from "./components/header/navBar.vue";
+	import AddClassModal from "./components/utils/addClassModal.vue";
 </script>
 
 <style scoped>

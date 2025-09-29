@@ -5,9 +5,8 @@
 			v-if="typeof label === 'string' && typeof targetElemId === 'string'"
 			:href="href"
 			class="nav-link fw-medium"
-			:data-bs-toggle="bsToggle"
-			:data-bs-target="targetElemId"
-			:class="[customClass, { active: isActive }]">
+			data-bs-toggle="tab"
+			:data-bs-target="targetElemId">
 			{{ label }}
 		</a>
 
@@ -19,10 +18,10 @@
 				v-for="(title, index) in tabTitles"
 				:key="index"
 				:href="href ?? '#'"
+				data-bs-toggle="tab"
 				class="nav-link fw-medium"
-				:data-bs-toggle="bsToggle"
-				:data-bs-target="targetElemIds[index]"
-				:class="[customClass, { active: index === 0 && isActive }]">
+				:class="index === 0 ? 'show active' : ''"
+				:data-bs-target="targetElemIds[index]">
 				{{ title }}
 			</a>
 		</div>
@@ -38,13 +37,11 @@
 		href?: string;
 		isActive?: boolean;
 		customClass?: string | string[];
-		bsToggle?: string;
 	}
 
 	const props = withDefaults(defineProps<TabTitleInterface>(), {
 		isActive: false,
 		customClass: "gray lighten-1 nav",
-		bsToggle: "tab",
 	});
 
 	// Validation: tabTitles and targetElemIds must match length
@@ -57,4 +54,15 @@
 			`tabTitles (${props.tabTitles.length}) and targetElemIds (${props.targetElemIds.length}) must have the same length.`
 		);
 	}
+
+	//what do i want
+	//when i click a particular tab, it should look for its target id and remove tab-pane out of it
+	//
 </script>
+
+<style scoped>
+	.active {
+		background-color: rgba(90, 90, 90, 0.425) !important;
+		color: white !important;
+	}
+</style>

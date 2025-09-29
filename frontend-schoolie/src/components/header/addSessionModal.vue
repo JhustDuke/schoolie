@@ -54,7 +54,7 @@
 
 	const emit = defineEmits<{
 		(event: "close"): void;
-		(event: "error", payload?: { msg: string; reason?: string }): void;
+		(event: "error", payload?: { reason: string }): void;
 		(event: "success", payload?: { msg: string }): void;
 	}>();
 
@@ -91,7 +91,6 @@
 		} catch (err: any) {
 			console.error(err.message);
 			emit("error", {
-				msg: `session year ${inputVal.value} not added`,
 				reason: err.message,
 			});
 		} finally {

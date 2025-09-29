@@ -8,22 +8,22 @@ export const sessionModel = (function () {
 			});
 			if (!res.ok) {
 				console.error("Failed to fetch session years");
-				return null;
+				throw new Error("failed to fetch a response");
 			}
 			const data = await res.json();
 			if (!Array.isArray(data)) {
 				console.error("Invalid response format");
-				return null;
+				throw new Error("invalid response format");
 			}
 			if (data.length === 0) {
-				console.error("no session years available in db");
-				return null;
+				console.error("data.length===0");
+				throw new Error("no session year available");
 			}
 			console.log("session years loaded");
 			return data;
-		} catch (err) {
+		} catch (err: any) {
 			console.error("Error fetching session years:", err);
-			return null;
+			throw new Error(err.message);
 		}
 	};
 
@@ -48,5 +48,24 @@ export const sessionModel = (function () {
 		}
 	};
 
-	return { addNewSessionYear, loadSessionYears };
+	const getSessionStats = async function (sessionYear: string): Promise<{
+		total_boys: number;
+		total_girls: number;
+		total_classes: number;
+	} | null> {
+		try {
+			const res = await fetch(`${baseurl}/getSchoolStats/${sessionYear}`, {
+				method: "GET",
+			});
+			if (!res.ok) {
+				console.error("failed to fetch resource");
+				throw new Error("request did not succeed");
+			}
+			const final = await res.json();
+			return final;
+		} catch (error: any) {
+			throw new Error(error.message);
+		}
+	};
+	return { addNewSessionYear, loadSessionYears, getSessionStats };
 })();
