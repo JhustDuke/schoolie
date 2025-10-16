@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-	import { ref, onMounted } from "vue";
+	import { ref, onMounted, inject } from "vue";
 	import { sessionModel } from "../../model";
 	import AddSessionModal from "./addSessionModal.vue";
 	import { notifyToast } from "../utils/scripts";
@@ -64,8 +64,7 @@
 
 	async function getSingleSessionStats(e: Event) {
 		const elemValue = (e.target as HTMLSelectElement)?.value;
-		if (elemValue.toLowerCase().includes("sessions")) {
-			console.log("noope");
+		if (elemValue.toLowerCase().includes("session")) {
 			return;
 		}
 		try {
@@ -79,10 +78,18 @@
 		}
 	}
 
+	const sessionStore = inject<{
+		allSessions: Readonly<Set<string>>;
+		updateSessions: (sessions: string[]) => void;
+	}>("sessions");
 	async function loadAllSessions() {
 		try {
 			const data: string[] | null = await sessionModel.loadSessionYears();
 			sessionData.value = [...(data || [])];
+
+			if (sessionData.value.length > 0) {
+				sessionStore?.updateSessions(sessionData.value);
+			}
 		} catch (err: any) {
 			notifyToast({
 				text: err.message,

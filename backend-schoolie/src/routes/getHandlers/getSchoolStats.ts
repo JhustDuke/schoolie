@@ -21,7 +21,7 @@ export const getSchoolStats: ServerRoute = {
 
 		handler: async function (req: Request, res: ResponseToolkit) {
 			const sessionYear = req.params.sessionYear;
-			const grade = req.query.class || null;
+
 			try {
 				const stats = await totalStatsModel(sessionYear);
 

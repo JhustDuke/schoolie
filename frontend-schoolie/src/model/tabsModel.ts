@@ -46,9 +46,21 @@ export const tabsModel = (function () {
 		}
 	};
 
-	const loadClasses = async function (): Promise<string[]> {
+	const loadClasses = async function (sessionYear: string): Promise<string[]> {
+		const safeYear = sessionYear.replace("/", "-");
+
 		try {
-			return [];
+			const res = await fetch(
+				`${baseUrl}/getClass?sessionYear=${encodeURIComponent(safeYear)}`
+			);
+			const result = await res.json();
+
+			if (!res.ok) {
+				throw new Error(result.message);
+			}
+
+			// result should be an array of class keys
+			return result as string[];
 		} catch (err: any) {
 			throw new Error(err.message);
 		}

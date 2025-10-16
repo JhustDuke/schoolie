@@ -28,3 +28,10 @@
 		isActive: false,
 	});
 </script>
+
+<style scoped>
+	.active {
+		background-color: rgb(219, 219, 219) !important;
+		color: rosybrown !important;
+	}
+</style>

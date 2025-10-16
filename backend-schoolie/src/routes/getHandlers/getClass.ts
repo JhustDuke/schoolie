@@ -1,11 +1,9 @@
 import { ServerRoute, Request, ResponseToolkit } from "@hapi/hapi";
 import { getClassModel } from "../../model";
-import joi from "joi";
-
 import Joi from "joi";
 
 const validateQuerySchema = Joi.object({
-	queriedClass: Joi.string().required().min(2).label("queriedClass"),
+	queriedClass: Joi.string().min(2).label("queriedClass"), // optional now
 	sessionYear: Joi.string().required().label("sessionYear"),
 });
 
@@ -20,7 +18,7 @@ export const getClass: ServerRoute = {
 					.response({
 						message: "Invalid query format",
 						expectedFormat: {
-							queriedClass: "e.g. 'jss1'",
+							queriedClass: "e.g. 'basic-1' (optional)",
 							sessionYear: "e.g. '2023/2024'",
 							err: (err as any).details,
 						},
@@ -36,23 +34,32 @@ export const getClass: ServerRoute = {
 		},
 	},
 	handler: async function (req: Request, res: ResponseToolkit) {
-		const queriedClass = <string>req.query.queriedClass;
+		const queriedClass = <string | undefined>req.query.queriedClass;
 		const sessionYear = <string>req.query.sessionYear;
 
-		if (!queriedClass || !sessionYear) {
-			return res
-				.response({ message: "Missing class or sessionYear" })
-				.code(400);
-		}
+		// destructure methods from the model factory
+		const { getClass, getClassKeys } = getClassModel();
 
 		try {
-			const classStats = await getClassModel(sessionYear, queriedClass);
+			if (queriedClass) {
+				// Scenario 1: specific class requested
+				const classStats = await getClass(sessionYear, queriedClass);
 
-			if (!classStats) {
-				return res.response({ message: "Class not found" }).code(404);
+				if (!classStats) {
+					return res.response({ message: "Class not found" }).code(404);
+				}
+
+				return res.response(classStats).code(200);
+			} else {
+				// Scenario 2: no queriedClass → return all class keys
+				const classKeys = await getClassKeys(sessionYear);
+
+				if (!classKeys.length) {
+					return res.response({ message: "No classes found" }).code(404);
+				}
+
+				return res.response(classKeys).code(200);
 			}
-
-			return res.response(JSON.stringify([classStats])).code(200);
 		} catch (err: any) {
 			return res.response({ message: err.message }).code(500);
 		}

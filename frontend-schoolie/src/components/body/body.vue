@@ -7,6 +7,7 @@
 					v-for="item in asideLinks"
 					:key="item.name"
 					:linkName="item.name"
+					:isActive="activeTab === item.name"
 					customClass="text-uppercase fw-bold"
 					@click="setTab(item.name)" />
 			</ul>
@@ -17,65 +18,52 @@
 			<transition
 				name="fade-slide"
 				mode="out-in">
-				<div :key="activeTab">
-					<!-- Overview -->
-					<section v-if="activeTab === 'overview'">
-						<TabTitle
-							:tabTitles="['Overview', 'Grade-2']"
-							:targetElemIds="['#overview', '#grade2']" />
-
-						<div class="tab-content">
-							<TabContent
-								id="overview"
-								isActive
-								show>
-								<Overview />
-							</TabContent>
-							<TabContent id="grade2"> grade 2 tabContent </TabContent>
-						</div>
-					</section>
-
-					<!-- Form -->
-					<section v-else-if="activeTab === 'form'">
-						<Form />
-					</section>
-
-					<!-- Fallback -->
-					<section v-else>
-						<BrokenLink
-							:title="activeTab"
-							errorMessage="this page seems to be unavailable at the moment" />
-					</section>
-				</div>
+				<KeepAlive>
+					<component
+						:is="currentTabComponent"
+						:key="activeTab" />
+				</KeepAlive>
 			</transition>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-	import { ref } from "vue";
+	import { ref, computed } from "vue";
 	import AnchorLink from "../utils/anchorLink.vue";
-	import TabTitle from "./tabTitle.vue";
-	import TabContent from "./tabContent.vue";
+	// import TabTitle from "./tabTitle.vue";
+	// import TabContent from "./tabContent.vue";
 	import BrokenLink from "../utils/brokenLink.vue";
 	import Overview from "./overview/overview.vue";
 	import Form from "../form/form.vue";
-
-	const activeTab = ref<string>("overview");
+	import AddClass from "./addClasses.vue";
 
 	const asideLinks: { name: string }[] = [
 		{ name: "overview" },
-		{ name: "timetable" },
-		{ name: "about" },
+		{ name: "add_classes" },
+		{ name: "add_pupil" },
 		{ name: "more" },
-		{ name: "form" },
 	];
+
+	const activeTab = ref<string>("overview");
+
+	const currentTabComponent = computed(function () {
+		switch (activeTab.value) {
+			case "overview":
+				return Overview;
+			case "add_pupil":
+				return Form;
+			case "add_classes":
+				return AddClass;
+			default:
+				return BrokenLink;
+		}
+	});
 
 	function setTab(tab: string): void {
 		activeTab.value = tab;
 	}
 </script>
-
 <style scoped>
 	.fade-slide-enter-active,
 	.fade-slide-leave-active {

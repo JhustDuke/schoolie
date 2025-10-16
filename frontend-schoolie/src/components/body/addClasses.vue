@@ -1,7 +1,6 @@
 <template>
 	<section id="classModal">
 		<div
-			v-show="isVisible"
 			class="pt-2 px-4 text-center pb-2 grey lighten-1 mx-auto w-50 opacity-75">
 			<!-- Close Button -->
 			<span class="float-end hover close-btn mb-2">
@@ -93,7 +92,7 @@
 					<span
 						v-for="cls in sortedChosenClasses"
 						:key="cls"
-						class="btn btn-sm green white-text text-uppercase px-3 py-2 dyn"
+						class="btn btn-sm green white-text text-uppercase px-3 py-2 dynamic"
 						@dblclick="removeClass(cls)">
 						{{ cls }}
 					</span>
@@ -170,13 +169,11 @@
 	}
 
 	// Sorted alphabetically
-	const sortedChosenClasses = computed(() =>
-		[...chosenClasses.value].sort((a, b) => a.localeCompare(b))
-	);
+	const sortedChosenClasses = computed(() => [...chosenClasses.value].sort());
 </script>
 
 <style scoped>
-	.dyn:hover {
+	.dynamic:hover {
 		background: grey !important;
 		color: white !important;
 	}
