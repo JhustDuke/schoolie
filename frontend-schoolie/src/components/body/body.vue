@@ -30,12 +30,12 @@
 
 <script setup lang="ts">
 	import { ref, computed } from "vue";
-	import AnchorLink from "../utils/anchorLink.vue";
+	import AnchorLink from "@utils/anchorLink.vue";
 	// import TabTitle from "./tabTitle.vue";
 	// import TabContent from "./tabContent.vue";
-	import BrokenLink from "../utils/brokenLink.vue";
+	import BrokenLink from "@utils/brokenLink.vue";
 	import Overview from "./overview/overview.vue";
-	import Form from "../form/form.vue";
+	import Form from "@components/form/form.vue";
 	import AddClass from "./addClasses.vue";
 
 	const asideLinks: { name: string }[] = [
@@ -63,6 +63,28 @@
 	function setTab(tab: string): void {
 		activeTab.value = tab;
 	}
+
+	/**
+	 * the major problem is the overview aside will trigger db fetches
+	 * but
+	 * it must have an overview which is hardcoded and gets everything from the db
+	 * the classes must be db fetched
+	 * clicking on the overview gets everything gotten from the db
+	 * tabs gets everything based on that specified sessionyear
+	 * ++++++++++++++++++++++++++++++TASK++++++++++++++++++++++++++++++
+	 * CREATE AND ADD CLASSES TO THE DB
+	 * -->LOAD A SESSION-YEAR
+	 * -->CREATE A METHOD TO ADD CLASSES FROM THE UI
+	 * -->CREATE A METHOD IN THE BACKEND TO RETURN ALL THE CLASS NAMES (to be used as tab-headers) TO THE UI
+	 * -->simulate fetching based on the grade
+	 * +++++PROBLEM+++++++
+	 * HOW TO STRUC THE CLASSES
+	 * +++SOLUTION++++
+	 * -->OVERVIEW CARD foor all overview
+	 * -->CLASSDETAIL CARD FOR ALL CLASS ISSUES
+	 *
+	 *
+	 */
 </script>
 <style scoped>
 	.fade-slide-enter-active,

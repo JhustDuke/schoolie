@@ -33,5 +33,6 @@
 	.active {
 		background-color: rgb(219, 219, 219) !important;
 		color: rosybrown !important;
+		padding: 2px !important;
 	}
 </style>

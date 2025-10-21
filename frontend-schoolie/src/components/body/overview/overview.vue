@@ -1,85 +1,136 @@
 <template>
-	<div
-		class="active tab-pane mt-4 p-3 rounded blue-grey lighten-5 shadow text-center text-md-start"
-		id="overViewTabContents">
-		<div class="row g-4 justify-content-center">
-			<div class="col-md">
-				<StatCard title="Total Classes" />
-			</div>
+	<div class="p-3 rounded shadow">
+		<!-- Horizontal Tab Headers -->
+		<nav class="d-flex gap-3 mb-4 border-bottom pb-2">
+			<AnchorLink
+				v-for="(tab, index) in tabsHeaders"
+				:key="index"
+				:linkName="tab"
+				:isActive="activeHeader === tab"
+				customClass="text-uppercase fw-bold"
+				@click="setHeader(tab)" />
+		</nav>
 
-			<div class="col-md">
-				<GenderSummaryCard />
-			</div>
+		<!-- Content -->
+		<main>
+			<!-- spinner -->
+			<center v-if="!isLoaded">
+				please wait
+				<div v-html="useSpinner"></div>
+			</center>
 
-			<div class="col-md">
-				<StatCard title="Total Pupils" />
-			</div>
+			<!-- error page -->
+			<center v-else-if="hasError">
+				<BrokenLink
+					title="page not found"
+					errorMessage="the page you're looking for is not found" />
+			</center>
 
-			<!-- Recently Added Pupils -->
-			<div class="col-12">
-				<div class="p-3 rounded white">
-					<h5>Recently Added Pupils</h5>
-					<div
-						class="d-flex flex-column flex-md-row justify-content-center justify-content-md-around align-items-center align-items-md-start p-3 flex-wrap text-center text-md-start">
-						<StudentCard
-							name="Aisha Bello"
-							className="Grade 1"
-							parentPhone="0802 456 7890" />
-						<StudentCard
-							name="John Doe"
-							className="Grade 2"
-							parentPhone="0812 123 4567" />
-						<StudentCard
-							name="Mary Ann"
-							className="Grade 3"
-							parentPhone="0803 987 6543" />
-					</div>
-				</div>
-			</div>
-
-			<!-- Class Summary -->
-			<div class="col-12">
-				<div class="p-3 rounded z-depth-1 white">
-					<h5>Class Summary</h5>
-					<div class="row g-3 justify-content-center">
-						<div class="col-md-3">
-							<ClassSummaryCard />
-						</div>
-						<div class="col-md-3">
-							<ClassSummaryCard />
-						</div>
-						<div class="col-md-3">
-							<ClassSummaryCard />
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<!-- Recently Updated -->
-			<div class="col-md">
-				<h5>Recently Updated</h5>
-				<div class="d-flex justify-content-evenly p-3 rounded z-depth-1 white">
-					<StudentCard
-						name="Ali Musa"
-						className="Grade 4"
-						parentPhone="0902 222 3333" />
-					<StudentCard
-						name="Bisi Ade"
-						className="Grade 2"
-						parentPhone="0701 111 2222" />
-					<StudentCard
-						name="Chika Obi"
-						className="Grade 5"
-						parentPhone="0809 888 7777" />
-				</div>
-			</div>
-		</div>
+			<!-- dynamic component starts here -->
+			<transition
+				v-else
+				name="fade-slide"
+				mode="out-in">
+				<component
+					:is="currentTab"
+					v-bind="classDetailsProps"></component>
+			</transition>
+		</main>
 	</div>
 </template>
 
 <script setup lang="ts">
-	import StatCard from "./statSummary.vue";
-	import GenderSummaryCard from "./genderSummary.vue";
-	import ClassSummaryCard from "./classSummary.vue";
-	import StudentCard from "./studentCard.vue";
+	import { ref, onMounted, computed, watch } from "vue";
+	import AllSummary from "./summary/allSummary.vue";
+	import ClassDetails from "./classDetails.vue";
+	import AnchorLink from "@utils/anchorLink.vue";
+	import BrokenLink from "@utils/brokenLink.vue";
+	import { spinner } from "@utils/spinner";
+
+	const useSpinner = spinner();
+
+	// states
+	const isLoaded = ref<boolean>(false);
+	const hasError = ref<boolean>(false);
+	const activeHeader = ref<string>("overview");
+	const classDetailsData = ref<any>(null);
+
+	//mock tabHeaders (this will be gotten from db)
+	const tabsHeaders: string[] = ["overview", "grade1", "grade2", "graded"];
+
+	const classDetailsProps = computed(function () {
+		return classDetailsData.value || {};
+	});
+
+	const currentTab = computed(function () {
+		return activeHeader.value === "overview" ? AllSummary : ClassDetails;
+	});
+
+	onMounted(function () {
+		fetchData("overview");
+	});
+
+	watch(activeHeader, async function (newTab) {
+		await fetchData(newTab);
+	});
+
+	// mock backend fetch simulation
+	function simulateFetch(tab: string): Promise<void> {
+		return new Promise(function (resolve, reject) {
+			setTimeout(function () {
+				if (tab === "graded") {
+					reject();
+				} else {
+					resolve();
+				}
+			}, 1500);
+		});
+	}
+
+	async function fetchData(tab: string): Promise<void> {
+		isLoaded.value = false;
+		hasError.value = false;
+
+		try {
+			await simulateFetch(tab);
+			classDetailsData.value = {
+				totalBoys: Math.floor(Math.random() * 20).toString(),
+				totalGirls: Math.floor(Math.random() * 20).toString(),
+				pupils: [
+					{ name: "Aisha Bello", className: tab, parentPhone: "08012345678" },
+					{ name: "John Doe", className: tab, parentPhone: "08087654321" },
+				],
+			};
+		} catch (err) {
+			hasError.value = true;
+		} finally {
+			isLoaded.value = true;
+		}
+	}
+
+	function setHeader(tab: string): void {
+		activeHeader.value = tab;
+	}
 </script>
+
+<style scoped>
+	.nav-link.active,
+	.active {
+		background-color: #ccc !important;
+		color: black !important;
+	}
+	.fade-slide-enter-active,
+	.fade-slide-leave-active {
+		transition: all 0.3s ease;
+	}
+	.fade-slide-enter-from,
+	.fade-slide-leave-to {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	.fade-slide-enter-to,
+	.fade-slide-leave-from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+</style>
