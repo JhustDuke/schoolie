@@ -13,20 +13,20 @@
 
 		<!-- Content -->
 		<main>
-			<!-- spinner -->
+			<!-- Spinner -->
 			<center v-if="!isLoaded">
 				please wait
 				<div v-html="useSpinner"></div>
 			</center>
 
-			<!-- error page -->
+			<!-- Error -->
 			<center v-else-if="hasError">
 				<BrokenLink
 					title="page not found"
 					errorMessage="the page you're looking for is not found" />
 			</center>
 
-			<!-- dynamic component starts here -->
+			<!-- Dynamic Component -->
 			<transition
 				v-else
 				name="fade-slide"
@@ -40,12 +40,13 @@
 </template>
 
 <script setup lang="ts">
-	import { ref, onMounted, computed, watch } from "vue";
+	import { ref, computed, watch, onMounted } from "vue";
 	import AllSummary from "./summary/allSummary.vue";
 	import ClassDetails from "./classDetails.vue";
 	import AnchorLink from "@utils/anchorLink.vue";
 	import BrokenLink from "@utils/brokenLink.vue";
 	import { spinner } from "@utils/spinner";
+	import { useCache } from "@utils/cacheHelper";
 
 	const useSpinner = spinner();
 
@@ -55,7 +56,7 @@
 	const activeHeader = ref<string>("overview");
 	const classDetailsData = ref<any>(null);
 
-	//mock tabHeaders (this will be gotten from db)
+	// mock tabs
 	const tabsHeaders: string[] = ["overview", "grade1", "grade2", "graded"];
 
 	const classDetailsProps = computed(function () {
@@ -74,15 +75,10 @@
 		await fetchData(newTab);
 	});
 
-	// mock backend fetch simulation
 	function simulateFetch(tab: string): Promise<void> {
 		return new Promise(function (resolve, reject) {
 			setTimeout(function () {
-				if (tab === "graded") {
-					reject();
-				} else {
-					resolve();
-				}
+				tab === "graded" ? reject() : resolve();
 			}, 1500);
 		});
 	}
@@ -92,16 +88,21 @@
 		hasError.value = false;
 
 		try {
-			await simulateFetch(tab);
-			classDetailsData.value = {
-				totalBoys: Math.floor(Math.random() * 20).toString(),
-				totalGirls: Math.floor(Math.random() * 20).toString(),
-				pupils: [
-					{ name: "Aisha Bello", className: tab, parentPhone: "08012345678" },
-					{ name: "John Doe", className: tab, parentPhone: "08087654321" },
-				],
-			};
-		} catch (err) {
+			//check is this data had been prefetched and cache b4 now
+			const data = await useCache(tab, async function () {
+				await simulateFetch(tab);
+				return {
+					totalBoys: Math.floor(Math.random() * 20).toString(),
+					totalGirls: Math.floor(Math.random() * 20).toString(),
+					pupils: [
+						{ name: "Aisha Bello", className: tab, parentPhone: "08012345678" },
+						{ name: "John Doe", className: tab, parentPhone: "08087654321" },
+					],
+				};
+			});
+
+			classDetailsData.value = data;
+		} catch {
 			hasError.value = true;
 		} finally {
 			isLoaded.value = true;
