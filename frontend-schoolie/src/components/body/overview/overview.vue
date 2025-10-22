@@ -13,20 +13,17 @@
 
 		<!-- Content -->
 		<main>
-			<!-- Spinner -->
 			<center v-if="!isLoaded">
 				please wait
 				<div v-html="useSpinner"></div>
 			</center>
 
-			<!-- Error -->
 			<center v-else-if="hasError">
 				<BrokenLink
 					title="page not found"
 					errorMessage="the page you're looking for is not found" />
 			</center>
 
-			<!-- Dynamic Component -->
 			<transition
 				v-else
 				name="fade-slide"
@@ -40,66 +37,83 @@
 </template>
 
 <script setup lang="ts">
-	import { ref, computed, watch, onMounted } from "vue";
+	import { ref, computed, onMounted, watch } from "vue";
 	import AllSummary from "./summary/allSummary.vue";
 	import ClassDetails from "./classDetails.vue";
 	import AnchorLink from "@utils/anchorLink.vue";
 	import BrokenLink from "@utils/brokenLink.vue";
 	import { spinner } from "@utils/spinner";
+	import { tabsModel } from "@models/tabsModel";
 	import { useCache } from "@utils/cacheHelper";
 
 	const useSpinner = spinner();
 
-	// states
-	const isLoaded = ref<boolean>(false);
-	const hasError = ref<boolean>(false);
-	const activeHeader = ref<string>("overview");
+	const isLoaded = ref(false);
+	const hasError = ref(false);
+	const activeHeader = ref("overview");
 	const classDetailsData = ref<any>(null);
+	const tabsHeaders = ref<string[]>([]);
 
-	// mock tabs
-	const tabsHeaders: string[] = ["overview", "grade1", "grade2", "graded"];
+	const classDetailsProps = computed(() => classDetailsData.value || {});
+	const currentTab = computed(() =>
+		activeHeader.value === "overview" ? AllSummary : ClassDetails
+	);
 
-	const classDetailsProps = computed(function () {
-		return classDetailsData.value || {};
-	});
-
-	const currentTab = computed(function () {
-		return activeHeader.value === "overview" ? AllSummary : ClassDetails;
-	});
-
-	onMounted(function () {
-		fetchData("overview");
+	onMounted(async function () {
+		try {
+			tabsHeaders.value = await tabsModel.loadClassesMock();
+			await fetchData("overview");
+		} catch {
+			hasError.value = true;
+		}
 	});
 
 	watch(activeHeader, async function (newTab) {
 		await fetchData(newTab);
 	});
 
-	function simulateFetch(tab: string): Promise<void> {
-		return new Promise(function (resolve, reject) {
-			setTimeout(function () {
-				tab === "graded" ? reject() : resolve();
-			}, 1500);
-		});
-	}
-
 	async function fetchData(tab: string): Promise<void> {
 		isLoaded.value = false;
 		hasError.value = false;
 
 		try {
-			//check is this data had been prefetched and cache b4 now
-			const data = await useCache(tab, async function () {
-				await simulateFetch(tab);
+			const cacheKey = "classData_" + tab;
+
+			const data = await useCache(cacheKey, async function () {
+				if (tab === "overview") {
+					// Fetch overview (school-wide stats)
+					const overviewData = await tabsModel.getSchoolStatsMock();
+
+					// Add mock presents to make UI feel richer
+					const presents = [
+						{ name: "Aisha Bello", present: true },
+						{ name: "John Doe", present: false },
+						{ name: "Mary Johnson", present: true },
+						{ name: "Ibrahim Yusuf", present: true },
+					];
+
+					return {
+						label: "overview",
+						totalBoys: overviewData.total_boys.toString(),
+						totalGirls: overviewData.total_girls.toString(),
+						totalClasses: overviewData.total_classes.toString(),
+						presents,
+					};
+				}
+
+				// Simulate class-level data
+				const pupils = await tabsModel.getClassDataMock(tab);
+
 				return {
-					totalBoys: Math.floor(Math.random() * 20).toString(),
-					totalGirls: Math.floor(Math.random() * 20).toString(),
-					pupils: [
-						{ name: "Aisha Bello", className: tab, parentPhone: "08012345678" },
-						{ name: "John Doe", className: tab, parentPhone: "08087654321" },
-					],
+					label: tab,
+					totalBoys: "10",
+					totalGirls: "12",
+					pupils,
 				};
 			});
+
+			// if “graded” throws or fails, display error component
+			if (tab === "graded") throw new Error("Intentional mock error");
 
 			classDetailsData.value = data;
 		} catch {

@@ -25,7 +25,7 @@
 <script setup lang="ts">
 	import { provide, ref, readonly /* computed */ } from "vue";
 	import Body from "@components/body/body.vue";
-	import NavBar from "@components/header/navBar.vue";
+	import NavBar from "@components/navbar/navBar.vue";
 	//import AddClassModal from "./components/body/addClassModal.vue";
 
 	const allSessions = ref<Set<string>>(new Set());
