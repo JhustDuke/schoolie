@@ -50,15 +50,18 @@
 
 	const isLoaded = ref(false);
 	const hasError = ref(false);
-	const activeHeader = ref("overview");
-	const classDetailsData = ref<any>(null);
-	const tabsHeaders = ref<string[]>([]);
 
-	const classDetailsProps = computed(() => classDetailsData.value || {});
+	const classDetailsData = ref<any>(null);
+	const classDetailsProps = computed(function () {
+		return classDetailsData.value || {};
+	});
+
+	const activeHeader = ref("overview");
 	const currentTab = computed(() =>
 		activeHeader.value === "overview" ? AllSummary : ClassDetails
 	);
 
+	const tabsHeaders = ref<string[]>([]);
 	onMounted(async function () {
 		try {
 			tabsHeaders.value = await tabsModel.loadClassesMock();
@@ -85,7 +88,7 @@
 					const overviewData = await tabsModel.getSchoolStatsMock();
 
 					// Add mock presents to make UI feel richer
-					const presents = [
+					const presets = [
 						{ name: "Aisha Bello", present: true },
 						{ name: "John Doe", present: false },
 						{ name: "Mary Johnson", present: true },
@@ -97,7 +100,7 @@
 						totalBoys: overviewData.total_boys.toString(),
 						totalGirls: overviewData.total_girls.toString(),
 						totalClasses: overviewData.total_classes.toString(),
-						presents,
+						presets,
 					};
 				}
 
