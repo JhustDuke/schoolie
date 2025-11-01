@@ -9,9 +9,12 @@
 					aria-hidden="true"
 					@click="emit('close')"></i>
 			</span>
-
+			<div class="red-text black fw-bold text-uppercase p-2">
+				hello, you seem to be new add classes below and choose a session to get
+				started!
+			</div>
 			<!-- Sessions Select -->
-			<div class="mb-3">
+			<div class="pb-5">
 				<label
 					for="sessionSelect"
 					class="form-label fw-bold text-uppercase red-text text-darken-4">
@@ -70,12 +73,11 @@
 				</button>
 			</div>
 
-			<!-- Divider -->
 			<hr class="my-4" />
 
 			<!-- Selected Session + Chosen Classes -->
 			<div>
-				<span class="text-muted">selected class and session goe here</span>
+				<span class="text-muted">selected class and session go here</span>
 				<h3
 					class="text-capitalize fw-bold"
 					v-if="selectedSession">
@@ -86,6 +88,7 @@
 					v-else>
 					session n/a
 				</h3>
+
 				<div
 					v-if="sortedChosenClasses.length"
 					class="d-flex flex-wrap gap-2 justify-content-center mt-2">
@@ -97,6 +100,7 @@
 						{{ cls }}
 					</span>
 				</div>
+
 				<p
 					v-if="sortedChosenClasses.length"
 					class="mt-2 text-muted red-text text-darken-4">
@@ -104,9 +108,33 @@
 				</p>
 				<p
 					v-else
-					class="text-muted"
-					>No classes selected yet</p
-				>
+					class="text-muted">
+					No classes selected yet
+				</p>
+			</div>
+
+			<!-- Submit -->
+			<div class="mt-4">
+				<button
+					class="btn btn-success text-uppercase w-50"
+					@click="submitClasses"
+					:disabled="
+						!selectedSession || !sortedChosenClasses.length || isSubmitting
+					">
+					<span v-if="!isSubmitting">Submit</span>
+					<span v-else>Submitting...</span>
+				</button>
+			</div>
+
+			<!-- Feedback -->
+			<div
+				v-if="feedbackMessage"
+				class="mt-3">
+				<p
+					class="fw-bold"
+					:class="feedbackSuccess ? 'text-success' : 'text-danger'">
+					{{ feedbackMessage }}
+				</p>
 			</div>
 		</div>
 	</section>
@@ -114,6 +142,7 @@
 
 <script setup lang="ts">
 	import { ref, computed } from "vue";
+	import { classModel } from "@models/classModel";
 
 	interface ModalPropsInterface {
 		isVisible?: boolean;
@@ -127,6 +156,7 @@
 		(event: "select", payload: { className: string }): void;
 	}>();
 
+	// Preset Classes
 	const classes = ref<string[]>([
 		"creche",
 		"nursery-1",
@@ -141,35 +171,75 @@
 	]);
 
 	const sessions = ref<string[]>(props.loadedSessions || []);
-	const selectedSession = ref<string>("");
 
+	// --- CLASS SELECTION HANDLERS ---
 	const chosenClasses = ref<string[]>([]);
-	const customClass = ref<string>("");
 
-	function chooseClass(cls: string) {
-		console.log("test");
-		if (!chosenClasses.value.includes(cls)) {
+	function chooseClass(cls: string): void {
+		const alreadyChosen = chosenClasses.value.includes(cls);
+		if (!alreadyChosen) {
 			chosenClasses.value.push(cls);
 		}
 		emit("select", { className: cls });
 	}
 
-	function addCustomClass() {
+	const customClass = ref<string>("");
+
+	function addCustomClass(): void {
 		const val = customClass.value.trim();
 		if (!val) return;
-		if (!chosenClasses.value.includes(val)) {
+
+		const alreadyChosen = chosenClasses.value.includes(val);
+		if (!alreadyChosen) {
 			chosenClasses.value.push(val);
 		}
 		emit("select", { className: val });
 		customClass.value = "";
 	}
 
-	function removeClass(cls: string) {
-		chosenClasses.value = chosenClasses.value.filter((c) => c !== cls);
+	function removeClass(cls: string): void {
+		const updated = chosenClasses.value.filter((c) => c !== cls);
+		chosenClasses.value = updated;
 	}
 
-	// Sorted alphabetically
-	const sortedChosenClasses = computed(() => [...chosenClasses.value].sort());
+	const sortedChosenClasses = computed(function (): string[] {
+		const sorted = [...chosenClasses.value].sort();
+		return sorted;
+	});
+
+	// --- SESSION HANDLING ---
+	const selectedSession = ref<string>("");
+
+	// --- SUBMISSION ---
+	const isSubmitting = ref<boolean>(false);
+	const feedbackMessage = ref<string>("");
+	const feedbackSuccess = ref<boolean>(false);
+
+	async function submitClasses(): Promise<void> {
+		// const canSubmit = selectedSession.value && sortedChosenClasses.value.length;
+		// if (!canSubmit) return;
+
+		isSubmitting.value = true;
+		feedbackMessage.value = "";
+
+		try {
+			const result = await classModel.addClassesMock(
+				selectedSession.value,
+				sortedChosenClasses.value
+			);
+
+			feedbackSuccess.value = result.success;
+			feedbackMessage.value = result.success
+				? `Successfully added ${result.added.length} classes`
+				: "Failed to add classes";
+			emit("close");
+		} catch (err: any) {
+			feedbackSuccess.value = false;
+			feedbackMessage.value = err.message || "An error occurred";
+		} finally {
+			isSubmitting.value = false;
+		}
+	}
 </script>
 
 <style scoped>

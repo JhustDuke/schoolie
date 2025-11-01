@@ -43,7 +43,7 @@
 	import AnchorLink from "@utils/anchorLink.vue";
 	import BrokenLink from "@utils/brokenLink.vue";
 	import { spinner } from "@utils/spinner";
-	import { tabsModel } from "@models/tabsModel";
+	import { classModel } from "@models/classModel";
 	import { useCache } from "@utils/cacheHelper";
 
 	const useSpinner = spinner();
@@ -64,7 +64,7 @@
 	const tabsHeaders = ref<string[]>([]);
 	onMounted(async function () {
 		try {
-			tabsHeaders.value = await tabsModel.loadClassesMock();
+			tabsHeaders.value = await classModel.loadClassesMock();
 			await fetchData("overview");
 		} catch {
 			hasError.value = true;
@@ -85,7 +85,7 @@
 			const data = await useCache(cacheKey, async function () {
 				if (tab === "overview") {
 					// Fetch overview (school-wide stats)
-					const overviewData = await tabsModel.getSchoolStatsMock();
+					const overviewData = await classModel.getSchoolStatsMock();
 
 					// Add mock presents to make UI feel richer
 					const presets = [
@@ -105,7 +105,7 @@
 				}
 
 				// Simulate class-level data
-				const pupils = await tabsModel.getClassDataMock(tab);
+				const pupils = await classModel.getClassDataMock(tab);
 
 				return {
 					label: tab,

@@ -1,41 +1,39 @@
 <template>
-	<div class="mx-auto grey lighten-3">
-		<header>
-			<NavBar />
-		</header>
+	<div
+		class="mx-auto grey lighten-3 isRelative black d-flex flex-column min-vh-100">
+		<header><NavBar /></header>
 
-		<main class="">
+		<main class="flex-grow-1">
 			<Body />
 		</main>
 
-		<!-- Backdrop wrapper for modal -->
-		<!-- <div
-			v-if="modalVisible"
-			class="modal-overlay">
+		<!-- Modal Backdrop -->
+		<div
+			v-if="mockVisible"
+			class="isAbsolute w-100 h-100 top-0 start-0 d-flex justify-content-center align-items-start"
+			style="
+				background: rgba(0, 0, 0, 0.5);
+				pointer-events: auto;
+				z-index: 1000;
+				padding-top: 5vh;
+			">
 			<AddClassModal
-				:isVisible="modalVisible"
+				:isVisible="mockVisible"
 				:loadedSessions="[...allSessions]"
-				@close="modalVisible = false" />
-		</div> -->
+				@close="mockVisible = !mockVisible" />
+		</div>
 
-		<footer class="yellow p-4"> footer content goes here </footer>
+		<footer class="yellow p-4">footer content goes here</footer>
 	</div>
 </template>
 
 <script setup lang="ts">
-	import { provide, ref, readonly /* computed */ } from "vue";
+	import { ref, computed, provide, readonly } from "vue";
 	import Body from "@components/body/body.vue";
 	import NavBar from "@components/navbar/navBar.vue";
-	//import AddClassModal from "./components/body/addClassModal.vue";
+	import AddClassModal from "@components/body/addClasses.vue";
 
 	const allSessions = ref<Set<string>>(new Set());
-	// const modalVisible = computed(function () {
-	// 	if (allSessions.value.size === 0) {
-	// 		return true;
-	// 	}
-
-	// 	return false;
-	// });
 	const updateSessions = function (sessionEntries: string[]) {
 		const val = [...sessionEntries];
 		val.forEach(function (entry: string) {
@@ -45,28 +43,10 @@
 		});
 	};
 
+	const mockVisible = ref(true);
+	const modalVisible = computed(function () {
+		return allSessions.value.size === 0;
+	});
+
 	provide("sessions", { allSessions: readonly(allSessions), updateSessions });
 </script>
-
-<style scoped>
-	.layout {
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
-	}
-
-	.main-body {
-		flex: 1;
-	}
-
-	/* Backdrop overlay to block interaction */
-	.modal-overlay {
-		position: fixed;
-		inset: 0; /* top:0; right:0; bottom:0; left:0 */
-		background: rgba(0, 0, 0, 0.5);
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		z-index: 1000;
-	}
-</style>
