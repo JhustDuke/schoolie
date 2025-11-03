@@ -1,5 +1,5 @@
 export * from "./baseRoute";
 export * from "./getAllSessions";
 export * from "./getSchoolStats";
-export * from "./getClass";
+export * from "./classOps";
 export * from "./searchQuery";

@@ -1,5 +1,5 @@
 import { ServerRoute, Request, ResponseToolkit } from "@hapi/hapi";
-import { getClassModel } from "../../model";
+import { classOpsModel } from "../../model";
 import Joi from "joi";
 
 const validateQuerySchema = Joi.object({
@@ -38,12 +38,12 @@ export const getClass: ServerRoute = {
 		const sessionYear = <string>req.query.sessionYear;
 
 		// destructure methods from the model factory
-		const { getClass, getClassKeys } = getClassModel();
+		const { getSingleClass, allClassNames } = classOpsModel();
 
 		try {
 			if (queriedClass) {
 				// Scenario 1: specific class requested
-				const classStats = await getClass(sessionYear, queriedClass);
+				const classStats = await getSingleClass(sessionYear, queriedClass);
 
 				if (!classStats) {
 					return res.response({ message: "Class not found" }).code(404);
@@ -52,9 +52,9 @@ export const getClass: ServerRoute = {
 				return res.response(classStats).code(200);
 			} else {
 				// Scenario 2: no queriedClass → return all class keys
-				const classKeys = await getClassKeys(sessionYear);
+				const classKeys = await allClassNames(sessionYear);
 
-				if (!classKeys.length) {
+				if (!classKeys?.length) {
 					return res.response({ message: "No classes found" }).code(404);
 				}
 

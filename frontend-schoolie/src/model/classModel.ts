@@ -35,13 +35,13 @@ export const classModel = (function () {
 		const safeYear = sessionYear.replace("/", "-");
 
 		try {
-			const res = await fetch(
+			const getSingleClass = await fetch(
 				`${baseUrl}/getClass?sessionYear=${encodeURIComponent(
 					safeYear
 				)}&queriedClass=${encodeURIComponent(queriedClass)}`
 			);
-			const result = await res.json();
-			if (!res.ok) throw new Error(result.message);
+			const result = await getSingleClass.json();
+			if (!getSingleClass.ok) throw new Error(result.message);
 			return result;
 		} catch (err: any) {
 			throw new Error(err.message);
@@ -55,11 +55,11 @@ export const classModel = (function () {
 	const loadClasses = async function (sessionYear: string): Promise<string[]> {
 		const safeYear = sessionYear.replace("/", "-");
 		try {
-			const res = await fetch(
+			const allClassNames = await fetch(
 				`${baseUrl}/getClass?sessionYear=${encodeURIComponent(safeYear)}`
 			);
-			const result = await res.json();
-			if (!res.ok) throw new Error(result.message);
+			const result = await allClassNames.json();
+			if (!allClassNames.ok) throw new Error(result.message);
 			return result as string[];
 		} catch (err: any) {
 			throw new Error(err.message);

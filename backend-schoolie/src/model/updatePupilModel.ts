@@ -1,4 +1,4 @@
-import { appPool } from "./createDBModel";
+import { appPool } from "./DBinit";
 
 interface updatePupilData {
 	className: string;

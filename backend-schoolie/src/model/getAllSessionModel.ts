@@ -1,5 +1,5 @@
 import { RowDataPacket } from "mysql2";
-import { appPool } from "./createDBModel";
+import { appPool } from "./DBinit";
 
 export const getAllSessionModel = async function () {
 	const dbConnection = await appPool.getConnection();

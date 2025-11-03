@@ -30,16 +30,21 @@ export const appPool = mysql.createPool({
 	connectionLimit: 10,
 });
 
-export async function createDBModel() {
-	const conn = await adminPool.getConnection();
-
+export async function initDbModel() {
+	let conn;
 	try {
+		conn = await adminPool.getConnection();
 		await conn.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
 		console.log(`✅ Database '${dbName}' created.`);
-	} catch (err) {
-		console.error("❌ Error creating database:", err);
-		throw err;
+	} catch (err: any) {
+		const msg =
+			err?.message ||
+			err?.sqlMessage ||
+			err?.code ||
+			"Unknown database error occurred";
+		console.error("❌ DB init error:", msg);
+		throw new Error(msg);
 	} finally {
-		conn.release();
+		if (conn) conn.release();
 	}
 }

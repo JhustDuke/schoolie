@@ -64,7 +64,7 @@
 	const tabsHeaders = ref<string[]>([]);
 	onMounted(async function () {
 		try {
-			tabsHeaders.value = await classModel.loadClassesMock();
+			tabsHeaders.value = await classModel.loadClasses("3000/3333");
 			await fetchData("overview");
 		} catch {
 			hasError.value = true;

@@ -10,6 +10,7 @@ export async function sessionYearTableModel(sessionYear: string) {
 	const createTableSQL = `
     CREATE TABLE IF NOT EXISTS \`${tableName}\` (
       id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+					
       classes JSON NOT NULL,
       total_boys INT DEFAULT 0,
       total_girls INT DEFAULT 0,

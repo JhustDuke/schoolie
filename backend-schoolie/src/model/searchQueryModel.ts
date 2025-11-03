@@ -1,4 +1,4 @@
-import { appPool } from "./createDBModel";
+import { appPool } from "./DBinit";
 import { getAllSessionModel } from ".";
 import {
 	sanitizeTableName,

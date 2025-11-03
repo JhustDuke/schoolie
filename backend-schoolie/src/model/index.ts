@@ -1,10 +1,10 @@
-export * from "./createDBModel";
-export * from "./sessionYearTableModel";
+export * from "./DBinit";
+export * from "./DBTableModel";
 
 //get
 export * from "./getAllSessionModel";
 export * from "./totalStatsModel";
-export * from "./getClassModel";
+export * from "./classOpsModel";
 export * from "./searchQueryModel";
 
 //post

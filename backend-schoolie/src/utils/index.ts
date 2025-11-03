@@ -5,3 +5,4 @@ export * from "./handleFileUpload";
 export * from "./propValueMatches";
 export * from "./hasProperty";
 export * from "./classSearchHelpers";
+export * from "./checkDuplicates";
