@@ -10,22 +10,26 @@
 				value="chooseSession"
 				>Choose session</option
 			>
+
 			<option
-				v-if="!sessionData?.length"
+				v-if="!store.allSessions.length"
 				class="text-muted"
 				disabled>
-				no sessions available click addSession
+				no sessions available — click Add Session
 			</option>
+
 			<option
-				v-for="year of sessionData"
-				:value="year"
-				>{{ year }}</option
-			>
+				v-for="year in store.allSessions"
+				:key="year"
+				:value="year">
+				{{ year }}
+			</option>
+
 			<option
 				value="addSession"
-				@click="isVisible = true"
-				>Add Session</option
-			>
+				@click="isVisible = true">
+				Add Session
+			</option>
 		</select>
 
 		<div
@@ -41,55 +45,59 @@
 </template>
 
 <script setup lang="ts">
-	import { ref, onMounted, inject } from "vue";
-	import { sessionModel } from "../../model";
+	import { onMounted, ref } from "vue";
 	import AddSessionModal from "./addSessionModal.vue";
+	import { sessionModel } from "../../model";
 	import { notifyToast } from "../utils/scripts";
+	import { useSessionStore } from "../../store/sessionStore";
 
 	const isVisible = ref<boolean>(false);
-	const sessionData = ref<string[] | null>([]);
-
-	const sessionStore = inject<{
-		allSessions: Readonly<Set<string>>;
-		updateSessions: (sessions: string[]) => void;
-	}>("sessions");
 
 	onMounted(async function () {
 		await loadAllSessions();
 	});
 
-	async function getSingleSessionStats(e: Event) {
-		const elemValue = (e.target as HTMLSelectElement)?.value;
-		if (elemValue.toLowerCase().includes("session")) return;
+	const store = useSessionStore();
+
+	async function getSingleSessionStats(e: Event): Promise<void> {
+		const elem = e.target as HTMLSelectElement;
+		const elemValue = elem.value;
 
 		try {
-			await sessionModel.getSessionStats(elemValue);
+			if (elemValue.toLowerCase().includes("session")) {
+				store.setActiveSession(store.allSessions[0]);
+			}
+
+			store.setActiveSession(elem.value);
+			await sessionModel.getSessionStats(elem.value);
 			notifyToast({
 				type: "success",
-				text: "session stats fetch successfully",
+				text: "Session stats fetched successfully",
 			});
 		} catch {
-			notifyToast({ type: "error", text: "could not fetch session stats" });
+			notifyToast({
+				type: "error",
+				text: "Could not fetch session stats",
+			});
 		}
 	}
 
-	async function loadAllSessions() {
+	async function loadAllSessions(): Promise<void> {
 		try {
 			const data: string[] | null = await sessionModel.loadSessionYears();
-			sessionData.value = [...(data || [])];
-			if (sessionData.value.length > 0)
-				sessionStore?.updateSessions(sessionData.value);
+			store.setSessions(data || []);
+			store.setActiveSession(store.allSessions[0]);
 		} catch (err: any) {
 			notifyToast({ text: err.message, type: "error" });
 		}
 	}
 
-	function showError(payload?: { reason: string }) {
-		notifyToast({ text: `reason:${payload?.reason}`, type: "error" });
+	function showError(payload?: { reason: string }): void {
+		notifyToast({ text: `Reason: ${payload?.reason}`, type: "error" });
 	}
 
-	async function showSuccess(payload?: { msg: string }) {
-		notifyToast({ text: `${payload?.msg}`, type: "success" });
+	async function showSuccess(payload?: { msg: string }): Promise<void> {
+		notifyToast({ text: payload?.msg || "Success", type: "success" });
 		await loadAllSessions();
 	}
 </script>

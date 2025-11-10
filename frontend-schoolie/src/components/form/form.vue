@@ -199,21 +199,30 @@
 		</div>
 
 		<!-- Submit and error list -->
+		<!-- Submit and error list -->
 		<center>
 			<div
 				v-if="hasFalsyState.hasError"
 				style="overflow-wrap: break-word"
-				class="red-text text muted p-2">
+				class="red-text text-muted p-2">
 				this fields are invalid:
 				{{ Array.from(hasFalsyState.fields).join(", ") }}
 			</div>
+
 			<button
-				:disabled="hasFalsyState.hasError"
 				type="button"
 				class="btn btn-primary w-50"
+				:disabled="hasFalsyState.hasError || isSubmitting"
+				v-html="submitButtonContent"
 				@click="onSubmit">
-				Submit
 			</button>
+
+			<div
+				class="mt-3 fw-bold"
+				v-if="submitStatus"
+				:class="isSubmitFailed ? 'red-text' : 'green-text'">
+				{{ submitStatus }}
+			</div>
 		</center>
 	</form>
 </template>
@@ -233,6 +242,8 @@
 		validateAddressField,
 	} from "../utils/scripts";
 	import naijaStateLocalGovernment from "naija-state-local-government";
+	import { formModel } from "../../model";
+	import { spinner } from "../utils/spinner";
 
 	const firstnameInput = ref<string>("");
 	const middlenameInput = ref<string>("");
@@ -366,8 +377,46 @@
 		console.log("upload success");
 	}
 
-	function onSubmit() {
-		console.log("Submit clicked");
-		console.log("Webcam base64:", webCam.value);
+	const isSubmitting = ref<boolean>(false);
+	const submitButtonContent = ref<string>("Submit");
+	const submitStatus = ref<string>("");
+	const isSubmitFailed = ref(true);
+
+	async function onSubmit(): Promise<void> {
+		isSubmitting.value = true;
+		submitButtonContent.value = spinner();
+		submitStatus.value = "";
+
+		try {
+			const formData = new FormData();
+
+			formData.append("firstnameInput", firstnameInput.value);
+			formData.append("middlenameInput", middlenameInput.value);
+			formData.append("surnameInput", surnameInput.value);
+			formData.append("genderSelect", genderSelect.value);
+			formData.append("dobInput", dobInput.value);
+			formData.append("religionSelect", religionSelect.value);
+			formData.append("bloodGroupSelect", bloodGroupSelect.value);
+			formData.append("addressInput", addressInput.value);
+			formData.append("fatherPhoneInput", fatherPhoneInput.value);
+			formData.append("motherPhoneInput", motherPhoneInput.value);
+			formData.append("otherPhoneInput", otherPhoneInput.value);
+			formData.append("statesSelect", stateSelect.value);
+			formData.append("lgaSelect", lgaSelect.value);
+			formData.append("classSelect", classSelect.value);
+			formData.append("passport", webCam.value);
+
+			const result = await formModel.sendFormData(formData);
+			console.log(result);
+			submitStatus.value = "Submitted ✅";
+			isSubmitFailed.value = false;
+		} catch (err: any) {
+			submitStatus.value =
+				err.message || "an error occured check console for more info";
+			isSubmitFailed.value = true;
+		} finally {
+			isSubmitting.value = false;
+			submitButtonContent.value = "Submit";
+		}
 	}
 </script>

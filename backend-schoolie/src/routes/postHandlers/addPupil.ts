@@ -87,7 +87,7 @@ export const addPupil: ServerRoute = {
 				.response({ result, message: "upload was succesful" })
 				.code(200);
 		} catch (error: any) {
-			return res.response({ msg: error.message }).code(500);
+			return res.response(error.message).code(500);
 		}
 	},
 };

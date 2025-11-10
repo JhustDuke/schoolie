@@ -11,7 +11,6 @@
 				@click="setHeader(tab)" />
 		</nav>
 
-		<!-- Content -->
 		<main>
 			<center v-if="!isLoaded">
 				please wait
@@ -30,14 +29,14 @@
 				mode="out-in">
 				<component
 					:is="currentTab"
-					v-bind="classDetailsProps"></component>
+					v-bind="classDetailsProps" />
 			</transition>
 		</main>
 	</div>
 </template>
 
 <script setup lang="ts">
-	import { ref, computed, onMounted, watch } from "vue";
+	import { ref, computed, watch } from "vue";
 	import AllSummary from "./summary/allSummary.vue";
 	import ClassDetails from "./classDetails.vue";
 	import AnchorLink from "@utils/anchorLink.vue";
@@ -45,31 +44,50 @@
 	import { spinner } from "@utils/spinner";
 	import { classModel } from "@models/classModel";
 	import { useCache } from "@utils/cacheHelper";
+	import { useSessionStore } from "../../../store/sessionStore";
 
 	const useSpinner = spinner();
-
 	const isLoaded = ref(false);
 	const hasError = ref(false);
-
 	const classDetailsData = ref<any>(null);
+
 	const classDetailsProps = computed(function () {
 		return classDetailsData.value || {};
 	});
 
-	const activeHeader = ref("overview");
-	const currentTab = computed(() =>
-		activeHeader.value === "overview" ? AllSummary : ClassDetails
-	);
+	const activeHeader = ref<string>("");
+	const currentTab = computed(function () {
+		return activeHeader.value === "overview" ? AllSummary : ClassDetails;
+	});
 
 	const tabsHeaders = ref<string[]>([]);
-	onMounted(async function () {
-		try {
-			tabsHeaders.value = await classModel.loadClasses("3000/3333");
-			await fetchData("overview");
-		} catch {
-			hasError.value = true;
-		}
-	});
+	const store = useSessionStore();
+
+	// ✅ Watch ensures we wait until selectedSession is available
+	watch(
+		function () {
+			return store.selectedSession;
+		},
+		async function (newSession) {
+			if (!newSession) return;
+
+			try {
+				isLoaded.value = false;
+				hasError.value = false;
+
+				tabsHeaders.value = await classModel.loadClasses(newSession);
+
+				activeHeader.value = tabsHeaders.value[0] || "overview";
+				await fetchData(activeHeader.value);
+			} catch (err: any) {
+				hasError.value = true;
+				console.error(err.message);
+			} finally {
+				isLoaded.value = true;
+			}
+		},
+		{ immediate: true }
+	);
 
 	watch(activeHeader, async function (newTab) {
 		await fetchData(newTab);
@@ -81,13 +99,13 @@
 
 		try {
 			const cacheKey = "classData_" + tab;
+			const sessionYear = store.selectedSession;
+
+			if (!sessionYear) throw new Error("Session not selected");
 
 			const data = await useCache(cacheKey, async function () {
 				if (tab === "overview") {
-					// Fetch overview (school-wide stats)
-					const overviewData = await classModel.getSchoolStatsMock();
-
-					// Add mock presents to make UI feel richer
+					const overviewData = await classModel.getSchoolStats(sessionYear);
 					const presets = [
 						{ name: "Aisha Bello", present: true },
 						{ name: "John Doe", present: false },
@@ -104,9 +122,7 @@
 					};
 				}
 
-				// Simulate class-level data
 				const pupils = await classModel.getClassDataMock(tab);
-
 				return {
 					label: tab,
 					totalBoys: "10",
@@ -114,9 +130,6 @@
 					pupils,
 				};
 			});
-
-			// if “graded” throws or fails, display error component
-			if (tab === "graded") throw new Error("Intentional mock error");
 
 			classDetailsData.value = data;
 		} catch {

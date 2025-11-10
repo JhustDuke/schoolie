@@ -42,7 +42,7 @@
 			<div class="mt-3 d-flex justify-content-evenly">
 				<div class="row mt-3 justify-content-center">
 					<div
-						v-for="cls in classes"
+						v-for="cls in presetClasses"
 						:key="cls"
 						class="col-6 col-md-auto mb-2">
 						<button
@@ -143,6 +143,7 @@
 <script setup lang="ts">
 	import { ref, computed } from "vue";
 	import { classModel } from "@models/classModel";
+	import { useSessionStore } from "../../store/sessionStore";
 
 	interface ModalPropsInterface {
 		isVisible?: boolean;
@@ -151,13 +152,8 @@
 
 	const props = defineProps<ModalPropsInterface>();
 
-	const emit = defineEmits<{
-		(event: "close"): void;
-		(event: "select", payload: { className: string }): void;
-	}>();
-
 	// Preset Classes
-	const classes = ref<string[]>([
+	const presetClasses = ref<string[]>([
 		"creche",
 		"nursery-1",
 		"nursery-2",
@@ -170,7 +166,13 @@
 		"basic-6",
 	]);
 
-	const sessions = ref<string[]>(props.loadedSessions || []);
+	const emit = defineEmits<{
+		(event: "close"): void;
+		(event: "select", payload: { className: string }): void;
+	}>();
+
+	const store = useSessionStore();
+	const sessions = ref<string[]>(store.allSessions || []);
 
 	// --- CLASS SELECTION HANDLERS ---
 	const chosenClasses = ref<string[]>([]);
@@ -216,26 +218,29 @@
 	const feedbackSuccess = ref<boolean>(false);
 
 	async function submitClasses(): Promise<void> {
-		// const canSubmit = selectedSession.value && sortedChosenClasses.value.length;
-		// if (!canSubmit) return;
+		const canSubmit = selectedSession.value && sortedChosenClasses.value.length;
+		if (!canSubmit) return;
 
 		isSubmitting.value = true;
 		feedbackMessage.value = "";
 
 		try {
-			const result = await classModel.addClassesMock(
+			const result = await classModel.addClasses(
 				selectedSession.value,
 				sortedChosenClasses.value
 			);
 
 			feedbackSuccess.value = result.success;
 			feedbackMessage.value = result.success
-				? `Successfully added ${result.added.length} classes`
+				? `Successfully added `
 				: "Failed to add classes";
 			emit("close");
 		} catch (err: any) {
 			feedbackSuccess.value = false;
-			feedbackMessage.value = err.message || "An error occurred";
+
+			feedbackMessage.value =
+				err.message ||
+				"couldnt complete registrations could be a network or duplicate error check console for more info. if network is fine try adding one after the other";
 		} finally {
 			isSubmitting.value = false;
 		}

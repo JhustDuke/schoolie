@@ -68,8 +68,8 @@
 	});
 
 	const emit = defineEmits<{
-		(e: "imageCaptured", payload: { success: boolean; image?: string }): void;
-		(e: "upload", payload: { success: boolean; file?: string }): void;
+		(e: "imageCaptured", payload: { success: boolean; image?: any }): void;
+		(e: "upload", payload: { success: boolean; file?: any }): void;
 	}>();
 
 	const video = ref<HTMLVideoElement | null>(null);
@@ -125,32 +125,33 @@
 	}
 
 	function snapPhoto() {
-		if (stream) {
-			const ctx = canvas.value?.getContext("2d");
-			canvas.value!.width = video.value?.videoWidth as number;
-			canvas.value!.height = video.value?.videoHeight as number;
-			ctx?.drawImage(
-				video.value!,
-				0,
-				0,
-				canvas.value!.width,
-				canvas.value!.height
-			);
-			const convertToImageData = canvas.value?.toDataURL("image/png");
-			generatedImg.value?.classList.remove("d-none");
-			generatedImg.value!.src = convertToImageData as string;
-			canvas.value?.classList.add("d-none");
-			console.log("snapped picture");
-			//if no image has been snapped
-			if (generatedImg.value!.src === "") {
-				emit("imageCaptured", { success: false });
-				return;
-			} else {
-				emit("imageCaptured", {
-					success: true,
-					image: generatedImg.value!.src,
-				});
-			}
+		if (stream && canvas.value && video.value) {
+			const ctx = canvas.value.getContext("2d")!;
+			canvas.value.width = video.value.videoWidth;
+			canvas.value.height = video.value.videoHeight;
+			ctx.drawImage(video.value, 0, 0, canvas.value.width, canvas.value.height);
+
+			// Convert to blob instead of base64
+			canvas.value.toBlob((blob) => {
+				if (!blob) {
+					emit("imageCaptured", { success: false });
+					return;
+				}
+
+				// Convert blob to File so backend can read it like normal upload
+				const file = new File([blob], "webcam.png", { type: blob.type });
+
+				// Preview the captured image
+				const imageUrl = URL.createObjectURL(file);
+				generatedImg.value?.classList.remove("d-none");
+				generatedImg.value!.src = imageUrl;
+				canvas.value?.classList.add("d-none");
+
+				console.log("snapped picture (blob)");
+
+				// Emit the file to parent
+				emit("imageCaptured", { success: true, image: file });
+			}, "image/png");
 		}
 	}
 
@@ -171,7 +172,7 @@
 
 				generatedImg.value!.classList.remove("d-none");
 				console.log("image read and stored successfully");
-				emit("upload", { success: true, file: generatedImg.value!.src });
+				emit("upload", { success: true, file });
 			} else {
 				emit("upload", { success: false });
 

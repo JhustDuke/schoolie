@@ -112,7 +112,7 @@ export const classOpsModel = function () {
 				`✅ Added classes [${newClasses.join(", ")}] to ${sessionYear}`
 			);
 		} catch (err: any) {
-			throw new Error(err.message || "class registration failed");
+			throw Error(err.message || "class registration failed");
 		} finally {
 			conn.release();
 		}

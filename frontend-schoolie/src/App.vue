@@ -9,7 +9,7 @@
 
 		<!-- Modal Backdrop -->
 		<div
-			v-if="mockVisible"
+			v-if="store.showModal"
 			class="isAbsolute w-100 h-100 top-0 start-0 d-flex justify-content-center align-items-start"
 			style="
 				background: rgba(0, 0, 0, 0.5);
@@ -18,9 +18,9 @@
 				padding-top: 5vh;
 			">
 			<AddClassModal
-				:isVisible="mockVisible"
-				:loadedSessions="[...allSessions]"
-				@close="mockVisible = !mockVisible" />
+				:isVisible="store.showModal"
+				:loadedSessions="[...store.allSessions]"
+				@close="store.toggleModal" />
 		</div>
 
 		<footer class="yellow p-4">footer content goes here</footer>
@@ -28,25 +28,10 @@
 </template>
 
 <script setup lang="ts">
-	import { ref, computed, provide, readonly } from "vue";
 	import Body from "@components/body/body.vue";
 	import NavBar from "@components/navbar/navBar.vue";
 	import AddClassModal from "@components/body/addClasses.vue";
+	import { useSessionStore } from "./store/sessionStore";
 
-	const allSessions = ref<Set<string>>(new Set());
-	const updateSessions = function (sessionEntries: string[]) {
-		const val = [...sessionEntries];
-		val.forEach(function (entry: string) {
-			if (!allSessions.value.has(entry)) {
-				allSessions.value.add(entry);
-			}
-		});
-	};
-
-	const mockVisible = ref(true);
-	const modalVisible = computed(function () {
-		return allSessions.value.size === 0;
-	});
-
-	provide("sessions", { allSessions: readonly(allSessions), updateSessions });
+	const store = useSessionStore();
 </script>

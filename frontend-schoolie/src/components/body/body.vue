@@ -31,8 +31,6 @@
 <script setup lang="ts">
 	import { ref, computed } from "vue";
 	import AnchorLink from "@utils/anchorLink.vue";
-	// import TabTitle from "./tabTitle.vue";
-	// import TabContent from "./tabContent.vue";
 	import BrokenLink from "@utils/brokenLink.vue";
 	import Overview from "./overview/overview.vue";
 	import Form from "@components/form/form.vue";

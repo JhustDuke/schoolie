@@ -26,18 +26,24 @@ export const addClasses: ServerRoute = {
 					.code(400)
 					.takeover(),
 		},
+
 		payload: {
 			output: "data",
 			parse: true,
 			allow: ["application/json", "application/x-www-form-urlencoded"],
 		},
-		cors: true,
+		cors: {
+			origin: ["*"],
+			headers: ["Content-Type", "Accept", "Access-Control-Allow-Origin"],
+			additionalHeaders: ["X-Requested-With"],
+		},
 	},
 	handler: async function (req: Request, res: ResponseToolkit) {
 		const { classes, sessionYear } = req.payload as {
 			classes: string[];
 			sessionYear: string;
 		};
+		console.log("i ran");
 
 		const newClasses = classOpsModel();
 		try {
@@ -47,7 +53,7 @@ export const addClasses: ServerRoute = {
 				.response({ message: `Added classes: ${classes.join(", ")}` })
 				.code(200);
 		} catch (err: any) {
-			return res.response({ status: "failed", error: err.message }).code(400);
+			return res.response(err.message).code(400);
 		}
 	},
 };
