@@ -46,6 +46,7 @@ export const addClasses: ServerRoute = {
 		console.log("i ran");
 
 		const newClasses = classOpsModel();
+
 		try {
 			await newClasses.addClasses(classes, sessionYear);
 

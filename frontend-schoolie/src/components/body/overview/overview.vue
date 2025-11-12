@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-	import { ref, computed, watch } from "vue";
+	import { ref, computed, watch, onMounted } from "vue";
 	import AllSummary from "./summary/allSummary.vue";
 	import ClassDetails from "./classDetails.vue";
 	import AnchorLink from "@utils/anchorLink.vue";
@@ -45,6 +45,7 @@
 	import { classModel } from "@models/classModel";
 	import { useCache } from "@utils/cacheHelper";
 	import { useSessionStore } from "../../../store/sessionStore";
+	import { useClassesStore } from "../../../store/classesStore";
 
 	const useSpinner = spinner();
 	const isLoaded = ref(false);
@@ -62,8 +63,12 @@
 
 	const tabsHeaders = ref<string[]>([]);
 	const store = useSessionStore();
-
+	const classesStore = useClassesStore();
 	// ✅ Watch ensures we wait until selectedSession is available
+
+	onMounted(function () {
+		destroySpinner();
+	});
 	watch(
 		function () {
 			return store.selectedSession;
@@ -76,6 +81,7 @@
 				hasError.value = false;
 
 				tabsHeaders.value = await classModel.loadClasses(newSession);
+				classesStore.setClasses(tabsHeaders.value);
 
 				activeHeader.value = tabsHeaders.value[0] || "overview";
 				await fetchData(activeHeader.value);
@@ -141,6 +147,14 @@
 
 	function setHeader(tab: string): void {
 		activeHeader.value = tab;
+	}
+	function destroySpinner() {
+		setTimeout(function () {
+			if (isLoaded.value === false) {
+				isLoaded.value = true;
+				hasError.value = true;
+			}
+		}, 15000);
 	}
 </script>
 

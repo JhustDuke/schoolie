@@ -9,53 +9,55 @@
 			</div>
 
 			<div class="red-text text-capitalize fw-bold">{{ errorMessage }}</div>
-			<small>{{ formMessage }}</small>
 
-			<form
-				v-if="formMessage"
-				class="my-3 flex-wrap p-2"
-				:style="{ maxWidth: width }">
-				<input
-					type="email"
-					class="form-control me-2"
-					:placeholder="placeholder" />
+			<div class="d-flex flex-column gap-2 mt-4">
 				<button
-					class="btn btn-primary mt-3 d-block w-100"
-					type="submit">
-					{{ buttonText }}
+					class="btn btn-outline-primary"
+					@click="backToOverview">
+					Back to Overview
 				</button>
-			</form>
+				<button
+					class="btn btn-outline-secondary"
+					@click="redirectUser">
+					Go
+				</button>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 	import { defineProps } from "vue";
+	import { useTabStore } from "../../store/tabStore";
 
 	interface BrokenLinkInterface {
 		title: string;
 		iconClass?: string;
 		errorMessage: string;
-		formMessage?: string;
-		placeholder?: string;
-		buttonText?: string;
+		redirectTo?: string;
 		wrapperClass?: string;
 		mainContainerClass?: string;
 		width?: string;
 	}
 
-	const props = defineProps<BrokenLinkInterface>();
+	withDefaults(defineProps<BrokenLinkInterface>(), {
+		wrapperClass: "grey lighten-1",
+		mainContainerClass:
+			"d-flex flex-column align-items-center text-muted flex-wrap p-3 text-center",
+		width: "300px",
+		redirectTo: "#",
+		title: "not found",
+		iconClass: "fa fa-ban fa-2x mb-2 red-text",
+		errorMessage: "Oops, nothing to display at the moment.",
+	});
 
-	// defaults
-	const {
-		title = "not found",
-		iconClass = "fa fa-ban fa-2x mb-2 red-text",
-		errorMessage = "Oops, nothing to display at the moment.",
-		formMessage = "Drop your email to be notified when it is:",
-		placeholder = "Enter your email",
-		buttonText = "Notify Me",
-		wrapperClass = "grey lighten-1",
-		mainContainerClass = "d-flex flex-column align-items-center text-muted flex-wrap p-3 text-center",
-		width = "300px",
-	} = props;
+	const tabStore = useTabStore();
+
+	function backToOverview(): void {
+		tabStore.goto("overview");
+	}
+
+	function redirectUser(): void {
+		window.location.reload();
+	}
 </script>

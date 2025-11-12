@@ -17,6 +17,12 @@
 				disabled>
 				no sessions available — click Add Session
 			</option>
+			<option
+				v-else
+				class="text-muted"
+				selected>
+				{{ store.selectedSession }}
+			</option>
 
 			<option
 				v-for="year in store.allSessions"
@@ -55,6 +61,7 @@
 
 	onMounted(async function () {
 		await loadAllSessions();
+		store.setActiveSession(store.allSessions[0]);
 	});
 
 	const store = useSessionStore();

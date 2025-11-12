@@ -231,9 +231,8 @@
 			);
 
 			feedbackSuccess.value = result.success;
-			feedbackMessage.value = result.success
-				? `Successfully added `
-				: "Failed to add classes";
+			feedbackMessage.value = `Successfully added `;
+
 			emit("close");
 		} catch (err: any) {
 			feedbackSuccess.value = false;

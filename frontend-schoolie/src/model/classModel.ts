@@ -72,16 +72,20 @@ export const classModel = (function () {
 	const addClasses = async function (
 		sessionYear: string,
 		newClasses: string[]
-	): Promise<{ success: boolean; added: string[] }> {
+	): Promise<{ success: boolean; added: string[] | string }> {
 		try {
-			const res = await fetch(`${baseUrl}/addClasses`, {
+			const response = await fetch(`${baseUrl}/addClasses`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ classes: newClasses, sessionYear }),
 			});
-			const result = await res.json();
-			if (!res.ok) throw new Error(result.message);
-			return { success: true, added: result.added };
+
+			if (!response.ok) {
+				console.log("res:", response);
+				const errText = await response.text();
+				throw new Error(errText || response.statusText);
+			}
+			return { success: true, added: newClasses.join(",") };
 		} catch (err: any) {
 			throw err.message;
 		}

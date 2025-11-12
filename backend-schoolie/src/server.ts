@@ -12,6 +12,23 @@ const server: Server = Hapi.server({
 	port,
 	host,
 });
+// global error handler
+server.ext("onPreResponse", (req, res) => {
+	const preRes = req.response;
+
+	if (preRes instanceof Error) {
+		console.error(preRes.stack);
+		return res
+			.response({
+				source: preRes.stack,
+				status: "error",
+				message: preRes.message || "Internal Server Error",
+			})
+			.code(500);
+	}
+
+	return res.continue;
+});
 
 server.route(allRoutes);
 

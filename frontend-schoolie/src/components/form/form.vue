@@ -45,17 +45,11 @@
 				<SelectField
 					id="classSelect"
 					label="Class"
-					:options="[
-						'Creche',
-						'Nursery 1',
-						'Nursery 2',
-						'Nursery 3',
-						'Grade 1',
-						'Grade 2',
-						'Grade 3',
-						'Grade 4',
-						'Grade 5',
-					]"
+					:options="
+						useClassesStore().allClasses.length
+							? useClassesStore().allClasses
+							: ['mockClass-1', 'mockClass-2']
+					"
 					v-model="formEntries.classSelect"
 					@focusout="
 						runValidation(
@@ -248,6 +242,7 @@
 	import { formModel } from "../../model";
 	import { spinner } from "../utils/spinner";
 	import { useTabStore } from "../../store/tabStore";
+	import { useClassesStore } from "../../store/classesStore";
 
 	interface FormEntriesInterface {
 		firstnameInput: string;
@@ -420,7 +415,6 @@
 			});
 
 			resetForm("appForm", imageSrcRef.value?.reset);
-			console.log(formEntries.firstnameInput);
 			useTabStore().goto("overview");
 		} catch (err: any) {
 			submitStatus.value = err.message || "An error occurred, check console";
