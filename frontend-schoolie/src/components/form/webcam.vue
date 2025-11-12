@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-	import { ref } from "vue";
+	import { ref, defineExpose } from "vue";
 	defineProps({
 		helpText: { type: String, default: "Press start or upload an image." },
 		altText: { type: String, default: "webcam image" },
@@ -181,4 +181,9 @@
 		};
 		reader.readAsDataURL(file);
 	}
+
+	function resetImageSrc() {
+		generatedImg.value!.src = "";
+	}
+	defineExpose({ reset: resetImageSrc });
 </script>

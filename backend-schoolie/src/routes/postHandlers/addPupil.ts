@@ -59,8 +59,11 @@ export const addPupil: ServerRoute = {
 			classSelect,
 			passport,
 		};
-		const error = validateFormFields(requiredFields);
-		if (error) return res.response({ error }).code(400);
+		const errorMsg = validateFormFields(requiredFields);
+
+		if (errorMsg) {
+			return res.response({ message: errorMsg }).code(400);
+		}
 
 		try {
 			const filepath = await handleFileUpload({

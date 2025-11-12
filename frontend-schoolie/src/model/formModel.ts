@@ -14,9 +14,11 @@ export const formModel = (function () {
 				method: "POST",
 				body: formData, // don't set Content-Type manually
 			});
+
 			if (!response.ok) {
-				console.log("res", response);
-				throw new Error(response.statusText);
+				console.log("res:", response);
+				const errText = await response.text();
+				throw new Error(errText || response.statusText);
 			}
 
 			return await response.json();

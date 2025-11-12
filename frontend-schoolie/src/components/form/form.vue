@@ -1,12 +1,15 @@
 <template>
-	<form class="container bg-light p-4 rounded shadow-sm">
-		<!-- Webcam Section -->
+	<form
+		class="container bg-light p-4 rounded shadow-sm"
+		id="appForm">
+		<!-- passport Section -->
 		<div class="row mb-3">
 			<div class="text-center">
 				<WebCam
+					ref="imageSrcRef"
 					@image-captured="onImageReceived"
 					@upload="onUploadReceived"
-					v-model="webCam" />
+					v-model="formEntries.passport" />
 			</div>
 		</div>
 
@@ -17,7 +20,7 @@
 					id="surname"
 					label="Surname"
 					placeholder="Enter Surname"
-					v-model="surnameInput"
+					v-model="formEntries.surnameInput"
 					@input="runValidation('name', 'surnameInput', $event)" />
 			</div>
 			<div class="col-md-3 mb-3">
@@ -25,7 +28,7 @@
 					id="firstname"
 					label="First Name"
 					placeholder="Enter First Name"
-					v-model="firstnameInput"
+					v-model="formEntries.firstnameInput"
 					@input="runValidation('name', 'firstnameInput', $event)" />
 			</div>
 			<div class="col-md-3 mb-3">
@@ -33,7 +36,7 @@
 					id="middlename"
 					label="Middle Name"
 					placeholder="Enter Middle Name"
-					v-model="middlenameInput"
+					v-model="formEntries.middlenameInput"
 					@input="runValidation('name', 'middlenameInput', $event)" />
 			</div>
 
@@ -53,7 +56,7 @@
 						'Grade 4',
 						'Grade 5',
 					]"
-					v-model="classSelect"
+					v-model="formEntries.classSelect"
 					@focusout="
 						runValidation(
 							'select',
@@ -71,8 +74,8 @@
 				<SelectField
 					id="genderSelect"
 					label="Gender"
-					v-model="genderSelect"
 					:options="['Male', 'Female']"
+					v-model="formEntries.genderSelect"
 					@focusout="
 						runValidation(
 							'select',
@@ -86,7 +89,7 @@
 				<TextField
 					id="dobInput"
 					label="Date of Birth"
-					v-model="dobInput"
+					v-model="formEntries.dobInput"
 					placeholder="YYYY-MM-DD"
 					type="text"
 					@focusout="runValidation('dob', 'dobInput', $event)" />
@@ -95,8 +98,8 @@
 				<SelectField
 					id="religionSelect"
 					label="Religion"
-					v-model="religionSelect"
 					:options="['Christian', 'Muslim']"
+					v-model="formEntries.religionSelect"
 					@focusout="
 						runValidation(
 							'select',
@@ -114,12 +117,12 @@
 				<SelectField
 					id="stateSelect"
 					label="State"
-					v-model="stateSelect"
 					:options="stateSelectOptions"
+					v-model="formEntries.statesSelect"
 					@focusout="
 						runValidation(
 							'select',
-							'stateSelect',
+							'statesSelect',
 							$event,
 							domStaticValues.chooseState
 						)
@@ -129,8 +132,8 @@
 				<SelectField
 					id="lgaSelect"
 					label="Local Government"
-					v-model="lgaSelect"
 					:options="lgaSelectOptions"
+					v-model="formEntries.lgaSelect"
 					@focusout="
 						runValidation(
 							'select',
@@ -144,8 +147,8 @@
 				<SelectField
 					id="bloodGroupSelect"
 					label="Blood Group"
-					v-model="bloodGroupSelect"
 					:options="['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-']"
+					v-model="formEntries.bloodGroupSelect"
 					@focusout="
 						runValidation(
 							'select',
@@ -165,7 +168,7 @@
 					label="Address"
 					placeholder="Enter Address"
 					isTextarea
-					v-model="addressInput"
+					v-model="formEntries.addressInput"
 					@input="runValidation('address', 'addressInput', $event)" />
 			</div>
 		</div>
@@ -177,7 +180,7 @@
 					id="fatherPhone"
 					label="Father's Phone"
 					placeholder="Enter Father's Phone"
-					v-model="fatherPhoneInput"
+					v-model="formEntries.fatherPhoneInput"
 					@input="runValidation('phone', 'fatherPhoneInput', $event)" />
 			</div>
 			<div class="col-md-4 mb-3">
@@ -185,7 +188,7 @@
 					id="motherPhone"
 					label="Mother's Phone"
 					placeholder="Enter Mother's Phone"
-					v-model="motherPhoneInput"
+					v-model="formEntries.motherPhoneInput"
 					@input="runValidation('phone', 'motherPhoneInput', $event)" />
 			</div>
 			<div class="col-md-4 mb-3">
@@ -193,12 +196,11 @@
 					id="otherPhone"
 					label="Other Phone"
 					placeholder="Enter Other Phone"
-					v-model="otherPhoneInput"
+					v-model="formEntries.otherPhoneInput"
 					@input="runValidation('phone', 'otherPhoneInput', $event)" />
 			</div>
 		</div>
 
-		<!-- Submit and error list -->
 		<!-- Submit and error list -->
 		<center>
 			<div
@@ -232,7 +234,7 @@
 	import PhoneField from "./phoneField.vue";
 	import SelectField from "./selectField.vue";
 	import WebCam from "./webcam.vue";
-	import { ref, watch, computed } from "vue";
+	import { reactive, ref, watch, computed } from "vue";
 	import {
 		validateNameField,
 		validateSelectField,
@@ -240,70 +242,98 @@
 		validatePhoneField,
 		validateDob,
 		validateAddressField,
+		notifyToast,
 	} from "../utils/scripts";
 	import naijaStateLocalGovernment from "naija-state-local-government";
 	import { formModel } from "../../model";
 	import { spinner } from "../utils/spinner";
+	import { useTabStore } from "../../store/tabStore";
 
-	const firstnameInput = ref<string>("");
-	const middlenameInput = ref<string>("");
-	const surnameInput = ref<string>("");
-	const genderSelect = ref<string>("");
-	const dobInput = ref<string>("");
-	const religionSelect = ref<string>("");
-	const bloodGroupSelect = ref<string>("");
-	const addressInput = ref<string>("");
-	const fatherPhoneInput = ref<string>("");
-	const motherPhoneInput = ref<string>("");
-	const otherPhoneInput = ref<string>("");
-	const lgaSelect = ref<string>("");
-	const stateSelect = ref<string>("");
-	const classSelect = ref<string>("");
+	interface FormEntriesInterface {
+		firstnameInput: string;
+		middlenameInput: string;
+		surnameInput: string;
+		genderSelect: string;
+		dobInput: string;
+		religionSelect: string;
+		bloodGroupSelect: string;
+		addressInput: string;
+		fatherPhoneInput: string;
+		motherPhoneInput: string;
+		otherPhoneInput: string;
+		lgaSelect: string;
+		statesSelect: string;
+		classSelect: string;
+		passport: string;
+	}
 
-	// webcam captured image (base64)
-	const webCam = ref<string>("");
-
-	const formFieldsState = ref<Record<string, boolean>>({
-		firstnameInput: false,
-		middlenameInput: false,
-		surnameInput: false,
-		genderSelect: false,
-		dobInput: false,
-		religionSelect: false,
-		bloodGroupSelect: false,
-		addressInput: false,
-		fatherPhoneInput: false,
-		motherPhoneInput: false,
-		otherPhoneInput: false,
-		lgaSelect: false,
-		stateSelect: false,
-		classSelect: false,
-		webCam: false,
+	// reactive form entries
+	const formEntries = reactive({
+		firstnameInput: "",
+		middlenameInput: "",
+		surnameInput: "",
+		genderSelect: "",
+		dobInput: "",
+		religionSelect: "",
+		bloodGroupSelect: "",
+		addressInput: "",
+		fatherPhoneInput: "",
+		motherPhoneInput: "",
+		otherPhoneInput: "",
+		lgaSelect: "",
+		statesSelect: "",
+		classSelect: "",
+		passport: "",
 	});
+
+	// reactive validation state
+	const formFieldsState = reactive<Record<keyof FormEntriesInterface, boolean>>(
+		{
+			firstnameInput: false,
+			middlenameInput: false,
+			surnameInput: false,
+			genderSelect: false,
+			dobInput: false,
+			religionSelect: false,
+			bloodGroupSelect: false,
+			addressInput: false,
+			fatherPhoneInput: false,
+			motherPhoneInput: false,
+			otherPhoneInput: false,
+			lgaSelect: false,
+			statesSelect: false,
+			classSelect: false,
+			passport: false,
+		}
+	);
 
 	const stateSelectOptions: string[] = naijaStateLocalGovernment.states();
 	let lgaSelectOptions = ref<string[]>([]);
 
-	watch(stateSelect, function (newValue) {
-		lgaSelectOptions.value = naijaStateLocalGovernment.lgas(newValue).lgas;
-	});
-
-	const hasFalsyState = computed(function () {
-		const errors = new Set<string>();
-		for (const key in formFieldsState.value) {
-			if (!formFieldsState.value[key]) {
-				errors.add(key);
+	watch(
+		function () {
+			return formEntries.statesSelect;
+		},
+		function (newValue) {
+			if (formEntries.statesSelect === "") {
+				return;
 			}
+			lgaSelectOptions.value = naijaStateLocalGovernment.lgas(newValue).lgas;
 		}
-		return {
-			hasError: errors.size > 0,
-			fields: errors,
-		};
+	);
+
+	const hasFalsyState = computed(() => {
+		let key: keyof FormEntriesInterface;
+		const errors = new Set<string>();
+		for (key in formFieldsState) {
+			if (!formFieldsState[key]) errors.add(key);
+		}
+		return { hasError: errors.size > 0, fields: errors };
 	});
 
 	function runValidation(
 		type: "name" | "select" | "phone" | "dob" | "address",
-		prop: string,
+		prop: keyof FormEntriesInterface,
 		event: Event,
 		invalidValue?: string
 	): void {
@@ -311,17 +341,18 @@
 			| HTMLInputElement
 			| HTMLSelectElement
 			| HTMLTextAreaElement;
+
 		if (type === "name") {
 			validateNameField({
 				inputElem: target as HTMLInputElement,
-				elementStateObj: formFieldsState.value,
+				elementStateObj: formFieldsState,
 				stateProp: prop,
 			});
 		}
 		if (type === "select") {
 			validateSelectField({
 				invalidValue: invalidValue || "",
-				stateObj: formFieldsState.value,
+				stateObj: formFieldsState,
 				prop,
 				selectElem: target as HTMLSelectElement,
 			});
@@ -330,57 +361,42 @@
 			validatePhoneField({
 				inputElem: target as HTMLInputElement,
 				prop,
-				statesObj: formFieldsState.value,
+				statesObj: formFieldsState,
 			});
 		}
 		if (type === "dob") {
 			validateDob({
 				inputElem: target as HTMLInputElement,
 				prop,
-				statesObj: formFieldsState.value,
+				statesObj: formFieldsState,
 			});
 		}
 		if (type === "address") {
 			validateAddressField({
 				inputElem: target as HTMLTextAreaElement,
 				prop,
-				statesObj: formFieldsState.value,
+				statesObj: formFieldsState,
 			});
 		}
 	}
 
-	function onImageReceived(payload: {
-		success: boolean;
-		image?: string | undefined;
-	}) {
-		if (!payload.success) {
-			console.log("webcam failure");
-			return;
-		}
-
-		webCam.value = payload.image!;
-		formFieldsState.value.webCam = !!webCam.value;
-		console.log("webcam success");
+	function onImageReceived(payload: { success: boolean; image?: string }) {
+		if (!payload.success) return;
+		formEntries.passport = payload.image!;
+		formFieldsState.passport = !!formEntries.passport;
 	}
-	function onUploadReceived(payload: {
-		success: boolean;
-		file?: string | undefined;
-	}) {
-		if (!payload.success) {
-			console.log("upload failure");
-			return;
-		}
 
-		// if child sends base64 as payload.file
-		webCam.value = payload.file!;
-		formFieldsState.value.webCam = !!webCam.value;
-		console.log("upload success");
+	function onUploadReceived(payload: { success: boolean; file?: string }) {
+		if (!payload.success) return;
+		formEntries.passport = payload.file!;
+		formFieldsState.passport = !!formEntries.passport;
 	}
 
 	const isSubmitting = ref<boolean>(false);
 	const submitButtonContent = ref<string>("Submit");
 	const submitStatus = ref<string>("");
 	const isSubmitFailed = ref(true);
+	const imageSrcRef = ref<InstanceType<typeof WebCam> | null>(null);
 
 	async function onSubmit(): Promise<void> {
 		isSubmitting.value = true;
@@ -389,34 +405,59 @@
 
 		try {
 			const formData = new FormData();
+			let key: keyof FormEntriesInterface;
+			for (key in formEntries) {
+				formData.append(key, formEntries[key]);
+			}
 
-			formData.append("firstnameInput", firstnameInput.value);
-			formData.append("middlenameInput", middlenameInput.value);
-			formData.append("surnameInput", surnameInput.value);
-			formData.append("genderSelect", genderSelect.value);
-			formData.append("dobInput", dobInput.value);
-			formData.append("religionSelect", religionSelect.value);
-			formData.append("bloodGroupSelect", bloodGroupSelect.value);
-			formData.append("addressInput", addressInput.value);
-			formData.append("fatherPhoneInput", fatherPhoneInput.value);
-			formData.append("motherPhoneInput", motherPhoneInput.value);
-			formData.append("otherPhoneInput", otherPhoneInput.value);
-			formData.append("statesSelect", stateSelect.value);
-			formData.append("lgaSelect", lgaSelect.value);
-			formData.append("classSelect", classSelect.value);
-			formData.append("passport", webCam.value);
-
-			const result = await formModel.sendFormData(formData);
-			console.log(result);
-			submitStatus.value = "Submitted ✅";
+			await formModel.sendFormData(formData);
 			isSubmitFailed.value = false;
+
+			notifyToast({
+				text: "successfully added new pupil",
+				type: "success",
+				timeout: 3000,
+			});
+
+			resetForm("appForm", imageSrcRef.value?.reset);
+			console.log(formEntries.firstnameInput);
+			useTabStore().goto("overview");
 		} catch (err: any) {
-			submitStatus.value =
-				err.message || "an error occured check console for more info";
+			submitStatus.value = err.message || "An error occurred, check console";
 			isSubmitFailed.value = true;
 		} finally {
 			isSubmitting.value = false;
 			submitButtonContent.value = "Submit";
 		}
+	}
+
+	function resetForm(formId: string, cb?: Function): void {
+		const formEl = document.getElementById(formId);
+
+		if (!formEl) {
+			console.error(`Element with form id "${formId}" not found`);
+			return;
+		}
+
+		const elements = formEl.querySelectorAll("*");
+		elements.forEach(function (el) {
+			if (el instanceof HTMLInputElement) {
+				if (el.type === "checkbox" || el.type === "radio") el.checked = false;
+				else el.value = "";
+			} else if (el instanceof HTMLTextAreaElement) {
+				el.value = "";
+			} else if (el instanceof HTMLSelectElement) {
+				el.selectedIndex = 0;
+			} else if (el instanceof HTMLImageElement) {
+				el.src = "";
+				cb?.();
+
+				// imageSrcRef.value.res3
+			}
+		});
+
+		// Reset reactive form entries
+		let key: keyof FormEntriesInterface;
+		for (key in formEntries) formEntries[key] = "";
 	}
 </script>

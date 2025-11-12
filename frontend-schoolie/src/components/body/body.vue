@@ -7,7 +7,8 @@
 					v-for="item in asideLinks"
 					:key="item.name"
 					:linkName="item.name"
-					:isActive="activeTab === item.name"
+					:id="item.id || ''"
+					:isActive="tabStore.activeTab === item.name"
 					customClass="text-uppercase fw-bold"
 					@click="setTab(item.name)" />
 			</ul>
@@ -21,7 +22,7 @@
 				<KeepAlive>
 					<component
 						:is="currentTabComponent"
-						:key="activeTab" />
+						:key="tabStore.activeTab" />
 				</KeepAlive>
 			</transition>
 		</div>
@@ -35,18 +36,21 @@
 	import Overview from "./overview/overview.vue";
 	import Form from "@components/form/form.vue";
 	import AddClass from "./addClasses.vue";
+	import { useTabStore } from "../../store/tabStore";
 
-	const asideLinks: { name: string }[] = [
-		{ name: "overview" },
-		{ name: "add_classes" },
-		{ name: "add_pupil" },
+	const asideLinks: { name: string; id?: string }[] = [
+		{ name: "overview", id: "#overview" },
+		{ name: "add_classes", id: "#addClasses" },
+		{ name: "add_pupil", id: "#addPupil" },
 		{ name: "more" },
 	];
 
 	const activeTab = ref<string>("overview");
+	const tabStore = useTabStore();
+	tabStore.setActiveTab(activeTab.value);
 
 	const currentTabComponent = computed(function () {
-		switch (activeTab.value) {
+		switch (tabStore.activeTab) {
 			case "overview":
 				return Overview;
 			case "add_pupil":
@@ -59,30 +63,8 @@
 	});
 
 	function setTab(tab: string): void {
-		activeTab.value = tab;
+		tabStore.setActiveTab(tab);
 	}
-
-	/**
-	 * the major problem is the overview aside will trigger db fetches
-	 * but
-	 * it must have an overview which is hardcoded and gets everything from the db
-	 * the classes must be db fetched
-	 * clicking on the overview gets everything gotten from the db
-	 * tabs gets everything based on that specified sessionyear
-	 * ++++++++++++++++++++++++++++++TASK++++++++++++++++++++++++++++++
-	 * CREATE AND ADD CLASSES TO THE DB
-	 * -->LOAD A SESSION-YEAR
-	 * -->CREATE A METHOD TO ADD CLASSES FROM THE UI
-	 * -->CREATE A METHOD IN THE BACKEND TO RETURN ALL THE CLASS NAMES (to be used as tab-headers) TO THE UI
-	 * -->simulate fetching based on the grade
-	 * +++++PROBLEM+++++++
-	 * HOW TO STRUC THE CLASSES
-	 * +++SOLUTION++++
-	 * -->OVERVIEW CARD foor all overview
-	 * -->CLASSDETAIL CARD FOR ALL CLASS ISSUES
-	 *
-	 *
-	 */
 </script>
 <style scoped>
 	.fade-slide-enter-active,
