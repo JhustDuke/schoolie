@@ -13,7 +13,7 @@
 			</span>
 
 			<p class="form-text red-text fw-bold text-capitalize">
-				Please register a session year <br />
+				oops, Please register a session year to continue <br />
 				<span v-show="showHint">
 					session year must be in format <br />
 					YYYY/YYYY
@@ -43,6 +43,8 @@
 	import { isValidYearFormat } from "../utils/scripts";
 	import { sessionModel } from "../../model";
 	import { ref } from "vue";
+	import { useTabStore } from "../../store/tabStore";
+	import { useSessionStore } from "../../store/sessionStore";
 
 	interface ModalPropsInterface {
 		visible?: boolean;
@@ -88,6 +90,8 @@
 			await sessionModel.addNewSessionYear(inputVal.value);
 			console.log("success");
 			emit("success", { msg: `session year ${inputVal.value} added` });
+			useTabStore().goto("add_classes");
+			useSessionStore().setActiveSession(inputVal.value);
 		} catch (err: any) {
 			console.error(err.message);
 			emit("error", {

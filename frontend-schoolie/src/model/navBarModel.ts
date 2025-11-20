@@ -16,16 +16,19 @@ export const navBarModel = (function () {
 	const searchModel = async function (params: Record<string, string>) {
 		try {
 			const fullUrl = searchUrl + buildQuery(params);
-			const response = await fetch(fullUrl);
+			const res = await fetch(fullUrl);
+			const data = await res.json();
 
-			if (!response.ok) {
-				throw new Error(`Request failed with status ${response.status}`);
+			if (!res.ok) {
+				// Show backend-provided response message
+				throw new Error(
+					data.response || `Request failed with status ${res.status}`
+				);
 			}
 
-			const data = await response.json();
-			return data.length > 0 ? data : "nothing gotten";
+			return data.response.length > 0 ? data.response : null;
 		} catch (error: any) {
-			console.error(error.message);
+			console.error("Search Error:", error.message);
 			throw error;
 		}
 	};

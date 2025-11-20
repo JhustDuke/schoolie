@@ -9,7 +9,7 @@
 
 		<!-- Modal Backdrop -->
 		<div
-			v-if="store.showModal"
+			v-if="0"
 			class="isAbsolute w-100 h-100 top-0 start-0 d-flex justify-content-center align-items-start"
 			style="
 				background: rgba(0, 0, 0, 0.5);

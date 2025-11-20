@@ -17,16 +17,11 @@
 				disabled>
 				no sessions available — click Add Session
 			</option>
-			<option
-				v-else
-				class="text-muted"
-				selected>
-				{{ store.selectedSession }}
-			</option>
 
 			<option
 				v-for="year in store.allSessions"
 				:key="year"
+				:selected="year === store.selectedSession"
 				:value="year">
 				{{ year }}
 			</option>
@@ -61,7 +56,12 @@
 
 	onMounted(async function () {
 		await loadAllSessions();
-		store.setActiveSession(store.allSessions[0]);
+		if (store.allSessions.length > 0) {
+			store.setActiveSession(store.allSessions[0]);
+			isVisible.value = false;
+		} else {
+			isVisible.value = true;
+		}
 	});
 
 	const store = useSessionStore();
@@ -69,14 +69,12 @@
 	async function getSingleSessionStats(e: Event): Promise<void> {
 		const elem = e.target as HTMLSelectElement;
 		const elemValue = elem.value;
-
+		if (elemValue.toLowerCase().includes("session")) {
+			return;
+		}
 		try {
-			if (elemValue.toLowerCase().includes("session")) {
-				store.setActiveSession(store.allSessions[0]);
-			}
-
-			store.setActiveSession(elem.value);
 			await sessionModel.getSessionStats(elem.value);
+			store.setActiveSession(elem.value);
 			notifyToast({
 				type: "success",
 				text: "Session stats fetched successfully",
@@ -84,12 +82,12 @@
 		} catch {
 			notifyToast({
 				type: "error",
-				text: "Could not fetch session stats",
+				text: "you don't have data in yet",
 			});
 		}
 	}
 
-	async function loadAllSessions(): Promise<void> {
+	async function loadAllSessions() {
 		try {
 			const data: string[] | null = await sessionModel.loadSessionYears();
 			store.setSessions(data || []);
@@ -98,6 +96,9 @@
 			notifyToast({ text: err.message, type: "error" });
 		}
 	}
+	/**
+	 *
+	 */
 
 	function showError(payload?: { reason: string }): void {
 		notifyToast({ text: `Reason: ${payload?.reason}`, type: "error" });

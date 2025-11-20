@@ -2,13 +2,6 @@
 	<section id="classModal">
 		<div
 			class="pt-2 px-4 text-center pb-2 grey lighten-1 mx-auto w-50 opacity-75">
-			<!-- Close Button -->
-			<span class="float-end hover close-btn mb-2">
-				<i
-					class="fa fa-window-close red-text"
-					aria-hidden="true"
-					@click="emit('close')"></i>
-			</span>
 			<div class="red-text black fw-bold text-uppercase p-2">
 				hello, you seem to be new add classes below and choose a session to get
 				started!
@@ -144,15 +137,17 @@
 	import { ref, computed } from "vue";
 	import { classModel } from "@models/classModel";
 	import { useSessionStore } from "../../store/sessionStore";
+	import { storeToRefs } from "pinia";
 
-	interface ModalPropsInterface {
-		isVisible?: boolean;
-		loadedSessions?: string[];
-	}
+	// --- STORE ---
+	const store = useSessionStore();
+	const { selectedSession, allSessions } = storeToRefs(store);
 
-	const props = defineProps<ModalPropsInterface>();
+	const sessions = computed(function (): string[] {
+		return allSessions.value || [];
+	});
 
-	// Preset Classes
+	// --- PRESET CLASSES ---
 	const presetClasses = ref<string[]>([
 		"creche",
 		"nursery-1",
@@ -166,15 +161,7 @@
 		"basic-6",
 	]);
 
-	const emit = defineEmits<{
-		(event: "close"): void;
-		(event: "select", payload: { className: string }): void;
-	}>();
-
-	const store = useSessionStore();
-	const sessions = ref<string[]>(store.allSessions || []);
-
-	// --- CLASS SELECTION HANDLERS ---
+	// --- CLASS SELECTION ---
 	const chosenClasses = ref<string[]>([]);
 
 	function chooseClass(cls: string): void {
@@ -182,7 +169,6 @@
 		if (!alreadyChosen) {
 			chosenClasses.value.push(cls);
 		}
-		emit("select", { className: cls });
 	}
 
 	const customClass = ref<string>("");
@@ -195,12 +181,14 @@
 		if (!alreadyChosen) {
 			chosenClasses.value.push(val);
 		}
-		emit("select", { className: val });
+
 		customClass.value = "";
 	}
 
 	function removeClass(cls: string): void {
-		const updated = chosenClasses.value.filter((c) => c !== cls);
+		const updated = chosenClasses.value.filter(function (c) {
+			return c !== cls;
+		});
 		chosenClasses.value = updated;
 	}
 
@@ -209,9 +197,6 @@
 		return sorted;
 	});
 
-	// --- SESSION HANDLING ---
-	const selectedSession = ref<string>("");
-
 	// --- SUBMISSION ---
 	const isSubmitting = ref<boolean>(false);
 	const feedbackMessage = ref<string>("");
@@ -219,6 +204,7 @@
 
 	async function submitClasses(): Promise<void> {
 		const canSubmit = selectedSession.value && sortedChosenClasses.value.length;
+
 		if (!canSubmit) return;
 
 		isSubmitting.value = true;
@@ -232,14 +218,11 @@
 
 			feedbackSuccess.value = result.success;
 			feedbackMessage.value = `Successfully added `;
-
-			emit("close");
 		} catch (err: any) {
 			feedbackSuccess.value = false;
-
 			feedbackMessage.value =
 				err.message ||
-				"couldnt complete registrations could be a network or duplicate error check console for more info. if network is fine try adding one after the other";
+				"couldnt complete registrations could be a network or duplicate error check console for more info.";
 		} finally {
 			isSubmitting.value = false;
 		}

@@ -20,24 +20,24 @@
 					id="surname"
 					label="Surname"
 					placeholder="Enter Surname"
-					v-model="formEntries.surnameInput"
-					@input="runValidation('name', 'surnameInput', $event)" />
+					v-model="formEntries.surname"
+					@input="runValidation('name', 'surname', $event)" />
 			</div>
 			<div class="col-md-3 mb-3">
 				<TextField
 					id="firstname"
 					label="First Name"
 					placeholder="Enter First Name"
-					v-model="formEntries.firstnameInput"
-					@input="runValidation('name', 'firstnameInput', $event)" />
+					v-model="formEntries.firstname"
+					@input="runValidation('name', 'firstname', $event)" />
 			</div>
 			<div class="col-md-3 mb-3">
 				<TextField
 					id="middlename"
 					label="Middle Name"
 					placeholder="Enter Middle Name"
-					v-model="formEntries.middlenameInput"
-					@input="runValidation('name', 'middlenameInput', $event)" />
+					v-model="formEntries.middlename"
+					@input="runValidation('name', 'middlename', $event)" />
 			</div>
 
 			<!-- select field starts here -->
@@ -83,10 +83,10 @@
 				<TextField
 					id="dobInput"
 					label="Date of Birth"
-					v-model="formEntries.dobInput"
+					v-model="formEntries.dob"
 					placeholder="YYYY-MM-DD"
 					type="text"
-					@focusout="runValidation('dob', 'dobInput', $event)" />
+					@focusout="runValidation('dob', 'dob', $event)" />
 			</div>
 			<div class="col-md-4 mb-3">
 				<SelectField
@@ -158,12 +158,12 @@
 		<div class="row mb-3">
 			<div class="col-12 mb-3">
 				<TextField
-					id="addressInput"
+					id="address"
 					label="Address"
 					placeholder="Enter Address"
 					isTextarea
-					v-model="formEntries.addressInput"
-					@input="runValidation('address', 'addressInput', $event)" />
+					v-model="formEntries.address"
+					@input="runValidation('address', 'address', $event)" />
 			</div>
 		</div>
 
@@ -174,24 +174,24 @@
 					id="fatherPhone"
 					label="Father's Phone"
 					placeholder="Enter Father's Phone"
-					v-model="formEntries.fatherPhoneInput"
-					@input="runValidation('phone', 'fatherPhoneInput', $event)" />
+					v-model="formEntries.fatherPhone"
+					@input="runValidation('phone', 'fatherPhone', $event)" />
 			</div>
 			<div class="col-md-4 mb-3">
 				<PhoneField
 					id="motherPhone"
 					label="Mother's Phone"
 					placeholder="Enter Mother's Phone"
-					v-model="formEntries.motherPhoneInput"
-					@input="runValidation('phone', 'motherPhoneInput', $event)" />
+					v-model="formEntries.motherPhone"
+					@input="runValidation('phone', 'motherPhone', $event)" />
 			</div>
 			<div class="col-md-4 mb-3">
 				<PhoneField
 					id="otherPhone"
 					label="Other Phone"
 					placeholder="Enter Other Phone"
-					v-model="formEntries.otherPhoneInput"
-					@input="runValidation('phone', 'otherPhoneInput', $event)" />
+					v-model="formEntries.otherPhone"
+					@input="runValidation('phone', 'otherPhone', $event)" />
 			</div>
 		</div>
 
@@ -245,17 +245,17 @@
 	import { useClassesStore } from "../../store/classesStore";
 
 	interface FormEntriesInterface {
-		firstnameInput: string;
-		middlenameInput: string;
-		surnameInput: string;
+		firstname: string;
+		middlename: string;
+		surname: string;
 		genderSelect: string;
-		dobInput: string;
+		dob: string;
 		religionSelect: string;
 		bloodGroupSelect: string;
-		addressInput: string;
-		fatherPhoneInput: string;
-		motherPhoneInput: string;
-		otherPhoneInput: string;
+		address: string;
+		fatherPhone: string;
+		motherPhone: string;
+		otherPhone: string;
 		lgaSelect: string;
 		statesSelect: string;
 		classSelect: string;
@@ -264,17 +264,17 @@
 
 	// reactive form entries
 	const formEntries = reactive({
-		firstnameInput: "",
-		middlenameInput: "",
-		surnameInput: "",
+		firstname: "",
+		middlename: "",
+		surname: "",
 		genderSelect: "",
-		dobInput: "",
+		dob: "",
 		religionSelect: "",
 		bloodGroupSelect: "",
-		addressInput: "",
-		fatherPhoneInput: "",
-		motherPhoneInput: "",
-		otherPhoneInput: "",
+		address: "",
+		fatherPhone: "",
+		motherPhone: "",
+		otherPhone: "",
 		lgaSelect: "",
 		statesSelect: "",
 		classSelect: "",
@@ -284,17 +284,17 @@
 	// reactive validation state
 	const formFieldsState = reactive<Record<keyof FormEntriesInterface, boolean>>(
 		{
-			firstnameInput: false,
-			middlenameInput: false,
-			surnameInput: false,
+			firstname: false,
+			middlename: false,
+			surname: false,
 			genderSelect: false,
-			dobInput: false,
+			dob: false,
 			religionSelect: false,
 			bloodGroupSelect: false,
-			addressInput: false,
-			fatherPhoneInput: false,
-			motherPhoneInput: false,
-			otherPhoneInput: false,
+			address: false,
+			fatherPhone: false,
+			motherPhone: false,
+			otherPhone: false,
 			lgaSelect: false,
 			statesSelect: false,
 			classSelect: false,

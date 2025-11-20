@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-	import { ref, computed, watch, onMounted } from "vue";
+	import { ref, computed, watch } from "vue";
 	import AllSummary from "./summary/allSummary.vue";
 	import ClassDetails from "./classDetails.vue";
 	import AnchorLink from "@utils/anchorLink.vue";
@@ -46,6 +46,7 @@
 	import { useCache } from "@utils/cacheHelper";
 	import { useSessionStore } from "../../../store/sessionStore";
 	import { useClassesStore } from "../../../store/classesStore";
+	import { useTabStore } from "../../../store/tabStore";
 
 	const useSpinner = spinner();
 	const isLoaded = ref(false);
@@ -66,9 +67,6 @@
 	const classesStore = useClassesStore();
 	// ✅ Watch ensures we wait until selectedSession is available
 
-	onMounted(function () {
-		destroySpinner();
-	});
 	watch(
 		function () {
 			return store.selectedSession;
@@ -139,6 +137,7 @@
 
 			classDetailsData.value = data;
 		} catch {
+			useTabStore().goto("add_classes");
 			hasError.value = true;
 		} finally {
 			isLoaded.value = true;
@@ -147,14 +146,6 @@
 
 	function setHeader(tab: string): void {
 		activeHeader.value = tab;
-	}
-	function destroySpinner() {
-		setTimeout(function () {
-			if (isLoaded.value === false) {
-				isLoaded.value = true;
-				hasError.value = true;
-			}
-		}, 15000);
 	}
 </script>
 

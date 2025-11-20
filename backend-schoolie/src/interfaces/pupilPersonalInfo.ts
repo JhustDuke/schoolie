@@ -1,15 +1,15 @@
 export interface PupilPersonalInfoInterface {
-	firstnameInput: string;
-	middlenameInput: string;
-	surnameInput: string;
+	firstname: string;
+	middlename: string;
+	surname: string;
 	genderSelect: "male" | "female";
-	dobInput: string;
+	dob: string;
 	religionSelect: string;
 	bloodGroupSelect: string;
-	addressInput: string;
-	fatherPhoneInput: string;
-	motherPhoneInput: string;
-	otherPhoneInput: string;
+	address: string;
+	fatherPhone: string;
+	motherPhone: string;
+	otherPhone: string;
 	lgaSelect: string;
 	statesSelect: string;
 	classSelect: string;

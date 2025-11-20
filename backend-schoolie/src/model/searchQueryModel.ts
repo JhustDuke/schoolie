@@ -33,6 +33,7 @@ export const searchQueryModel = async function (
 		};
 	};
 
+	// Fetch and parse classes safely
 	const fetchParsedClassesFromDB = async function (
 		tableName: string
 	): Promise<{ [key: string]: Record<string, any> }> {
@@ -43,25 +44,16 @@ export const searchQueryModel = async function (
 
 			const [rows]: any = await conn.query(query);
 
-			if (!rows.length) {
-				throw new Error("rows array is empty");
-			}
-			if (!rows[0].classes) {
-				throw new Error(`no classes present in ${rows[0]}`);
-			}
+			// Return empty object instead of throwing if no classes
+			if (!rows.length || !rows[0].classes) return {};
 
-			const parsed: { [key: string]: Record<string, any> } = JSON.parse(
-				rows[0].classes
-			);
-			return parsed;
-		} catch (err: any) {
-			throw new Error(err.message);
+			return JSON.parse(rows[0].classes);
 		} finally {
 			conn.release();
 		}
 	};
 
-	//gets all the classes PARSED for a specified sessionYear and an additional emptyClasses for debugging purposes
+	// Get all classes across sessions, handling empty tables
 	const getAllSessionsClasses = async function (sessionsArr: any[]): Promise<{
 		allClassNames: Array<Record<string, any>>;
 		emptyClasses: Array<Record<"_empty", boolean>>;
@@ -69,12 +61,12 @@ export const searchQueryModel = async function (
 	}> {
 		const allClassNames: Array<Record<string, any>> = [];
 		const emptyClasses: Array<Record<"_empty", boolean>> = [];
-		const tableWithClasses: any[] = [];
+		const tableWithClasses: string[] = [];
 
 		for await (let sessionYear of sessionsArr) {
-			let parsedClassData: any = await fetchParsedClassesFromDB(sessionYear);
+			const parsedClassData: any = await fetchParsedClassesFromDB(sessionYear);
 
-			if (parsedClassData && Object.keys(parsedClassData).length) {
+			if (Object.keys(parsedClassData).length) {
 				allClassNames.push(parsedClassData);
 				tableWithClasses.push(sessionYear);
 			} else {
@@ -121,7 +113,15 @@ export const searchQueryModel = async function (
 		if (!matchedPupils.length) throw new Error("no pupil found");
 
 		// return the matched pupils array
-		return matchedPupils;
+		// return the matched pupils array but only selected fields
+		return matchedPupils.map(function (pupil: any) {
+			return {
+				firstname: pupil.firstname,
+				surname: pupil.surname,
+				classSelect: pupil.classSelect,
+				passport: pupil.passport,
+			};
+		});
 	};
 
 	const recurseClassSearch = async function (

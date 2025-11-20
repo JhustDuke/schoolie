@@ -25,17 +25,17 @@ export const addPupil: ServerRoute = {
 			return res.response({ message: "payload required" }).code(500);
 
 		const {
-			firstnameInput,
-			middlenameInput,
-			surnameInput,
+			firstname,
+			middlename,
+			surname,
 			genderSelect,
-			dobInput,
+			dob,
 			religionSelect,
 			bloodGroupSelect,
-			addressInput,
-			fatherPhoneInput,
-			motherPhoneInput,
-			otherPhoneInput,
+			address,
+			fatherPhone,
+			motherPhone,
+			otherPhone,
 			lgaSelect,
 			statesSelect,
 			classSelect,
@@ -43,17 +43,17 @@ export const addPupil: ServerRoute = {
 		} = <any>req.payload;
 
 		const requiredFields = {
-			firstnameInput,
-			middlenameInput,
-			surnameInput,
+			firstname,
+			middlename,
+			surname,
 			genderSelect,
-			dobInput,
+			dob,
 			religionSelect,
 			bloodGroupSelect,
-			addressInput,
-			fatherPhoneInput,
-			motherPhoneInput,
-			otherPhoneInput,
+			address,
+			fatherPhone,
+			motherPhone,
+			otherPhone,
 			lgaSelect,
 			statesSelect,
 			classSelect,
@@ -69,11 +69,11 @@ export const addPupil: ServerRoute = {
 			const filepath = await handleFileUpload({
 				file: passport,
 				imageData: {
-					firstname: firstnameInput,
-					lastName: surnameInput,
+					firstname,
+					lastName: surname,
 					className: classSelect,
 					gender: genderSelect,
-					middleName: middlenameInput,
+					middleName: middlename,
 				},
 			});
 			const result = await addPupilModel({
