@@ -20,7 +20,7 @@
 			<center v-else-if="hasError">
 				<BrokenLink
 					title="page not found"
-					errorMessage="the page you're looking for is not found" />
+					:errorMessage="customErrorMsg" />
 			</center>
 
 			<transition
@@ -43,6 +43,7 @@
 	import BrokenLink from "@utils/brokenLink.vue";
 	import { spinner } from "@utils/spinner";
 	import { classModel } from "@models/classModel";
+
 	import { useCache } from "@utils/cacheHelper";
 	import { useSessionStore } from "../../../store/sessionStore";
 	import { useClassesStore } from "../../../store/classesStore";
@@ -51,6 +52,7 @@
 	const useSpinner = spinner();
 	const isLoaded = ref(false);
 	const hasError = ref(false);
+	const customErrorMsg = ref("can't find the requested resource");
 	const classDetailsData = ref<any>(null);
 
 	const classDetailsProps = computed(function () {
@@ -102,46 +104,53 @@
 		hasError.value = false;
 
 		try {
-			const cacheKey = "classData_" + tab;
 			const sessionYear = store.selectedSession;
-
 			if (!sessionYear) throw new Error("Session not selected");
 
+			const cacheKey = "classData_" + tab;
+
 			const data = await useCache(cacheKey, async function () {
-				if (tab === "overview") {
-					const overviewData = await classModel.getSchoolStats(sessionYear);
-					const presets = [
-						{ name: "Aisha Bello", present: true },
-						{ name: "John Doe", present: false },
-						{ name: "Mary Johnson", present: true },
-						{ name: "Ibrahim Yusuf", present: true },
-					];
-
-					return {
-						label: "overview",
-						totalBoys: overviewData.total_boys.toString(),
-						totalGirls: overviewData.total_girls.toString(),
-						totalClasses: overviewData.total_classes.toString(),
-						presets,
-					};
-				}
-
-				const pupils = await classModel.getClassDataMock(tab);
-				return {
-					label: tab,
-					totalBoys: "10",
-					totalGirls: "12",
-					pupils,
-				};
+				if (tab === "overview") return fetchOverview(sessionYear);
+				return fetchClass(tab, sessionYear);
 			});
 
 			classDetailsData.value = data;
-		} catch {
-			useTabStore().goto("add_classes");
+		} catch (err: any) {
+			customErrorMsg.value = err.message;
+			// useTabStore().goto("add_classes");
 			hasError.value = true;
 		} finally {
 			isLoaded.value = true;
 		}
+	}
+
+	async function fetchOverview(sessionYear: string) {
+		const overviewData = await classModel.getSchoolStats(sessionYear);
+		const presets = [
+			{ name: "Aisha Bello", present: true },
+			{ name: "John Doe", present: false },
+			{ name: "Mary Johnson", present: true },
+			{ name: "Ibrahim Yusuf", present: true },
+		];
+
+		return {
+			label: "overview",
+			totalBoys: overviewData.total_boys.toString(),
+			totalGirls: overviewData.total_girls.toString(),
+			totalClasses: overviewData.total_classes.toString(),
+			presets,
+		};
+	}
+
+	async function fetchClass(tab: string, sessionYear: string) {
+		const pupils = await classModel.getClassData(sessionYear, tab);
+		console.log(pupils);
+		return {
+			label: tab,
+			totalBoys: "10",
+			totalGirls: "12",
+			pupils,
+		};
 	}
 
 	function setHeader(tab: string): void {

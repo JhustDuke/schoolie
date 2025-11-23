@@ -6,10 +6,10 @@ export * from "./getAllSessionModel";
 export * from "./totalStatsModel";
 export * from "./classOpsModel";
 export * from "./searchQueryModel";
+export * from "./getPupilsModel";
 
 //post
 export * from "./addPupilModel";
-export * from "./getPupilByClassModel";
 
 //patch
 export * from "./updatePupilModel";

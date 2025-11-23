@@ -1,96 +1,87 @@
 <template>
-	<div>
+	<div class="position-relative">
 		<i
 			class="fa fa-cog white-text fs-5"
 			style="cursor: pointer"
-			@click="isVisible = true"></i>
+			@click="openModal">
+		</i>
 
+		<!-- MODAL -->
 		<div
 			v-if="isVisible"
-			class="modal-backdrop">
-			<div class="modal-container bg-white p-4 rounded shadow-lg">
-				<h6 class="fw-bold mb-3">Manage Sessions</h6>
+			class="position-absolute bg-white p-3 rounded shadow"
+			style="right: 0; top: 40px; width: 260px; z-index: 50">
+			<h6 class="fw-bold mb-3">Manage Sessions</h6>
 
-				<!-- Multi-select list -->
-				<div v-if="sessions.length">
-					<div
-						v-for="session in sessions"
-						:key="session"
-						class="form-check">
-						<input
-							class="form-check-input"
-							type="checkbox"
-							:id="session"
-							:value="session"
-							v-model="selectedSessions" />
-						<label
-							class="form-check-label"
-							:for="session">
-							{{ session }}
-						</label>
-					</div>
+			<center
+				v-html="spin"
+				v-if="isLoading"></center>
+
+			<div v-else>
+				<div
+					v-for="session in sessions"
+					:key="session"
+					class="py-2 px-2 border-bottom del"
+					style="cursor: pointer"
+					@dblclick="onDoubleClick(session)">
+					{{ session }}
 				</div>
-				<p
-					v-else
-					class="text-muted"
-					>No sessions available</p
-				>
-
-				<!-- Action button -->
-				<button
-					class="btn btn-danger mt-3 w-100"
-					@click="confirmDelete">
-					Delete Selected
-				</button>
-
-				<button
-					class="btn btn-secondary mt-2 w-100"
-					@click="isVisible = false">
-					Close
-				</button>
+				<div
+					v-if="sessions.length === 0"
+					class="text-muted">
+					No sessions available
+				</div>
 			</div>
+
+			<button
+				class="btn btn-secondary mt-3 w-100"
+				@click="isVisible = false">
+				Close
+			</button>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-	import { ref, inject } from "vue";
+	import { ref, nextTick } from "vue";
+	import { useSessionStore } from "../../store/sessionStore";
+	import { spinner } from "../utils/spinner";
 
-	const isVisible = ref<boolean>(false);
-	const selectedSessions = ref<string[]>([]);
+	const spin = spinner("red-text");
+	const sessionStore = useSessionStore();
 
-	const sessionStore = inject<{
-		allSessions: Readonly<Set<string>>;
-	}>("sessions");
+	const isVisible = ref(false);
+	const isLoading = ref(false);
+	const sessions = ref<string[]>([]);
 
-	const sessions = Array.from(sessionStore?.allSessions || []);
+	const emit = defineEmits<{
+		(e: "delete-session", session: string): void;
+	}>();
 
-	function confirmDelete(): void {
-		if (!selectedSessions.value.length) {
-			alert("Please select at least one session.");
-			return;
+	const openModal = async function () {
+		isVisible.value = true;
+		isLoading.value = true;
+		await nextTick();
+		// simulate async load
+		sessions.value = Array.from(sessionStore.allSessions);
+		isLoading.value = false;
+	};
+
+	const onDoubleClick = function (session: string) {
+		if (
+			window.confirm(
+				`Delete session "${session}"?\nThis action cannot be undone.`
+			)
+		) {
+			emit("delete-session", session);
+			isVisible.value = false;
 		}
-
-		alert(
-			`Selected sessions: ${selectedSessions.value.join(
-				", "
-			)}\n\n⚠️ This action cannot be undone!`
-		);
-		isVisible.value = false;
-	}
+	};
 </script>
 
 <style scoped>
-	.modal-backdrop {
-		position: fixed;
-		inset: 0;
-		background: rgba(0, 0, 0, 0.5);
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		z-index: 9999;
-	}
-	.modal-container {
-		width: 320px;
+	.del:hover {
+		color: white !important;
+		background-color: red;
 	}
 </style>

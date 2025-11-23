@@ -32,17 +32,24 @@ export const classModel = (function () {
 		sessionYear: string,
 		queriedClass: string
 	): Promise<any[] | null> {
-		const safeYear = sessionYear.replace("/", "-");
+		const safeYear: string = sessionYear.replace("/", "-");
 
 		try {
-			const getSingleClass = await fetch(
-				`${baseUrl}/getClass?sessionYear=${encodeURIComponent(
+			const response = await fetch(
+				`${baseUrl}/getPupils?sessionYear=${encodeURIComponent(
 					safeYear
-				)}&queriedClass=${encodeURIComponent(queriedClass)}`
+				)}&classname=${encodeURIComponent(queriedClass)}`
 			);
-			const result = await getSingleClass.json();
-			if (!getSingleClass.ok) throw new Error(result.message);
-			return result;
+
+			// Parse body *before* checking status
+			const body = await response.json();
+
+			if (!response.ok) {
+				throw new Error(body.message || "Failed to fetch class data");
+			}
+
+			// body already contains only the pupils
+			return body;
 		} catch (err: any) {
 			throw new Error(err.message);
 		}

@@ -5,6 +5,7 @@ import {
 	getClass,
 	getSchoolStats,
 	searchQuery,
+	getPupilByClass,
 } from "./getHandlers";
 
 export const getRoutes: ServerRoute[] = [
@@ -13,4 +14,5 @@ export const getRoutes: ServerRoute[] = [
 	getSchoolStats,
 	getClass,
 	searchQuery,
+	getPupilByClass,
 ];

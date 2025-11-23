@@ -5,7 +5,11 @@ export const notFoundRoutes: ServerRoute[] = [
 		method: "*",
 		path: "/{any?}",
 		handler: function (request: Request, res: ResponseToolkit) {
-			return res.response({ message: "route not found" }).code(404);
+			return res
+				.response({
+					message: `path '${request.path}'  not found`,
+				})
+				.code(404);
 		},
 	},
 ];

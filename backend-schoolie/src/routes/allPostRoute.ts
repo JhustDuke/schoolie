@@ -1,13 +1,3 @@
-import {
-	addPupil,
-	addSessionYear,
-	getPupilByClass,
-	addClasses,
-} from "./postHandlers";
+import { addPupil, addSessionYear, addClasses } from "./postHandlers";
 
-export const postRoutes = [
-	addPupil,
-	addSessionYear,
-	getPupilByClass,
-	addClasses,
-];
+export const postRoutes = [addPupil, addSessionYear, addClasses];

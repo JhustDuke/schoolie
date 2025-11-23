@@ -8,8 +8,10 @@
 				@search-started="onSearchStart"
 				@search-valid="onSearchSubmit" />
 
-			<LoginORsignup class="d-none" />
-			<SessionAndCog />
+			<div class="d-flex align-items-center gap-3">
+				<SessionSelect />
+				<CogIcon @delete-session="deleteHandler" />
+			</div>
 		</div>
 		<!-- modal hidden by default -->
 		<SearchResultModal
@@ -24,11 +26,13 @@
 <script setup lang="ts">
 	import { ref } from "vue";
 	import Logo from "./logo.vue";
-	import LoginORsignup from "./loginORsignup.vue";
-	import SessionAndCog from "./sessionSelectAndCog.vue";
+
 	import SearchAndTooltip from "./searchAndTooltip.vue";
 	import SearchResultModal from "./searchResultModal.vue";
-	import { navBarModel } from "@models/navBarModel";
+	import SessionSelect from "./sessionSelect.vue";
+	import CogIcon from "./cogIcon.vue";
+
+	import { navBarModel } from "../../model";
 
 	const searchResults = ref<Array<Record<string, unknown>>>([]);
 	const isModalVisible = ref<boolean>(false);
@@ -72,6 +76,26 @@
 		}
 	};
 
+	const deleteHandler = async function (session: string) {
+		try {
+			isLoading.value = true;
+			await navBarModel.deleteSession(session);
+			console.log(`Session "${session}" deleted successfully`);
+			setTimeout(function () {
+				window.location.reload();
+			}, 2000);
+		} catch (err: unknown) {
+			console.error(
+				"Delete session failed:",
+				err instanceof Error ? err.message : err
+			);
+			alert(
+				`Failed to delete session: ${err instanceof Error ? err.message : err}`
+			);
+		} finally {
+			isLoading.value = false;
+		}
+	};
 	const toggleModal = function () {
 		isModalVisible.value = false;
 	};
