@@ -1,6 +1,7 @@
 <template>
 	<div class="p-3 rounded shadow">
-		<nav class="d-flex gap-3 mb-4 border-bottom pb-2">
+		<!-- Desktop tabs -->
+		<nav class="d-none d-md-flex gap-3 mb-4 border-bottom pb-2">
 			<AnchorLink
 				v-for="(tab, index) in tabsHeaders"
 				:key="index"
@@ -9,6 +10,21 @@
 				customClass="text-uppercase fw-bold"
 				@click="setHeader(tab)" />
 		</nav>
+
+		<!-- Mobile select dropdown -->
+		<div class="d-md-none mb-3">
+			<select
+				v-model="activeHeader"
+				class="form-select"
+				@change="setHeader(activeHeader)">
+				<option
+					v-for="tab in tabsHeaders"
+					:key="tab"
+					:value="tab">
+					{{ tab }}
+				</option>
+			</select>
+		</div>
 
 		<main>
 			<center v-if="!isLoaded">
