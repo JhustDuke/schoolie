@@ -5,6 +5,7 @@ export const useTabStore = defineStore("activeTabStore", {
 	state: function () {
 		return {
 			activeTab: "" as string,
+			allTabs: [] as string[],
 		};
 	},
 
@@ -14,6 +15,9 @@ export const useTabStore = defineStore("activeTabStore", {
 		},
 		goto(tabName: string) {
 			this.activeTab = tabName;
+		},
+		setAllTabs(tabs: string[]) {
+			this.allTabs = [...tabs];
 		},
 	},
 });

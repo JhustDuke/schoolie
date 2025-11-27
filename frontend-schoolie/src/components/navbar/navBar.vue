@@ -5,6 +5,7 @@
 			<Logo />
 
 			<SearchAndTooltip
+				class="d-none d-md-flex"
 				@search-started="onSearchStart"
 				@search-valid="onSearchSubmit" />
 

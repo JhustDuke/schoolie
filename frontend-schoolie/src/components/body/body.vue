@@ -47,7 +47,13 @@
 
 	const activeTab = ref<string>("overview");
 	const tabStore = useTabStore();
+
 	tabStore.setActiveTab(activeTab.value);
+	tabStore.setAllTabs(
+		asideLinks.map(function (tab: any) {
+			return tab.name;
+		})
+	);
 
 	const currentTabComponent = computed(function () {
 		switch (tabStore.activeTab) {

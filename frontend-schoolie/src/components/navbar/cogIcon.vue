@@ -18,6 +18,7 @@
 				v-if="isLoading"></center>
 
 			<div v-else>
+				<p class="text-muted">double click to delete</p>
 				<div
 					v-for="session in sessions"
 					:key="session"
