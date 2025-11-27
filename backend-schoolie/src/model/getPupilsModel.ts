@@ -14,11 +14,12 @@ export const getPupilByClassModel = async function ({
 
 	try {
 		const [rows]: any = await conn.query(
-			`SELECT classes FROM \`${table}\` WHERE id=1`
+			`SELECT classes, total_boys, total_girls FROM \`${table}\` `
 		);
 
 		if (!rows.length) throw new Error("No data found");
 
+		const { total_boys, total_girls } = rows[0];
 		const classData: Record<string, any> = JSON.parse(rows[0].classes || "{}");
 
 		const classKey: string | undefined = Object.keys(classData).find(function (
@@ -51,7 +52,14 @@ export const getPupilByClassModel = async function ({
 				firstname: p.firstnameInput || p.firstname || null,
 				surname: p.surnameInput || p.surname || null,
 				dob: p.dobInput || null,
-				passport: cleanedPassport ? `/${cleanedPassport}` : null,
+				fatherContact: p.fatherPhoneInput || p.fatherPhone || null,
+				passport: cleanedPassport
+					? `${
+							process.env.BASE_URL || "http://localhost:3333"
+					  }/${cleanedPassport}`
+					: null,
+				totalBoys: total_boys,
+				totalGirls: total_girls,
 			};
 		});
 

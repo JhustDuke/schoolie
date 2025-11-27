@@ -28,10 +28,17 @@ export const classModel = (function () {
 	/**
 	 * Fetches class-specific data for a given session year and class name
 	 */
+	interface classDetailsType {
+		firstname?: string | null;
+		lastname?: string | null;
+		passport?: string | null;
+		totalBoys?: string | null;
+		totalGirls?: string | null;
+	}
 	const getClassData = async function (
 		sessionYear: string,
 		queriedClass: string
-	): Promise<any[] | null> {
+	): Promise<classDetailsType[] | null> {
 		const safeYear: string = sessionYear.replace("/", "-");
 
 		try {
@@ -41,15 +48,17 @@ export const classModel = (function () {
 				)}&classname=${encodeURIComponent(queriedClass)}`
 			);
 
-			// Parse body *before* checking status
 			const body = await response.json();
 
 			if (!response.ok) {
-				throw new Error(body.message || "Failed to fetch class data");
+				throw new Error(body.error || "Failed to fetch class data");
 			}
 
-			// body already contains only the pupils
-			return body;
+			if (!Array.isArray(body.result)) {
+				throw new Error("Invalid response format from server");
+			}
+
+			return body.result; // ✅ now returns the array
 		} catch (err: any) {
 			throw new Error(err.message);
 		}
@@ -86,103 +95,24 @@ export const classModel = (function () {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ classes: newClasses, sessionYear }),
 			});
+			const body = await response.json();
 
 			if (!response.ok) {
-				console.log("res:", response);
-				const errText = await response.text();
-				throw new Error(errText || response.statusText);
+				throw new Error(body.message || "class registration failed");
 			}
 			return { success: true, added: newClasses.join(",") };
 		} catch (err: any) {
-			throw err.message;
+			throw err;
 		}
 	};
 
-	// --------------------------
-	// MOCK ENDPOINTS
-	// --------------------------
-
-	const getSchoolStatsMock = async function (): Promise<{
-		total_boys: number;
-		total_girls: number;
-		total_classes: number;
-	}> {
-		return new Promise(function (resolve) {
-			setTimeout(function () {
-				resolve({
-					total_boys: 120,
-					total_girls: 130,
-					total_classes: 6,
-				});
-			}, 2000);
-		});
-	};
-
-	const getClassDataMock = async function (
-		queriedClass: string
-	): Promise<any[]> {
-		return new Promise(function (resolve, reject) {
-			setTimeout(function () {
-				if (queriedClass === "graded") {
-					reject(new Error("class not found"));
-				} else {
-					resolve([
-						{
-							name: "Aisha Bello",
-							className: queriedClass,
-							parentPhone: "08012345678",
-						},
-						{
-							name: "John Doe",
-							className: queriedClass,
-							parentPhone: "08087654321",
-						},
-					]);
-				}
-			}, 2000);
-		});
-	};
-
-	/**
-	 * Mock version of loadClasses that returns sample tab headers
-	 */
-	const loadClassesMock = async function (): Promise<string[]> {
-		return new Promise(function (resolve) {
-			setTimeout(function () {
-				resolve(["overview", "grade1", "grade2", "graded"]);
-			}, 2000);
-		});
-	};
-
-	/**
-	 * Mock version of addClasses that simulates adding classes
-	 */
-	const addClassesMock = async function (
-		sessionYear: string,
-		newClasses: string[]
-	): Promise<{ success: boolean; added: string[] }> {
-		return new Promise(function (resolve) {
-			setTimeout(function () {
-				console.log(
-					`[MOCK] Added ${newClasses.length} classes for ${sessionYear}:`,
-					newClasses
-				);
-				resolve({ success: true, added: newClasses });
-			}, 2000);
-		});
-	};
-
-	// --------------------------
-	// EXPORTS
-	// --------------------------
 	return {
 		loadClasses,
-		loadClassesMock,
+
 		getSchoolStats,
-		getSchoolStatsMock,
+
 		getClassData,
-		getClassDataMock,
+
 		addClasses,
-		addClassesMock,
 	};
 })();

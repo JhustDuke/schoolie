@@ -25,6 +25,7 @@ export const addPupil: ServerRoute = {
 			return res.response({ message: "payload required" }).code(500);
 
 		const {
+			sessionYear,
 			firstname,
 			middlename,
 			surname,
@@ -39,6 +40,7 @@ export const addPupil: ServerRoute = {
 			lgaSelect,
 			statesSelect,
 			classSelect,
+			alias,
 			passport,
 		} = <any>req.payload;
 
@@ -77,10 +79,10 @@ export const addPupil: ServerRoute = {
 				},
 			});
 			const result = await addPupilModel({
-				sessionYear: "3000/3333",
-				className: "primary-5",
+				sessionYear,
+				className: classSelect,
 				gender: genderSelect,
-				alias: "diamond",
+				alias,
 				pupilPersonalInfo: {
 					...requiredFields,
 					passport: filepath,

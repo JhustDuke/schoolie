@@ -1,9 +1,6 @@
-// import { v4 as uuidv4 } from "uuid";
-// import * as time from "dayjs";
-
 import { appPool } from ".";
-import { sanitizeTableName, getTotalStats } from "../utils";
 import { PupilPersonalInfoInterface } from "../interfaces";
+import { sanitizeTableName } from "../utils";
 
 interface newPupilInterface {
 	sessionYear: string;
@@ -13,64 +10,98 @@ interface newPupilInterface {
 	pupilPersonalInfo: PupilPersonalInfoInterface;
 }
 
-/**
- * Adds a new pupil to the class list for the given session year.
- * Updates totals if the pupil is not a duplicate.
- */
+// --- DB HELPERS -------------------------------------------------------------
+
+// --- MAIN METHOD ------------------------------------------------------------
+
 export async function addPupilModel({
 	sessionYear,
 	className,
 	gender,
-	alias = "test_alias",
+	alias = className,
 	pupilPersonalInfo,
 }: newPupilInterface): Promise<boolean> {
 	const table = sanitizeTableName(sessionYear);
-	const sessionYearStats = await getTotalStats(table);
 
-	let { total_boys, total_girls, classes: existingClasses } = sessionYearStats;
+	// 1. LOAD DB DATA
+	const { total_boys, total_girls, classes } = await fetchSessionData(table);
 
-	const classExists = existingClasses[className] !== undefined;
-	const genderKey = gender === "female" ? "girls" : "boys";
+	let newTotalBoys = total_boys;
+	let newTotalGirls = total_girls;
 
-	if (!classExists) {
-		existingClasses[className] = {
-			alias,
-			boys: [],
-			girls: [],
-		};
-		existingClasses[className][genderKey].push(pupilPersonalInfo);
-		if (gender === "female") total_girls += 1;
-		if (gender === "male") total_boys += 1;
-	} else {
-		const pupilList = existingClasses[className][genderKey];
-		if (!isPupilDuplicate(pupilList, pupilPersonalInfo)) {
-			pupilList.push(pupilPersonalInfo);
-			if (gender === "female") total_girls += 1;
-			if (gender === "male") total_boys += 1;
-		}
+	// 2. CLASS MUST ALREADY EXIST
+	if (!classes[className]) {
+		throw new Error("class does not exist in this session year");
 	}
 
-	const classDataToJson = JSON.stringify(existingClasses);
+	const genderKey = gender === "female" ? "girls" : "boys";
+	const pupilList = classes[className][genderKey];
 
+	// 3. DUPLICATE CHECK
+	if (!isDuplicatePupil(pupilList, pupilPersonalInfo)) {
+		pupilList.push(pupilPersonalInfo);
+
+		// SINGLE SOURCE OF TRUTH FOR INCREMENTS
+		if (gender === "male") newTotalBoys += 1;
+		if (gender === "female") newTotalGirls += 1;
+	} else {
+		throw new Error("duplicate pupil");
+	}
+
+	// 4. WRITE BACK
+	await updateSessionData(
+		table,
+		JSON.stringify(classes),
+		newTotalBoys,
+		newTotalGirls
+	);
+	console.log({ newTotalBoys, newTotalGirls, classes });
+	return true;
+}
+
+// --- UTIL -------------------------------------------------------------------
+
+function isDuplicatePupil(arr: any[], pupil: any): boolean {
+	return arr.some(function (item) {
+		return JSON.stringify(item) === JSON.stringify(pupil);
+	});
+}
+async function fetchSessionData(table: string) {
 	const conn = await appPool.getConnection();
+
 	try {
-		const insertQuery = `UPDATE \`${table}\` SET classes=?, total_boys=?, total_girls=? WHERE id=1`;
-		await conn.query(insertQuery, [classDataToJson, total_boys, total_girls]);
-		console.log("insert success");
-		return true;
-	} catch (err: any) {
-		console.log("insert data failure");
-		throw new Error(err.message);
+		const [rows]: any = await conn.query(
+			`SELECT total_boys, total_girls, classes FROM \`${table}\``
+		);
+
+		if (!rows.length) {
+			throw new Error("session year table has no rows");
+		}
+
+		return {
+			total_boys: Number(rows[0].total_boys),
+			total_girls: Number(rows[0].total_girls),
+			classes: rows[0].classes ? JSON.parse(rows[0].classes) : {},
+		};
 	} finally {
 		conn.release();
 	}
 }
 
-/**
- * Checks if a pupil already exists in the provided array.
- */
-function isPupilDuplicate(arr: any[], pupil: any): boolean {
-	return arr.some(function (item) {
-		return JSON.stringify(item) === JSON.stringify(pupil);
-	});
+async function updateSessionData(
+	table: string,
+	classesJson: string,
+	total_boys: number,
+	total_girls: number
+) {
+	const conn = await appPool.getConnection();
+
+	try {
+		await conn.query(
+			`UPDATE \`${table}\` SET classes=?, total_boys=?, total_girls=?`,
+			[classesJson, total_boys, total_girls]
+		);
+	} finally {
+		conn.release();
+	}
 }

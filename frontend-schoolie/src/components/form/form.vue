@@ -241,8 +241,9 @@
 	import naijaStateLocalGovernment from "naija-state-local-government";
 	import { formModel } from "../../model";
 	import { spinner } from "../utils/spinner";
-	import { useTabStore } from "../../store/tabStore";
+
 	import { useClassesStore } from "../../store/classesStore";
+	import { useSessionStore } from "../../store/sessionStore";
 
 	interface FormEntriesInterface {
 		firstname: string;
@@ -400,14 +401,16 @@
 
 		try {
 			const formData = new FormData();
+			formData.append("sessionYear", useSessionStore().selectedSession);
+
 			let key: keyof FormEntriesInterface;
 			for (key in formEntries) {
 				formData.append(key, formEntries[key]);
 			}
 
 			await formModel.sendFormData(formData);
-			isSubmitFailed.value = false;
 
+			isSubmitFailed.value = false;
 			notifyToast({
 				text: "successfully added new pupil",
 				type: "success",
@@ -415,7 +418,7 @@
 			});
 
 			resetForm("appForm", imageSrcRef.value?.reset);
-			useTabStore().goto("overview");
+			window.location.reload();
 		} catch (err: any) {
 			submitStatus.value = err.message || "An error occurred, check console";
 			isSubmitFailed.value = true;

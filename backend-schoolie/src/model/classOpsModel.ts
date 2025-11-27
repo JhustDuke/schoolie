@@ -39,11 +39,11 @@ export const classOpsModel = function () {
 		const table: string = sanitizeTableName(sessionYear);
 
 		try {
-			const query: string = `SELECT classes FROM \`${table}\` WHERE id = 1`;
+			const query: string = `SELECT classes FROM \`${table}\``;
 			const [rows]: any = await conn.query(query);
 
 			if (!rows.length) {
-				throw new Error("no classes found");
+				return null;
 			}
 
 			const classes: Record<string, unknown> =
@@ -79,6 +79,7 @@ export const classOpsModel = function () {
 					currentClasses,
 					newClasses
 				);
+
 				if (isDuplicate) {
 					throw new Error(
 						`duplicate entries ${duplicates.join(", ")} in ${sessionYear}`
@@ -87,10 +88,21 @@ export const classOpsModel = function () {
 			}
 
 			const query: string = `SELECT classes FROM \`${table}\` `;
-			const [rows]: any[] = await conn.query(query);
+			let [rows]: any[] = await conn.query(query);
 
 			if (!rows.length) {
-				throw new Error("database operation error");
+				const initClassesInDB = JSON.stringify({});
+
+				await conn.query(
+					`INSERT INTO \`${table}\` (CLASSES,TOTAL_BOYS,TOTAL_GIRLS) VALUES (?,?,?)`,
+					[initClassesInDB, 0, 0]
+				);
+
+				const [retryRows]: any[] = await conn.query(
+					`SELECT classes FROM \`${table}\``
+				);
+
+				rows = retryRows;
 			}
 
 			const classes: Record<string, unknown> =

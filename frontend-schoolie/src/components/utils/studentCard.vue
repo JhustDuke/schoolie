@@ -4,7 +4,7 @@
 
 		<div
 			><img
-				:src="image"
+				:src="passport"
 				alt="student image"
 				class="rounded d-block"
 				style="width: 80px; height: 100%; object-fit: cover"
@@ -13,7 +13,6 @@
 		<!-- Student Info -->
 		<div>
 			<div class="fw-bold text-uppercase">{{ name }}</div>
-			<div class="text-capitalize">Class: {{ className }}</div>
 			<div>Parent Phone: {{ parentPhone }}</div>
 
 			<!-- Actions -->
@@ -36,19 +35,16 @@
 </template>
 
 <script setup lang="ts">
-	import defaultImage from "../../assets/defaultImage.png";
 	interface StudentCardPropsInterface {
 		name: string;
-		className: string;
 		parentPhone: string;
-		image?: string;
+		passport?: string;
 	}
 
 	withDefaults(defineProps<StudentCardPropsInterface>(), {
 		name: "n/a",
 		className: "n/a",
 		parentPhone: "n/a",
-		image: defaultImage,
 	});
 </script>
 

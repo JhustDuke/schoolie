@@ -1,6 +1,5 @@
 <template>
 	<div class="p-3 rounded shadow">
-		<!-- Horizontal Tab Headers -->
 		<nav class="d-flex gap-3 mb-4 border-bottom pb-2">
 			<AnchorLink
 				v-for="(tab, index) in tabsHeaders"
@@ -19,7 +18,7 @@
 
 			<center v-else-if="hasError">
 				<BrokenLink
-					title="page not found"
+					title="oops! something went wrong"
 					:errorMessage="customErrorMsg" />
 			</center>
 
@@ -42,21 +41,34 @@
 	import AnchorLink from "@utils/anchorLink.vue";
 	import BrokenLink from "@utils/brokenLink.vue";
 	import { spinner } from "@utils/spinner";
-	import { classModel } from "@models/classModel";
-
 	import { useCache } from "@utils/cacheHelper";
 	import { useSessionStore } from "../../../store/sessionStore";
 	import { useClassesStore } from "../../../store/classesStore";
 	import { useTabStore } from "../../../store/tabStore";
+	import { classModel } from "../../../model";
 
 	const useSpinner = spinner();
 	const isLoaded = ref(false);
 	const hasError = ref(false);
 	const customErrorMsg = ref("can't find the requested resource");
-	const classDetailsData = ref<any>(null);
 
+	type classDetailsPropStructure = {
+		totalBoys: string;
+		totalGirls: string;
+		pupils: {
+			firstAndLastName: string;
+			fatherPhone: string;
+			passport: string | null;
+		}[];
+	};
+
+	const classDetailsData = ref<classDetailsPropStructure>({
+		totalBoys: "0",
+		totalGirls: "0",
+		pupils: [],
+	});
 	const classDetailsProps = computed(function () {
-		return classDetailsData.value || {};
+		return classDetailsData.value as classDetailsPropStructure;
 	});
 
 	const activeHeader = ref<string>("");
@@ -67,7 +79,6 @@
 	const tabsHeaders = ref<string[]>([]);
 	const store = useSessionStore();
 	const classesStore = useClassesStore();
-	// ✅ Watch ensures we wait until selectedSession is available
 
 	watch(
 		function () {
@@ -99,7 +110,7 @@
 		await fetchData(newTab);
 	});
 
-	async function fetchData(tab: string): Promise<void> {
+	const fetchData = async function (tab: string): Promise<void> {
 		isLoaded.value = false;
 		hasError.value = false;
 
@@ -114,44 +125,56 @@
 				return fetchClass(tab, sessionYear);
 			});
 
-			classDetailsData.value = data;
+			if (data) classDetailsData.value = data;
 		} catch (err: any) {
 			customErrorMsg.value = err.message;
-			// useTabStore().goto("add_classes");
+			useTabStore().goto("add_classes");
 			hasError.value = true;
 		} finally {
 			isLoaded.value = true;
 		}
-	}
+	};
 
-	async function fetchOverview(sessionYear: string) {
+	const fetchClass = async function (
+		tab: string,
+		sessionYear: string
+	): Promise<classDetailsPropStructure> {
+		try {
+			const data = (await classModel.getClassData(sessionYear, tab)) || [];
+
+			let totalBoys = "";
+			let totalGirls = "";
+			const pupilInfo = data.map(function (entry: any) {
+				totalBoys = entry.totalBoys;
+				totalGirls = entry.totalGirls;
+				return {
+					firstAndLastName: entry.firstname + " " + entry.surname,
+					fatherPhone: entry.fatherContact,
+					passport: entry.passport,
+				};
+			});
+
+			return { pupils: pupilInfo, totalBoys, totalGirls };
+		} catch (err: any) {
+			customErrorMsg.value = err.message;
+			hasError.value = true;
+			return { pupils: [], totalBoys: "n/a", totalGirls: "n/a" };
+		} finally {
+			isLoaded.value = true;
+		}
+	};
+
+	const fetchOverview = async function (
+		sessionYear: string
+	): Promise<classDetailsPropStructure> {
 		const overviewData = await classModel.getSchoolStats(sessionYear);
-		const presets = [
-			{ name: "Aisha Bello", present: true },
-			{ name: "John Doe", present: false },
-			{ name: "Mary Johnson", present: true },
-			{ name: "Ibrahim Yusuf", present: true },
-		];
 
 		return {
-			label: "overview",
-			totalBoys: overviewData.total_boys.toString(),
-			totalGirls: overviewData.total_girls.toString(),
-			totalClasses: overviewData.total_classes.toString(),
-			presets,
+			totalBoys: overviewData?.total_boys.toString() || "0",
+			totalGirls: overviewData?.total_girls.toString() || "0",
+			pupils: [],
 		};
-	}
-
-	async function fetchClass(tab: string, sessionYear: string) {
-		const pupils = await classModel.getClassData(sessionYear, tab);
-		console.log(pupils);
-		return {
-			label: tab,
-			totalBoys: "10",
-			totalGirls: "12",
-			pupils,
-		};
-	}
+	};
 
 	function setHeader(tab: string): void {
 		activeHeader.value = tab;
@@ -159,11 +182,6 @@
 </script>
 
 <style scoped>
-	.nav-link.active,
-	.active {
-		background-color: #ccc !important;
-		color: black !important;
-	}
 	.fade-slide-enter-active,
 	.fade-slide-leave-active {
 		transition: all 0.3s ease;
@@ -172,10 +190,5 @@
 	.fade-slide-leave-to {
 		opacity: 0;
 		transform: translateY(10px);
-	}
-	.fade-slide-enter-to,
-	.fade-slide-leave-from {
-		opacity: 1;
-		transform: translateY(0);
 	}
 </style>

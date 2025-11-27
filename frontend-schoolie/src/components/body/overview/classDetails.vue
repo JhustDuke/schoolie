@@ -1,38 +1,64 @@
 <template>
 	<div class="p-3 rounded white">
-		<!-- GENDER SUMMARY -->
-		<GenderSummary
-			:maleTotal="totalBoys"
-			:femaleTotal="totalGirls" />
+		<!-- GENDER SUMMARY (inline) -->
+		<div class="p-3 rounded white text-center text-md-start">
+			<h5 color="blue-text">Gender summary</h5>
 
-		<!-- TOTAL STATS (example stat usage) -->
+			<div class="d-flex justify-content-center gap-4 mt-2">
+				<div>
+					<i class="fa fa-male blue-text fa-2x"></i>
+					<div
+						class="fw-bold"
+						id="maleTotal"
+						>{{ totalBoys }}</div
+					>
+				</div>
+
+				<div>
+					<i class="fa fa-female pink-text fa-2x"></i>
+					<div
+						class="fw-bold"
+						id="femaleTotal"
+						>{{ totalGirls }}</div
+					>
+				</div>
+			</div>
+		</div>
+
+		<!-- TOTAL STATS (inline) -->
 		<div class="d-flex justify-content-around mt-3">
-			<StatCard
-				title="Total Pupils"
-				:value="pupils.length" />
-			<StatCard
-				title="Total Boys"
-				:value="totalBoys" />
-			<StatCard
-				title="Total Girls"
-				:value="totalGirls" />
+			<div class="p-3 rounded white text-center text-md-start">
+				<h5 color="blue-text">Total Pupils</h5>
+				<p class="fs-4 fw-bold red-text">{{ totalBoys + totalGirls }}</p>
+			</div>
+
+			<div class="p-3 rounded white text-center text-md-start">
+				<h5 color="blue-text">Total Boys</h5>
+				<p class="fs-4 fw-bold red-text">{{ totalBoys }}</p>
+			</div>
+
+			<div class="p-3 rounded white text-center text-md-start">
+				<h5 color="blue-text">Total Girls</h5>
+				<p class="fs-4 fw-bold red-text">{{ totalGirls }}</p>
+			</div>
 		</div>
 
 		<!-- STUDENT CARDS -->
 		<div class="mt-4">
 			<h6 class="fw-bold mb-3">Pupils</h6>
+
 			<div
 				v-if="pupils.length > 0"
-				class="d-flex justify-content-start">
+				class="d-flex justify-content-evenly flex-md-wrap">
 				<StudentCard
 					class="mx-2"
 					v-for="(pupil, index) in pupils"
 					:key="index"
-					:name="pupil.name"
-					:className="pupil.className"
-					:parentPhone="pupil.parentPhone"
-					:image="pupil.image" />
+					:name="String(pupil.firstAndLastName)"
+					:parentPhone="String(pupil.fatherPhone)"
+					:passport="pupil.passport || defaultImage" />
 			</div>
+
 			<div
 				v-else
 				class="text-muted text-center"
@@ -43,36 +69,24 @@
 </template>
 
 <script setup lang="ts">
-	import GenderSummary from "./summary/genderSummary.vue";
-	import StatCard from "./summary/statSummary.vue";
-	import StudentCard from "@utils/studentCard.vue";
-
+	import StudentCard from "../../utils/studentCard.vue";
 	import defaultImage from "@assets/defaultImage.png";
 
-	interface PupilInterface {
-		name: string;
-		className: string;
-		parentPhone: string;
-		image?: string;
+	interface PupilsCardInterface {
+		firstAndLastName: string | null;
+		fatherPhone: string | null;
+		passport?: string | null;
 	}
 
 	export interface ClassDetailsInterface {
 		totalBoys: string;
 		totalGirls: string;
-		pupils: PupilInterface[];
+		pupils: PupilsCardInterface[];
 	}
 
 	withDefaults(defineProps<ClassDetailsInterface>(), {
 		totalBoys: "N/A",
 		totalGirls: "N/A",
-		image: defaultImage,
-
 		pupils: () => [],
 	});
 </script>
-
-<style scoped>
-	h6 {
-		color: #333;
-	}
-</style>

@@ -1,7 +1,6 @@
 <template>
 	<section id="classModal">
-		<div
-			class="pt-2 px-4 text-center pb-2 grey lighten-1 mx-auto w-50 opacity-75">
+		<div class="pt-2 px-4 text-center pb-2 grey lighten-1 mx-auto w-100">
 			<div class="red-text black fw-bold text-uppercase p-2">
 				hello, you seem to be new add classes below and choose a session to get
 				started!
@@ -218,6 +217,7 @@
 
 			feedbackSuccess.value = result.success;
 			feedbackMessage.value = `Successfully added `;
+			window.location.reload();
 		} catch (err: any) {
 			feedbackSuccess.value = false;
 			feedbackMessage.value =

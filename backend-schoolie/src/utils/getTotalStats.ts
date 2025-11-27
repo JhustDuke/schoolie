@@ -10,14 +10,17 @@ export async function getTotalStats(
 ): Promise<{ total_boys: number; total_girls: number; classes: any }> {
 	const conn = await pool.getConnection();
 	const table = sanitizeTableName(tableSessionYear);
-	const query = `SELECT total_boys, total_girls, classes FROM \`${table}\` WHERE id=1`;
+	const query = `SELECT total_boys, total_girls, classes FROM \`${table}\` `;
 
 	try {
 		const [rows]: any = await conn.query(query);
 		if (rows.length === 0) {
+			console.log("emptyyy");
 			await conn.query(
-				`INSERT INTO \`${table}\` (id, total_boys, total_girls, classes) VALUES (1, 0, 0, '{}')`
+				`UPDATE \`${table}\` SET classes=?,total_boys=?, total_girls=? `,
+				[JSON.stringify({}), 0, 0]
 			);
+
 			return { total_boys: 0, total_girls: 0, classes: {} };
 		}
 		const { total_boys, total_girls, classes } = rows[0];
@@ -28,7 +31,7 @@ export async function getTotalStats(
 		};
 	} catch (error: any) {
 		console.error("Error fetching totals:", error.message);
-		throw new Error("Could not retrieve total stats");
+		throw new Error(error.message);
 	} finally {
 		conn.release();
 	}

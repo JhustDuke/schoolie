@@ -7,7 +7,7 @@
 				<div
 					class="fw-bold"
 					id="maleTotal"
-					>{{ maleTotal }}</div
+					>{{ totalBoys }}</div
 				>
 			</div>
 			<div>
@@ -15,7 +15,7 @@
 				<div
 					class="fw-bold"
 					id="femaleTotal"
-					>{{ femaleTotal }}</div
+					>{{ totalGirls }}</div
 				>
 			</div>
 		</div>
@@ -26,11 +26,11 @@
 	// props could be added later if values become dynamic
 
 	interface genderSummary {
-		maleTotal?: string;
-		femaleTotal?: string;
+		totalBoys?: string;
+		totalGirls?: string;
 	}
-	withDefaults(defineProps<genderSummary>(), {
-		maleTotal: "N/a",
-		femaleTotal: "N/a",
+	const { totalBoys, totalGirls } = withDefaults(defineProps<genderSummary>(), {
+		totalGirls: "N/a",
+		totalBoys: "N/a",
 	});
 </script>

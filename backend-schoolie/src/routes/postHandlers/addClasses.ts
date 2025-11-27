@@ -43,7 +43,6 @@ export const addClasses: ServerRoute = {
 			classes: string[];
 			sessionYear: string;
 		};
-		console.log("i ran");
 
 		const newClasses = classOpsModel();
 
@@ -54,7 +53,7 @@ export const addClasses: ServerRoute = {
 				.response({ message: `Added classes: ${classes.join(", ")}` })
 				.code(200);
 		} catch (err: any) {
-			return res.response(err.message).code(400);
+			return res.response({ message: err.message }).code(400);
 		}
 	},
 };
