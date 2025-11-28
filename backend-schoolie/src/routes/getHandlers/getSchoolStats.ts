@@ -8,7 +8,7 @@ const paramValidateSchema = joi.object({
 
 export const getSchoolStats: ServerRoute = {
 	method: "GET",
-	path: "/getSchoolStats/{sessionYear}",
+	path: "/getSchoolStats/{sessionYear?}",
 	options: {
 		cors: {
 			origin: ["*"],
@@ -21,6 +21,9 @@ export const getSchoolStats: ServerRoute = {
 
 		handler: async function (req: Request, res: ResponseToolkit) {
 			const sessionYear = req.params.sessionYear;
+			if (!sessionYear) {
+				return res.response("session year is required").code(400);
+			}
 
 			try {
 				const stats = await totalStatsModel(sessionYear);
@@ -31,8 +34,6 @@ export const getSchoolStats: ServerRoute = {
 					.response({ message: err.message, outcome: "failed to get totals" })
 					.code(400);
 			}
-
-			return res.response("testing getTotals").code(200);
 		},
 	},
 };

@@ -79,14 +79,14 @@
 	}
 
 	export interface ClassDetailsInterface {
-		totalBoys: string;
-		totalGirls: string;
+		totalBoys: number;
+		totalGirls: number;
 		pupils: PupilsCardInterface[];
 	}
 
 	withDefaults(defineProps<ClassDetailsInterface>(), {
-		totalBoys: "N/A",
-		totalGirls: "N/A",
+		totalBoys: 0,
+		totalGirls: 0,
 		pupils: () => [],
 	});
 </script>

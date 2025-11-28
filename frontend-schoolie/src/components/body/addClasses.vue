@@ -217,6 +217,7 @@
 
 			feedbackSuccess.value = result.success;
 			feedbackMessage.value = `Successfully added `;
+
 			window.location.reload();
 		} catch (err: any) {
 			feedbackSuccess.value = false;

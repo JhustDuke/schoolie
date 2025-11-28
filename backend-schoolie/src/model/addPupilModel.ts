@@ -10,10 +10,6 @@ interface newPupilInterface {
 	pupilPersonalInfo: PupilPersonalInfoInterface;
 }
 
-// --- DB HELPERS -------------------------------------------------------------
-
-// --- MAIN METHOD ------------------------------------------------------------
-
 export async function addPupilModel({
 	sessionYear,
 	className,
@@ -34,7 +30,7 @@ export async function addPupilModel({
 		throw new Error("class does not exist in this session year");
 	}
 
-	const genderKey = gender === "female" ? "girls" : "boys";
+	const genderKey = gender.toLowerCase() === "female" ? "girls" : "boys";
 	const pupilList = classes[className][genderKey];
 
 	// 3. DUPLICATE CHECK
@@ -42,8 +38,8 @@ export async function addPupilModel({
 		pupilList.push(pupilPersonalInfo);
 
 		// SINGLE SOURCE OF TRUTH FOR INCREMENTS
-		if (gender === "male") newTotalBoys += 1;
-		if (gender === "female") newTotalGirls += 1;
+		if (gender.toLowerCase() === "male") newTotalBoys += 1;
+		if (gender.toLowerCase() === "female") newTotalGirls += 1;
 	} else {
 		throw new Error("duplicate pupil");
 	}
@@ -66,6 +62,7 @@ function isDuplicatePupil(arr: any[], pupil: any): boolean {
 		return JSON.stringify(item) === JSON.stringify(pupil);
 	});
 }
+
 async function fetchSessionData(table: string) {
 	const conn = await appPool.getConnection();
 

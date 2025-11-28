@@ -69,8 +69,8 @@
 	const customErrorMsg = ref("can't find the requested resource");
 
 	type classDetailsPropStructure = {
-		totalBoys: string;
-		totalGirls: string;
+		totalBoys: number;
+		totalGirls: number;
 		pupils: {
 			firstAndLastName: string;
 			fatherPhone: string;
@@ -79,8 +79,8 @@
 	};
 
 	const classDetailsData = ref<classDetailsPropStructure>({
-		totalBoys: "0",
-		totalGirls: "0",
+		totalBoys: 0,
+		totalGirls: 0,
 		pupils: [],
 	});
 	const classDetailsProps = computed(function () {
@@ -158,8 +158,8 @@
 		try {
 			const data = (await classModel.getClassData(sessionYear, tab)) || [];
 
-			let totalBoys = "";
-			let totalGirls = "";
+			let totalBoys = 0;
+			let totalGirls = 0;
 			const pupilInfo = data.map(function (entry: any) {
 				totalBoys = entry.totalBoys;
 				totalGirls = entry.totalGirls;
@@ -174,7 +174,7 @@
 		} catch (err: any) {
 			customErrorMsg.value = err.message;
 			hasError.value = true;
-			return { pupils: [], totalBoys: "n/a", totalGirls: "n/a" };
+			return { pupils: [], totalBoys: 0, totalGirls: 0 };
 		} finally {
 			isLoaded.value = true;
 		}
@@ -186,8 +186,8 @@
 		const overviewData = await classModel.getSchoolStats(sessionYear);
 
 		return {
-			totalBoys: overviewData?.total_boys.toString() || "0",
-			totalGirls: overviewData?.total_girls.toString() || "0",
+			totalBoys: overviewData?.total_boys || 0,
+			totalGirls: overviewData?.total_girls || 0,
 			pupils: [],
 		};
 	};
