@@ -42,17 +42,17 @@
 				v-else
 				name="fade-slide"
 				mode="out-in">
-				<component
-					:is="currentTab"
-					v-bind="classDetailsProps" />
+				<ClassDetails
+					:total-boys="classDetailsData.totalBoys"
+					:total-girls="classDetailsData.totalGirls"
+					:pupils="classDetailsData.pupils" />
 			</transition>
 		</main>
 	</div>
 </template>
 
 <script setup lang="ts">
-	import { ref, computed, watch } from "vue";
-	import AllSummary from "./summary/allSummary.vue";
+	import { ref, watch } from "vue";
 	import ClassDetails from "./classDetails.vue";
 	import AnchorLink from "@utils/anchorLink.vue";
 	import BrokenLink from "@utils/brokenLink.vue";
@@ -83,14 +83,8 @@
 		totalGirls: 0,
 		pupils: [],
 	});
-	const classDetailsProps = computed(function () {
-		return classDetailsData.value as classDetailsPropStructure;
-	});
 
 	const activeHeader = ref<string>("");
-	const currentTab = computed(function () {
-		return activeHeader.value === "overview" ? AllSummary : ClassDetails;
-	});
 
 	const tabsHeaders = ref<string[]>([]);
 	const store = useSessionStore();

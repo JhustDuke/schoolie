@@ -1,5 +1,5 @@
 export const sessionModel = (function () {
-	const baseurl = "http://localhost:3333";
+	const baseurl = import.meta.env.VITE_API_BASE_URL;
 
 	const loadSessionYears = async function (): Promise<string[] | null> {
 		try {

@@ -1,13 +1,13 @@
-import { ServerRoute, Request, ResponseToolkit } from "@hapi/hapi";
+import { ServerRoute } from "@hapi/hapi";
+import path from "path";
 
-export const baseRoute: ServerRoute =
-	// base route
-	{
-		method: "GET",
-		path: "/",
-		handler: function (request: Request, res: ResponseToolkit) {
-			return res
-				.response("Hello from Hapi + TypeScript! and getRoutes")
-				.code(200);
+export const baseRoute: ServerRoute = {
+	method: "GET",
+	path: "/{param*}",
+	handler: {
+		directory: {
+			path: path.join(process.cwd(), "dist"),
+			index: ["index.html"],
 		},
-	};
+	},
+};

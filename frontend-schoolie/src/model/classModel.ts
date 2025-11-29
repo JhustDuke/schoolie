@@ -1,13 +1,6 @@
 export const classModel = (function () {
-	const baseUrl = "http://localhost:3333";
+	const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
-	// --------------------------
-	// REAL ENDPOINTS
-	// --------------------------
-
-	/**
-	 * Gets overall school stats for the selected session year
-	 */
 	const getSchoolStats = async function (sessionYear: string): Promise<{
 		total_boys: number;
 		total_girls: number;

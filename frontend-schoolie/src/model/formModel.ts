@@ -1,5 +1,5 @@
 export const formModel = (function () {
-	const API_BASE_URL = "http://localhost:3333";
+	const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 	/**
 	 * Sends form data to the specified endpoint using POST.

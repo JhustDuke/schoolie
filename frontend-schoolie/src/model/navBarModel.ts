@@ -1,6 +1,5 @@
 export const navBarModel = (function () {
-	const baseDeleteUrl = "http://localhost:3333/deleteSession";
-	const searchUrl = "http://localhost:3333/search?";
+	const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 	// Build query string from an object
 	const buildQuery = function (obj: Record<string, string>) {
@@ -14,12 +13,11 @@ export const navBarModel = (function () {
 	// --- SEARCH MODEL ---
 	const searchModel = async function (params: Record<string, string>) {
 		try {
-			const fullUrl = searchUrl + buildQuery(params);
+			const fullUrl = `${baseUrl}search?${buildQuery(params)}`;
 			const res = await fetch(fullUrl);
 			const data = await res.json();
 
 			if (!res.ok) {
-				// Show backend-provided response message
 				throw new Error(
 					data.response || `Request failed with status ${res.status}`
 				);
@@ -32,13 +30,12 @@ export const navBarModel = (function () {
 		}
 	};
 
-	// --- DELETE SINGLE SESSION (REAL) ---
+	// --- DELETE SINGLE SESSION ---
 	const deleteSession = async function (sessionYear: string): Promise<any> {
 		try {
 			if (!sessionYear) throw new Error("No sessionYear provided");
 
-			// Construct URL with path param
-			const fullUrl = `${baseDeleteUrl}/${encodeURIComponent(sessionYear)}`;
+			const fullUrl = `${baseUrl}delete/${encodeURIComponent(sessionYear)}`;
 			const response = await fetch(fullUrl, { method: "DELETE" });
 
 			if (!response.ok) {
@@ -57,7 +54,6 @@ export const navBarModel = (function () {
 
 	return {
 		searchModel,
-
 		deleteSession,
 	};
 })();

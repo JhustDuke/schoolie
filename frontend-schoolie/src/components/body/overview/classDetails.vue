@@ -49,7 +49,7 @@
 
 			<div
 				v-if="pupils.length > 0"
-				class="d-flex flex-column flex-md-row flex-md-wrap justify-content-evenly">
+				class="d-flex flex-column justify-content-evenly justify-content-md-start flex-md-row flex-md-wrap">
 				<StudentCard
 					class="mx-2"
 					v-for="(pupil, index) in pupils"
