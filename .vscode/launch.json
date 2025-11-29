@@ -1,0 +1,17 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Debug Hapi.js Backend",
+
+			"runtimeExecutable": "ts-node",
+			"runtimeArgs": ["-r", "ts-node/register"],
+			"args": ["${workspaceFolder}/backend-schoolie/src/server.ts"],
+			"cwd": "${workspaceFolder}/backend-schoolie",
+			"skipFiles": ["<node_internals>/**", "node_modules/**"],
+			"outFiles": ["${workspaceFolder}/backend-schoolie/**/*.js"]
+		}
+	]
+}
