@@ -13,7 +13,8 @@ export const navBarModel = (function () {
 	// --- SEARCH MODEL ---
 	const searchModel = async function (params: Record<string, string>) {
 		try {
-			const fullUrl = `${baseUrl}search?${buildQuery(params)}`;
+			const fullUrl = `${baseUrl}/search?${buildQuery(params)}`;
+			console.log(fullUrl);
 			const res = await fetch(fullUrl);
 			const data = await res.json();
 

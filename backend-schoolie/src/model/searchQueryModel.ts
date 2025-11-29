@@ -11,29 +11,43 @@ export const searchQueryModel = async function (
 	queryObj: queryInterface,
 	pool = appPool
 ) {
-	const HighPriorityKeys = ["classname", "gender", "sessionyear"];
+	// --- helper to normalize pupils ---
+	const formatPupils = function (allPupils: any[]) {
+		return allPupils.map(function (p) {
+			const rawPassport: string = p.passport || "";
 
+			const cleanedPassport: string = rawPassport
+				.replace(/\\/g, "/")
+				.replace("src/uploads/", "uploads/");
+
+			return {
+				firstname: p.firstnameInput || p.firstname || null,
+				surname: p.surnameInput || p.surname || null,
+				dob: p.dobInput || null,
+				fatherContact: p.fatherPhoneInput || p.fatherPhone || null,
+				passport: cleanedPassport || null,
+			};
+		});
+	};
+
+	// --- Parse query for high/other keys ---
+	const HighPriorityKeys = ["classname", "gender", "sessionyear"];
 	const queryParser = function () {
 		const queryStringKeys = Object.keys(queryObj);
 		const highKeys: string[] = [];
 		const otherKeys: string[] = [];
 
 		for (let key of queryStringKeys) {
-			const lowerCasedKey = key.toLowerCase();
-			if (HighPriorityKeys.includes(lowerCasedKey)) {
+			if (HighPriorityKeys.includes(key.toLowerCase())) {
 				highKeys.push(key);
 			} else {
 				otherKeys.push(key);
 			}
 		}
-
-		return {
-			highKeys,
-			otherKeys,
-		};
+		return { highKeys, otherKeys };
 	};
 
-	// Fetch and parse classes safely
+	// --- Fetch parsed classes safely ---
 	const fetchParsedClassesFromDB = async function (
 		tableName: string
 	): Promise<{ [key: string]: Record<string, any> }> {
@@ -41,118 +55,30 @@ export const searchQueryModel = async function (
 		try {
 			const safeTable = sanitizeTableName(tableName);
 			const query = `SELECT classes FROM \`${safeTable}\``;
-
 			const [rows]: any = await conn.query(query);
-
-			// Return empty object instead of throwing if no classes
 			if (!rows.length || !rows[0].classes) return {};
-
 			return JSON.parse(rows[0].classes);
 		} finally {
 			conn.release();
 		}
 	};
 
-	// Get all classes across sessions, handling empty tables
-	const getAllSessionsClasses = async function (sessionsArr: any[]): Promise<{
-		allClassNames: Array<Record<string, any>>;
-		emptyClasses: Array<Record<"_empty", boolean>>;
-		tableWithClasses: Array<string>;
-	}> {
+	// --- Get all classes across sessions ---
+	const getAllSessionsClasses = async function (sessionsArr: any[]) {
 		const allClassNames: Array<Record<string, any>> = [];
-		const emptyClasses: Array<Record<"_empty", boolean>> = [];
 		const tableWithClasses: string[] = [];
 
 		for await (let sessionYear of sessionsArr) {
 			const parsedClassData: any = await fetchParsedClassesFromDB(sessionYear);
-
 			if (Object.keys(parsedClassData).length) {
 				allClassNames.push(parsedClassData);
 				tableWithClasses.push(sessionYear);
-			} else {
-				emptyClasses.push({ _empty: true });
 			}
 		}
-
-		return { allClassNames, emptyClasses, tableWithClasses };
+		return { allClassNames, tableWithClasses };
 	};
 
-	// main function: searches parsed classes by gender
-	const searchParsedClassesByGender = function (
-		classesArr: Record<string, any>[], // array of class entry objects
-		queryObj: Record<string, any>, // query object containing search values
-		searchKeys: string[] // list of property names to check
-	): any[] {
-		// create an empty array to store matched pupils
-		const matchedPupils: any[] = [];
-
-		// loop through each class entry object in the array
-		for (let classEntryObj of classesArr) {
-			// loop through each class key in the current class entry object
-			for (let singleClassKey in classEntryObj) {
-				// get the class object (e.g., containing boys and girls arrays)
-				const singleClass = classEntryObj[singleClassKey];
-				// process the boys array for matches
-				processGenderGroup(
-					singleClass.boys,
-					searchKeys,
-					queryObj,
-					matchedPupils
-				);
-				// process the girls array for matches
-				processGenderGroup(
-					singleClass.girls,
-					searchKeys,
-					queryObj,
-					matchedPupils
-				);
-			}
-		}
-
-		// if no pupils were matched, throw an error
-		if (!matchedPupils.length) throw new Error("no pupil found");
-
-		// return the matched pupils array
-		// return the matched pupils array but only selected fields
-		return matchedPupils.map(function (pupil: any) {
-			return {
-				firstname: pupil.firstname,
-				surname: pupil.surname,
-				classSelect: pupil.classSelect,
-				passport: pupil.passport,
-			};
-		});
-	};
-
-	const recurseClassSearch = async function (
-		queryObj: any, // the object containing search filters
-		searchKeys: string[] // keys to check in pupil objects for matching
-	) {
-		try {
-			// retrieve all session years from the database
-			const allSessionYears = await getAllSessionModel();
-
-			// retrieve all classes for the retrieved session years you can retrieve empty class too for debegging purposes
-			const { allClassNames } = await getAllSessionsClasses(allSessionYears);
-
-			// search parsed classes by gender using provided query and search keys
-			const result = searchParsedClassesByGender(
-				allClassNames,
-				queryObj,
-				searchKeys
-			);
-
-			// return the search result
-			return result;
-		} catch (err: any) {
-			// if any error occurs, throw it as a new Error with its message
-			throw new Error(err.message);
-		}
-	};
-
-	/**
-	 * Parses and validates classes from DB result
-	 */
+	// --- Extract gender-specific data from a class ---
 	const extractClassData = async function (
 		tableName: string,
 		className: string | null,
@@ -162,32 +88,19 @@ export const searchQueryModel = async function (
 		genderData: any[];
 		classOverview?: any;
 	}> {
-		// Expect: Retrieve parsed class data from DB based on tableName
 		const parsed = await fetchParsedClassesFromDB(tableName);
-
-		// Expect: Fail immediately if DB query returned null/undefined
-		if (!parsed) {
-			throw new Error("invalid SQL result...");
-		}
-
-		// Expect: Fail if parsed object exists but contains no class keys
-		if (Object.keys(parsed).length === 0) {
-			console.warn(tableName, "is empty");
-		}
+		if (!parsed) throw new Error("invalid SQL result");
 		const result: any = {};
 
-		// Expect: If a className exists in parsed, set class content and gender-specific data
 		if (className && parsed[className]) {
 			result.allClasses = parsed;
 			result.classOverview = parsed[className];
 			result.genderData = parsed[className][gender] || [];
 		}
-
-		// Expect: Return fully prepared result object with requested data
 		return result;
 	};
 
-	//exec all data search
+	// --- Various search strategy functions ---
 	const execAllCriteriaGivenSearch = async function ({
 		tableName,
 		className,
@@ -201,21 +114,14 @@ export const searchQueryModel = async function (
 		queryObj: Record<string, any>;
 		searchTerms: string[];
 	}) {
-		const { genderData } = await extractClassData(
-			tableName as string,
-			className as string,
-			gender
-		);
+		const { genderData } = await extractClassData(tableName, className, gender);
 		const filteredResult = filterPupilsBySearchTerms(
 			genderData,
 			queryObj,
 			searchTerms
 		);
-		if (filteredResult.length) {
-			return filteredResult;
-		} else {
-			throw new Error("no match found");
-		}
+		if (filteredResult.length) return filteredResult;
+		throw new Error("no match found");
 	};
 
 	const execAllButSessionYearGivenSearch = async function ({
@@ -229,35 +135,24 @@ export const searchQueryModel = async function (
 		queryObj: Record<string, any>;
 		searchTerms: string[];
 	}) {
-		//get all session years,
 		const allSessions: string[] = await getAllSessionModel();
-
-		//this gets destructured table thats is not null
 		const { tableWithClasses } = await getAllSessionsClasses(allSessions);
-
 		const result: any[] = [];
 
 		for (let tableName of tableWithClasses) {
-			//go into all sessionyear based on the supplied classes and extract the needed gender
 			const { genderData } = await extractClassData(
 				tableName,
 				className,
 				gender
 			);
-
-			//search by that gender
 			const filtered = filterPupilsBySearchTerms(
 				genderData,
 				queryObj,
 				searchTerms
 			);
-			if (Array.isArray(filtered) && filtered.length) {
-				result.push(...filtered);
-			}
+			if (filtered.length) result.push(...filtered);
 		}
-		if (!result.length) {
-			throw new Error("no match found");
-		}
+		if (!result.length) throw new Error("no match found");
 		return result;
 	};
 
@@ -272,25 +167,17 @@ export const searchQueryModel = async function (
 		queryObj: Record<string, any>;
 		searchTerms: string[];
 	}) {
-		// get all session years
 		const allSessions: string[] = await getAllSessionModel();
-
-		// get only the sessions with classes
 		const { tableWithClasses } = await getAllSessionsClasses(allSessions);
-
 		const result: any[] = [];
 
 		for (let tableName of tableWithClasses) {
-			// extract class data for the given className in each table
 			const { classOverview } = await extractClassData(
 				tableName,
 				className,
 				gender
 			);
-
 			if (!classOverview) continue;
-
-			// check both genders explicitly
 			const boys = classOverview.boys || [];
 			const girls = classOverview.girls || [];
 
@@ -308,9 +195,7 @@ export const searchQueryModel = async function (
 			if (filteredBoys.length) result.push(...filteredBoys);
 			if (filteredGirls.length) result.push(...filteredGirls);
 		}
-
 		if (!result.length) throw new Error("no match found across sessions");
-
 		return result;
 	};
 
@@ -323,107 +208,116 @@ export const searchQueryModel = async function (
 		queryObj: Record<string, any>;
 		searchTerms: string[];
 	}) {
-		// get all session years
 		const allSessions: string[] = await getAllSessionModel();
-
-		// get only the sessions with classes
 		const { allClassNames } = await getAllSessionsClasses(allSessions);
-
 		const result: any[] = [];
 
-		// search across every parsed class object
 		for (let classEntryObj of allClassNames) {
 			for (let singleClassKey in classEntryObj) {
 				const singleClass = classEntryObj[singleClassKey];
-
-				// grab gender array (boys or girls depending on supplied gender)
 				const genderArr = singleClass[gender] || [];
-
-				// filter that array using provided search terms
 				const filtered = filterPupilsBySearchTerms(
 					genderArr,
 					queryObj,
 					searchTerms
 				);
-
-				if (filtered.length) {
-					result.push(...filtered);
-				}
+				if (filtered.length) result.push(...filtered);
 			}
 		}
-
 		if (!result.length) throw new Error("no match found across sessions");
-
 		return result;
 	};
 
-	// main function: executes a class data search based on provided query parameters
+	const recurseClassSearch = async function (
+		queryObj: any,
+		searchKeys: string[]
+	) {
+		const allSessionYears = await getAllSessionModel();
+		const { allClassNames } = await getAllSessionsClasses(allSessionYears);
+		return searchParsedClassesByGender(allClassNames, queryObj, searchKeys);
+	};
+
+	const searchParsedClassesByGender = function (
+		classesArr: Record<string, any>[],
+		queryObj: Record<string, any>,
+		searchKeys: string[]
+	) {
+		const matchedPupils: any[] = [];
+		for (let classEntryObj of classesArr) {
+			for (let singleClassKey in classEntryObj) {
+				const singleClass = classEntryObj[singleClassKey];
+				processGenderGroup(
+					singleClass.boys,
+					searchKeys,
+					queryObj,
+					matchedPupils
+				);
+				processGenderGroup(
+					singleClass.girls,
+					searchKeys,
+					queryObj,
+					matchedPupils
+				);
+			}
+		}
+		if (!matchedPupils.length) throw new Error("no pupil found");
+		return matchedPupils;
+	};
+
+	// --- Execute the proper strategy ---
 	const execSearchStrategy = async function () {
-		// destructure parsed query into search terms (non-critical keys) and main filter (critical keys)
 		const { otherKeys: searchTerms, highKeys: mainFilter } = queryParser();
-		// sanitize session year to make a safe table name if provided
 		const tableName = queryObj.sessionyear
 			? sanitizeTableName(queryObj.sessionyear)
 			: null;
-
-		// get the classname from the query object
 		const className = queryObj.classname;
-
-		// determine gender key to use ("boys" or "girls") based on query gender
 		const gender =
 			queryObj.gender === "male".toLowerCase().trim() ? "boys" : "girls";
 
-		// if both search terms and main filter are empty, stop and throw an error
 		if (!searchTerms.length && !mainFilter.length)
 			throw new Error("no value provided");
 
-		// if no main filter exists, perform a recursive search across all classes/sessions
-		if (!mainFilter.length) {
-			console.log("recurse search ran");
-			return await recurseClassSearch(queryObj, searchTerms);
-		}
+		let rawResult: any[] = [];
 
-		//first all criteria is given i.e tablename(sessionYear),classname,gender(gender has a default value so its always given) and searchterm
-		if (allCriteriaGiven(queryObj, searchTerms)) {
-			console.log("execAllCriteriaGivenSearch ran");
-			return await execAllCriteriaGivenSearch({
+		if (!mainFilter.length)
+			rawResult = await recurseClassSearch(queryObj, searchTerms);
+		else if (allCriteriaGiven(queryObj, searchTerms))
+			rawResult = await execAllCriteriaGivenSearch({
 				tableName: tableName as string,
 				className: className as string,
 				gender,
 				queryObj,
 				searchTerms,
 			});
-		}
+		else if (allButSessionYearGiven(queryObj, searchTerms))
+			rawResult = await execAllButSessionYearGivenSearch({
+				className: className as string,
+				gender,
+				queryObj,
+				searchTerms,
+			});
+		else if (onlyClassNameGiven(queryObj, searchTerms))
+			rawResult = await execOnlyClassNameGivenSearch({
+				className: className as string,
+				gender,
+				queryObj,
+				searchTerms,
+			});
+		else if (onlyGenderGiven(queryObj, searchTerms))
+			rawResult = await execOnlyGenderGivenSearch({
+				gender,
+				queryObj,
+				searchTerms,
+			});
 
-		//criteria 2: sessionYear(tableName) is NOT given
-		if (allButSessionYearGiven(queryObj, searchTerms)) {
-			console.log("allButSessionYearGiven ran");
-			return await execAllButSessionYearGivenSearch({
-				className: className as string,
-				gender,
-				queryObj,
-				searchTerms,
-			});
-		}
-		//criteria 3:only classname and gender(has default value) and searchterms
-		if (onlyClassNameGiven(queryObj, searchTerms)) {
-			console.log("onlyClassNameGiven ran");
-			return await execOnlyClassNameGivenSearch({
-				className: className as string,
-				gender,
-				queryObj,
-				searchTerms,
-			});
-		}
-		//criteria 4:only gender is given
-		if (onlyGenderGiven(queryObj, searchTerms)) {
-			console.log("onlyGenderGiven ran");
-			return await execOnlyGenderGivenSearch({ gender, queryObj, searchTerms });
-		}
+		// --- always format pupils consistently ---
+		return formatPupils(rawResult);
 	};
+
 	return await execSearchStrategy();
 };
 
+// --- helper functions to determine which criteria exist ---
 function allCriteriaGiven(queryObj: queryInterface, searchTerms: string[]) {
 	return Boolean(
 		queryObj.sessionyear &&
@@ -446,7 +340,6 @@ function allButSessionYearGiven(
 function onlyClassNameGiven(queryObj: queryInterface, searchTerms: string[]) {
 	return Boolean(queryObj.classname && searchTerms.length > 0);
 }
-
 function onlyGenderGiven(queryObj: queryInterface, searchTerms: string[]) {
 	return Boolean(queryObj.gender && searchTerms.length > 0);
 }

@@ -41,7 +41,7 @@
 					v-for="(student, index) in results"
 					:key="index"
 					:name="student.firstname + ' ' + student.surname"
-					:className="student.classSelect"
+					:passport="student.passport"
 					:parentPhone="student.parentPhone || 'n/a'" />
 			</div>
 		</div>
