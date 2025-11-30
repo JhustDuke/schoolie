@@ -1,6 +1,6 @@
-@import "../../node_modules/font-awesome/css/font-awesome.min.css";
-@import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
-@import "../../node_modules/materializecss-colors-alone/colors.css";
+@import "../node_modules/font-awesome/css/font-awesome.min.css";
+@import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+@import "../node_modules/materializecss-colors-alone/colors.css";
 
 .hover:hover {
 	background-color: rgb(204, 145, 146);
