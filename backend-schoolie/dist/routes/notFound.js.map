@@ -1,1 +1,0 @@
-{"version":3,"file":"notFound.js","sourceRoot":"","sources":["../../src/routes/notFound.ts"],"names":[],"mappings":";;;AAEa,QAAA,cAAc,GAAkB;IAC5C;QACC,MAAM,EAAE,GAAG;QACX,IAAI,EAAE,SAAS;QACf,OAAO,EAAE,UAAU,OAAgB,EAAE,GAAoB;YACxD,OAAO,GAAG;iBACR,QAAQ,CAAC;gBACT,OAAO,EAAE,SAAS,OAAO,CAAC,IAAI,cAAc;aAC5C,CAAC;iBACD,IAAI,CAAC,GAAG,CAAC,CAAC;QACb,CAAC;KACD;CACD,CAAC"}

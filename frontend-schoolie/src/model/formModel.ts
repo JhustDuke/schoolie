@@ -15,16 +15,16 @@ export const formModel = (function () {
 				body: formData, // don't set Content-Type manually
 			});
 
+			const data = await response.json();
 			if (!response.ok) {
-				console.log("res:", response);
-				const errText = await response.text();
-				throw new Error(errText || response.statusText);
+				console.log("err.message:", data.message);
+				throw new Error(data.message || response.statusText);
 			}
 
-			return await response.json();
+			return data;
 		} catch (err: any) {
 			//console.log("err", err);
-			throw err || "failed";
+			throw err || "failed to register pupil";
 		}
 	};
 

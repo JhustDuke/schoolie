@@ -1,1 +1,0 @@
-{"version":3,"file":"sanitizeTableYear.js","sourceRoot":"","sources":["../../src/utils/sanitizeTableYear.ts"],"names":[],"mappings":";;AAGA,8CAEC;AALD;;GAEG;AACH,SAAgB,iBAAiB,CAAC,IAAY;IAC7C,OAAO,IAAI,CAAC,OAAO,CAAC,gBAAgB,EAAE,GAAG,CAAC,CAAC;AAC5C,CAAC"}

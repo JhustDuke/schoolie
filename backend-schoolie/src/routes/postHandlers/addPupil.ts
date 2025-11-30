@@ -92,7 +92,11 @@ export const addPupil: ServerRoute = {
 				.response({ result, message: "upload was succesful" })
 				.code(200);
 		} catch (error: any) {
-			return res.response(error.message).code(500);
+			return res
+				.response({
+					message: error.message || " failed to register in the backend",
+				})
+				.code(500);
 		}
 	},
 };
